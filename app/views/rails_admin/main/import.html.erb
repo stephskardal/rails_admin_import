@@ -1,0 +1,95 @@
+<% if false -%>
+<% if @response.has_key?(:error) -%>
+<div class="alert-message error">
+<%= @response[:error] %>
+</div>
+<% end -%>
+<% if @response.has_key?(:notice) -%>
+<div class="alert-message notice">
+<%= @response[:notice] %>
+</div>
+<% end -%>
+<% end -%>
+
+<h1>Import <%= @abstract_model.to_param.titleize %></h1>
+
+<small>The following fields must be included in the import file</small>
+<table width="100%" cellpadding="0" cellspacing="0">
+<tr>
+<td width="20%">
+<h3>Standard Fields</h3>
+<ul>
+<% @abstract_model.model::IMPORT_FIELDS.each do |field| -%>
+<li><%= field %></li>
+<% end -%>
+</ul>
+</td>
+
+<% if @abstract_model.model::BELONGS_TO_FIELDS.any? -%>
+<td width="20%">
+<h3>Belongs To Fields</h3>
+<ul>
+<% @abstract_model.model::BELONGS_TO_FIELDS.each do |field| -%>
+<li><%= field %></li>
+<% end -%>
+</ul>
+<small>These fields map to other items in the database, lookup through title.</small>
+</td>
+<% end -%>
+
+<% if @abstract_model.model::FILE_FIELDS.any? -%>
+<td width="20%">
+<h3>File Fields</h3>
+<ul>
+<% @abstract_model.model::FILE_FIELDS.each do |field| -%>
+<li><%= field %></li>
+<% end -%>
+</ul>
+<small>These must be a downloadable URL.</small>
+</td>
+<% end -%>
+
+<% if @abstract_model.model::MANY_TO_MANY_FIELDS.any? -%>
+<td width="20%">
+<h3>Multiple Fields</h3>
+<ul>
+<% @abstract_model.model::MANY_TO_MANY_FIELDS.each do |field| -%>
+<li><%= field %></li>
+<% end -%>
+</ul>
+<small>These fields map to other columns in the database, lookup through title. There may be multiple columns with this header in the spreadsheet.</small>
+</td>
+<% end -%>
+
+<% if @abstract_model.model.reflections.include?(:product_types) -%>
+<td>
+<h3>Variant Fields</h3>
+<ul>
+<% Import::VARIANT_IMPORT_FIELDS.each do |field| -%>
+<li><%= field %></li>
+<% end -%>
+</ul>
+<h3>Downloadable Variant Fields</h3>
+<ul>
+<li>downloadable (must be URL)</li>
+<% Import::DOWNLOAD_VARIANT_IMPORT_FIELDS.each do |field| -%>
+<li><%= field %></li>
+<% end -%>
+</ul>
+</td>
+<% end -%>
+	</tr>
+</table>
+
+<%= form_tag rails_admin_import.import_url(@abstract_model.to_param), :multipart => true do |f| -%>
+  <%= file_field_tag :file %>
+  <% [@abstract_model.model::BELONGS_TO_FIELDS, @abstract_model.model::MANY_TO_MANY_FIELDS].flatten.each do |field| -%>
+  <label style="width:200px;"><%= field %> mapping</label>&nbsp;&nbsp;
+  <select name="<%= field %>">
+    <% field.to_s.classify.constantize.new.attributes.keys.each do |key| -%>
+  	<option value="<%= key %>"><%= key %></option>
+	<% end -%>
+  <select><br /><br />
+  <% end -%>
+  <%= submit_tag "Upload", :disable_with => "Uploading..." %>
+<% end -%>
