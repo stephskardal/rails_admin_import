@@ -1,41 +1,26 @@
-Piggybak Gem (Engine)
+Rails Admin Import functionality
 ========
 
-Modular / mountable ecommerce gem. Features:
-
-* Configurable tax methods, shipping methods, payment methods
-
-* One page checkout, with AJAX for shipping and tax calculations
-
-* Order processing completed in transaction, minimizing orphan data created 
-
-* Fully defined backend RailsAdmin interface for adding orders on the backend
+Plugin functionality to add generic import to Rails Admin interface
 
 Installation
 ========
 
 * First, add to Gemfile:
     
-        gem "piggybak", :git => "git://github.com/stephskardal/demo.git"
-
-* Next, run rake task to copy migrations:
-
-        rake piggybak_engine:install:migrations
-
-* Next, run rake task to run migrations:
-
-        rake db:migrate
+        gem "rails_admin_import", :git => "git://github.com/stephskardal/demo.git"
 
 * Next, mount in your application by adding:
 
-        mount Piggybak::Engine => '/checkout', :as => 'piggybak'" to config/routes
+        mount RailsAdminImport::Engine => '/rails_admin_import', :as => 'rails_admin_import'" to config/routes
 
-More Details
-========
+* Add to models that will be importable:
 
-Visit the project website [here][project-website] to see more documentation and view a demo.
+        ****
 
-[project-website]: http://www.piggybak.org/
+* Add to cancan to allow access to import:
+
+        ****
 
 Copyright
 ========
