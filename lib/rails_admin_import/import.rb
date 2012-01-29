@@ -4,67 +4,46 @@ module RailsAdminImport
   module Import
     extend ActiveSupport::Concern
   
-    included do
-      self::FILE_FIELDS = self.set_file_fields
-  
-      self::MANY_TO_MANY_FIELDS = self.set_has_and_belongs_to_many
-  
-      self::BELONGS_TO_FIELDS = self.set_belongs_to
-  
-      self::AUTO_EXCLUDED = [:id, :created_at, :updated_at]
-      if !self.const_defined?(:EXCLUDED_FIELDS)
-        self::EXCLUDED_FIELDS = []
-      end
-  
-      self::IMPORT_FIELDS = self.set_import_fields
-    end
-  
     module ClassMethods
-      def set_file_fields
-        fields = []
-  
-        self.attachment_definitions.each do |k, v|
-          fields << k
+      def file_fields
+        if self.methods.include?(:attachment_definitions) && !self.attachment_definitions.nil?
+          return self.attachment_definitions.keys
         end
-  
-        fields
+        [] 
       end
   
-      def set_import_fields
+      def import_fields
         fields = []  
-        self.new.attributes.keys.each do |key|
-          fields << key.to_sym
-        end
+
+        fields = self.new.attributes.keys.collect { |key| key.to_sym }
   
-        self::BELONGS_TO_FIELDS.each do |key|
+        self.belongs_to_fields.each do |key|
           fields.delete("#{key}_id".to_sym)
         end
   
-        self::FILE_FIELDS.each do |key|
+        self.file_fields.each do |key|
           fields.delete("#{key}_file_name".to_sym)
           fields.delete("#{key}_content_type".to_sym)
           fields.delete("#{key}_file_size".to_sym)
           fields.delete("#{key}_updated_at".to_sym)
         end
   
-        [self::AUTO_EXCLUDED, self::EXCLUDED_FIELDS].flatten.each do |key|
+        [:id, :created_at, :updated_at, self.excluded_fields].flatten.each do |key|
           fields.delete(key)
         end
   
         fields
       end
-  
-      def set_belongs_to
-        attrs = []
-        self.reflections.each do |k, v|
-          if v.macro == :belongs_to
-            attrs << k 
-          end
-        end
-        attrs
+ 
+      def excluded_fields
+        []
       end
   
-      def set_has_and_belongs_to_many
+      def belongs_to_fields
+        self.reflections.select { |k, v| v.macro == :belongs_to }.keys
+      end
+  
+      def many_to_many_fields
         attrs = []
         self.reflections.each do |k, v|
           if v.macro == :has_and_belongs_to_many
@@ -83,7 +62,7 @@ module RailsAdminImport
         map = {}
   
         file.readline.each_with_index do |key, i|
-          if self::MANY_TO_MANY_FIELDS.include?(key.to_sym)
+          if self.many_to_many_fields.include?(key.to_sym)
             map[key.to_sym] ||= []
             map[key.to_sym] << i
           else
@@ -94,10 +73,10 @@ module RailsAdminImport
         results = { :success => [], :error => [] }
   
         associated_map = {}
-        self::BELONGS_TO_FIELDS.flatten.each do |field|
+        self.belongs_to_fields.flatten.each do |field|
           associated_map[field] = field.to_s.classify.constantize.all.inject({}) { |hash, c| hash[c.send(params[field])] = c.id; hash }
         end
-        self::MANY_TO_MANY_FIELDS.flatten.each do |field|
+        self.many_to_many_fields.flatten.each do |field|
           associated_map[field] = field.to_s.classify.constantize.all.inject({}) { |hash, c| hash[c.send(params[field])] = c; hash }
         end
   
@@ -106,6 +85,8 @@ module RailsAdminImport
           object.import_files(row, map)
           object.import_belongs_to_data(associated_map, row, map)
           object.import_many_to_many_data(associated_map, row, map)
+
+          object.before_import_save(row, map)
    
           if object.save
             results[:success] << "Created: #{object.import_display}"
@@ -119,7 +100,7 @@ module RailsAdminImport
   
       def import_new(row, map)
         new_attrs = {}
-        self::IMPORT_FIELDS.each do |key|
+        self.import_fields.each do |key|
           new_attrs[key] = row[map[key]] if map[key]
         end
         self.new(new_attrs)
@@ -127,8 +108,16 @@ module RailsAdminImport
     end
    
     module InstanceMethods
+      def before_import_save(*args)
+        # Meant to be overridden to do special actions 
+      end
+
+      def import_display
+        self.id
+      end
+
       def import_files(row, map)
-        self.class::FILE_FIELDS.each do |key|
+        self.class.file_fields.each do |key|
           if map[key] && !row[map[key]].nil?
             format = row[map[key]].match(/[a-z0-9]+$/)
             open("#{Rails.root}/tmp/uploads/#{self.permalink}.#{format}", 'wb') { |file| file << open(row[map[key]]).read }
@@ -138,7 +127,7 @@ module RailsAdminImport
       end
 
       def import_belongs_to_data(associated_map, row, map)
-        self.class::BELONGS_TO_FIELDS.each do |key|
+        self.class.belongs_to_fields.each do |key|
           if map.has_key?(key) && row[map[key]] != ""
             self.send("#{key}_id=", associated_map[key][row[map[key]]])
           end
@@ -146,7 +135,7 @@ module RailsAdminImport
       end
   
       def import_many_to_many_data(associated_map, row, map)
-        self.class::MANY_TO_MANY_FIELDS.each do |key|
+        self.class.many_to_many_fields.each do |key|
           values = []
   
           map[key] ||= []
@@ -161,6 +150,10 @@ module RailsAdminImport
           end
         end
       end
-    end 
+    end
   end
+end
+
+class ActiveRecord::Base
+  include RailsAdminImport::Import
 end
