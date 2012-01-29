@@ -11,11 +11,18 @@ Gem::Specification.new do |s|
   s.authors = ["Steph Skardal"]
   s.date = %q{2012-01-27}
   s.email = %q{steph@endpoint.com}
-  s.extra_rdoc_files = [
-    "README.rdoc"
-  ]
+  s.extra_rdoc_files = []
   s.files = [
-    "app/controllers/rails_admin_import/widgets_controller.rb"
+    "app/controllers/rails_admin_import/base_controller.rb",
+    "app/views/rails_admin/main/import.html.erb",
+    "config/locales/rails_admin_import.en.yml",
+    "config/routes.rb",
+    "lib/engine.rb",
+    "lib/rails_admin_import/import.rb",
+    "lib/rails_admin_import.rb",
+    "Rakefile",
+    "README.md",
+    "VERSION"
   ]
   s.rdoc_options = ["--charset=UTF-8"]
   s.require_paths = ["lib"]
