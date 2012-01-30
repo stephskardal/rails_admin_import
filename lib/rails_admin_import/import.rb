@@ -27,18 +27,15 @@ module RailsAdminImport
           fields.delete("#{key}_file_size".to_sym)
           fields.delete("#{key}_updated_at".to_sym)
         end
-  
-        [:id, :created_at, :updated_at, self.excluded_fields].flatten.each do |key|
+ 
+        excluded_fields = RailsAdminImport.config(self).excluded_fields 
+        [:id, :created_at, :updated_at, excluded_fields].flatten.each do |key|
           fields.delete(key)
         end
   
         fields
       end
  
-      def excluded_fields
-        []
-      end
-  
       def belongs_to_fields
         self.reflections.select { |k, v| v.macro == :belongs_to }.keys
       end
@@ -79,7 +76,9 @@ module RailsAdminImport
         self.many_to_many_fields.flatten.each do |field|
           associated_map[field] = field.to_s.classify.constantize.all.inject({}) { |hash, c| hash[c.send(params[field])] = c; hash }
         end
-  
+ 
+        label_method = RailsAdminImport.config(self).label
+ 
         file.each do |row|
           object = self.import_new(row, map)
           object.import_files(row, map)
@@ -89,9 +88,9 @@ module RailsAdminImport
           object.before_import_save(row, map)
    
           if object.save
-            results[:success] << "Created: #{object.import_display}"
+            results[:success] << "Created: #{object.send(label_method)}"
           else
-            results[:error] << "Failed to create: #{object.import_display}. Errors: #{object.errors.full_messages.join(', ')}."
+            results[:error] << "Failed to create: #{object.send(label_method)}. Errors: #{object.errors.full_messages.join(', ')}."
           end
         end
   
