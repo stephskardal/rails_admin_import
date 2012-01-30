@@ -61,6 +61,19 @@
 </td>
 <% end -%>
 
+<% if RailsAdminImport.config(@abstract_model.model).extra_fields.any? -%>
+<td width="20%">
+<h3>Extra Fields</h3>
+<ul>
+<% RailsAdminImport.config(@abstract_model.model).extra_fields.each do |field| -%>
+<li><%= field %></li>
+<% end -%>
+</ul>
+<small>Additional application specific fields.</small>
+</td>
+<% end -%>
+
+
 	</tr>
 </table>
 
