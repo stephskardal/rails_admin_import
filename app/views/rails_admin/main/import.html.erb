@@ -77,7 +77,7 @@
 	</tr>
 </table>
 
-<%= form_tag rails_admin_import.import_url(@abstract_model.to_param), :multipart => true do |f| -%>
+<%= form_tag rails_admin.import_url(@abstract_model.to_param), :multipart => true do |f| -%>
   <%= file_field_tag :file %>
   <% [@abstract_model.model.belongs_to_fields, @abstract_model.model.many_to_many_fields].flatten.each do |field| -%>
   <label style="width:200px;"><%= field %> mapping</label>&nbsp;&nbsp;

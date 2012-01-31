@@ -1,0 +1,11 @@
+
+en:
+  admin:
+    actions:
+      import:
+        title: "Import"
+        menu: "Import"
+        breadcrumb: "Import"
+        link: "Import"
+        bulk_link: "Import"
+        done: "Imported"

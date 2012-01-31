@@ -1,40 +1,53 @@
-require 'rails_admin_import/import'
-require 'rails_admin_import/config'
+require "rails_admin_import/engine"
+require "rails_admin_import/import"
+require "rails_admin_import/config"
 
 module RailsAdminImport
   def self.config(entity = nil, &block)
     if entity
-      RailsAdminImport::Config.model(entity, &block)
+    RailsAdminImport::Config.model(entity, &block)
     elsif block_given? && ENV['SKIP_RAILS_ADMIN_INITIALIZER'] != "true"
       block.call(RailsAdminImport::Config)
-    else
-      RailsAdminImport::Config
-    end 
+  else
+    RailsAdminImport::Config
+    end
   end
 
   def self.reset
     RailsAdminImport::Config.reset
   end
+end
 
-  class Engine < Rails::Engine
-=begin
-    config.to_prepare do
-      ActiveRecord::Base.send(:subclasses).each do |model|
-      #  model.class_eval do
-      #    include ::RailsAdminImport::Import
-      #  end 
-      #  model.send :include, ::RailsAdminImport::Import
+require 'rails_admin/config/actions'
+
+module RailsAdmin
+  module Config
+    module Actions
+      class Import < Base
+        RailsAdmin::Config::Actions.register(self)
+        
+        register_instance_option :collection do
+          true
+        end
+
+        register_instance_option :http_methods do
+          [:get, :post]
+        end
+
+        register_instance_option :controller do
+          Proc.new do
+            @response = {}
+
+            if request.post?
+              results = @abstract_model.model.run_import(params)
+              @response[:notice] = results[:success].join("<br />").html_safe if results[:success].any?
+              @response[:error] = results[:error].join("<br />").html_safe if results[:error].any?
+            end
+
+            render :action => @action.template_name
+          end
+        end
       end
     end
-
-    initializer "rails_admin_import.rails_admin_config" do |app|
-      #RailsAdmin.config do |config|
-        #config.actions do
-        #  collection :import do
-        #  end
-        #end 
-      #end
-    end
-=end
   end
 end

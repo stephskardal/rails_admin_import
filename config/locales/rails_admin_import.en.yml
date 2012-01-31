@@ -1,6 +1,0 @@
-en:
-  admin:
-    actions:
-      import:
-        menu: "Import"
-        breadcrumb: "Import"
