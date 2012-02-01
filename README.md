@@ -26,7 +26,18 @@ Installation
               [:field1, :field2, :field3]
             end
             label :name
+            extra_fields do
+              [:field3, :field4, :field5]
+            end
           end
+        end
+
+* Define instance methods to be hooked into the import process:
+
+        # some model
+        def before_import_save(row, map)
+          self.set_permalink
+          self.import_nested_data(row, map)
         end
 
 TODO
