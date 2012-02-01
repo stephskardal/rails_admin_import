@@ -86,7 +86,7 @@ module RailsAdminImport
           object.import_many_to_many_data(associated_map, row, map)
 
           object.before_import_save(row, map)
-   
+ 
           if object.save
             results[:success] << "Created: #{object.send(label_method)}"
           else
@@ -118,9 +118,15 @@ module RailsAdminImport
       def import_files(row, map)
         self.class.file_fields.each do |key|
           if map[key] && !row[map[key]].nil?
-            format = row[map[key]].match(/[a-z0-9]+$/)
-            open("#{Rails.root}/tmp/uploads/#{self.permalink}.#{format}", 'wb') { |file| file << open(row[map[key]]).read }
-            self.send("#{key}=", File.open("#{Rails.root}/tmp/uploads/#{self.permalink}.#{format}"))
+            begin
+              # Strip file
+              row[map[key]] = row[map[key]].gsub(/\s+/, "")
+              format = row[map[key]].match(/[a-z0-9]+$/)
+              open("#{Rails.root}/tmp/uploads/#{self.permalink}.#{format}", 'wb') { |file| file << open(row[map[key]]).read }
+              self.send("#{key}=", File.open("#{Rails.root}/tmp/uploads/#{self.permalink}.#{format}"))
+            rescue Exception => e
+              self.errors.add(key, "Import error: #{e.inspect}")
+            end
           end
         end
       end
