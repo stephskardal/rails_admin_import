@@ -86,11 +86,15 @@ module RailsAdminImport
           object.import_many_to_many_data(associated_map, row, map)
 
           object.before_import_save(row, map)
- 
-          if object.save
-            results[:success] << "Created: #{object.send(label_method)}"
+
+          if object.errors.empty?
+            if object.save
+              results[:success] << "Created: #{object.send(label_method)}"
+            else
+              results[:error] << "Failed to create: #{object.send(label_method)}. Errors: #{object.errors.full_messages.join(', ')}."
+            end
           else
-            results[:error] << "Failed to create: #{object.send(label_method)}. Errors: #{object.errors.full_messages.join(', ')}."
+            results[:error] << "Errors before save: #{object.send(label_method)}. Errors: #{object.errors.full_messages.join(', ')}."
           end
         end
   
@@ -125,7 +129,7 @@ module RailsAdminImport
               open("#{Rails.root}/tmp/uploads/#{self.permalink}.#{format}", 'wb') { |file| file << open(row[map[key]]).read }
               self.send("#{key}=", File.open("#{Rails.root}/tmp/uploads/#{self.permalink}.#{format}"))
             rescue Exception => e
-              self.errors.add(key, "Import error: #{e.inspect}")
+              self.errors.add(:base, "Import error: #{e.inspect}")
             end
           end
         end
