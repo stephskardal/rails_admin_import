@@ -16,7 +16,7 @@
 <small>The following fields may be included in the import file</small>
 <table width="100%" cellpadding="0" cellspacing="0">
 <tr>
-<td width="20%">
+<td width="20%" valign="top">
 <h3>Standard Fields</h3>
 <ul>
 <% @abstract_model.model.import_fields.each do |field| -%>
@@ -26,7 +26,7 @@
 </td>
 
 <% if @abstract_model.model.belongs_to_fields.any? -%>
-<td width="20%">
+<td width="20%" valign="top">
 <h3>Belongs To Fields</h3>
 <ul>
 <% @abstract_model.model.belongs_to_fields.each do |field| -%>
@@ -38,7 +38,7 @@
 <% end -%>
 
 <% if @abstract_model.model.file_fields.any? -%>
-<td width="20%">
+<td width="20%" valign="top">
 <h3>File Fields</h3>
 <ul>
 <% @abstract_model.model.file_fields.each do |field| -%>
@@ -50,7 +50,7 @@
 <% end -%>
 
 <% if @abstract_model.model.many_to_many_fields.any? -%>
-<td width="20%">
+<td width="20%" valign="top">
 <h3>Multiple Fields</h3>
 <ul>
 <% @abstract_model.model.many_to_many_fields.each do |field| -%>
@@ -62,7 +62,7 @@
 <% end -%>
 
 <% if RailsAdminImport.config(@abstract_model.model).extra_fields.any? -%>
-<td width="20%">
+<td width="20%" valign="top">
 <h3>Extra Fields</h3>
 <ul>
 <% RailsAdminImport.config(@abstract_model.model).extra_fields.each do |field| -%>
