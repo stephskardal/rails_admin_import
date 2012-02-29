@@ -37,17 +37,19 @@ module RailsAdminImport
       end
  
       def belongs_to_fields
-        self.reflections.select { |k, v| v.macro == :belongs_to }.keys
+        attrs = self.reflections.select { |k, v| v.macro == :belongs_to }.keys
+        attrs - RailsAdminImport.config(self).excluded_fields 
       end
   
-      def many_to_many_fields
+      def many_fields
         attrs = []
         self.reflections.each do |k, v|
-          if v.macro == :has_and_belongs_to_many
+          if [:has_and_belongs_to_many, :has_many].include?(v.macro)
             attrs << k.to_s.singularize.to_sym
           end
         end
-        attrs
+
+        attrs - RailsAdminImport.config(self).excluded_fields 
       end 
   
       def run_import(params)
@@ -59,7 +61,7 @@ module RailsAdminImport
         map = {}
   
         file.readline.each_with_index do |key, i|
-          if self.many_to_many_fields.include?(key.to_sym)
+          if self.many_fields.include?(key.to_sym)
             map[key.to_sym] ||= []
             map[key.to_sym] << i
           else
@@ -73,7 +75,7 @@ module RailsAdminImport
         self.belongs_to_fields.flatten.each do |field|
           associated_map[field] = field.to_s.classify.constantize.all.inject({}) { |hash, c| hash[c.send(params[field])] = c.id; hash }
         end
-        self.many_to_many_fields.flatten.each do |field|
+        self.many_fields.flatten.each do |field|
           associated_map[field] = field.to_s.classify.constantize.all.inject({}) { |hash, c| hash[c.send(params[field])] = c; hash }
         end
  
@@ -81,11 +83,11 @@ module RailsAdminImport
  
         file.each do |row|
           object = self.import_new(row, map)
-          object.import_files(row, map)
           object.import_belongs_to_data(associated_map, row, map)
-          object.import_many_to_many_data(associated_map, row, map)
-
+          object.import_many_data(associated_map, row, map)
           object.before_import_save(row, map)
+
+          object.import_files(row, map)
 
           if object.errors.empty?
             if object.save
@@ -120,19 +122,21 @@ module RailsAdminImport
       end
 
       def import_files(row, map)
-        self.class.file_fields.each do |key|
-          if map[key] && !row[map[key]].nil?
-            begin
-              # Strip file
-              row[map[key]] = row[map[key]].gsub(/\s+/, "")
-              format = row[map[key]].match(/[a-z0-9]+$/)
-              open("#{Rails.root}/tmp/uploads/#{self.permalink}.#{format}", 'wb') { |file| file << open(row[map[key]]).read }
-              self.send("#{key}=", File.open("#{Rails.root}/tmp/uploads/#{self.permalink}.#{format}"))
-            rescue Exception => e
-              self.errors.add(:base, "Import error: #{e.inspect}")
+        if self.valid?
+          self.class.file_fields.each do |key|
+            if map[key] && !row[map[key]].nil?
+              begin
+                # Strip file
+                row[map[key]] = row[map[key]].gsub(/\s+/, "")
+                format = row[map[key]].match(/[a-z0-9]+$/)
+                open("#{Rails.root}/tmp/uploads/#{self.permalink}.#{format}", 'wb') { |file| file << open(row[map[key]]).read }
+                self.send("#{key}=", File.open("#{Rails.root}/tmp/uploads/#{self.permalink}.#{format}"))
+              rescue Exception => e
+                self.errors.add(:base, "Import error: #{e.inspect}")
+              end
             end
           end
-        end
+		end
       end
 
       def import_belongs_to_data(associated_map, row, map)
@@ -143,8 +147,8 @@ module RailsAdminImport
         end
       end
   
-      def import_many_to_many_data(associated_map, row, map)
-        self.class.many_to_many_fields.each do |key|
+      def import_many_data(associated_map, row, map)
+        self.class.many_fields.each do |key|
           values = []
   
           map[key] ||= []
