@@ -72,20 +72,31 @@
 <small>Additional application specific fields.</small>
 </td>
 <% end -%>
-
-
 	</tr>
 </table>
 
 <%= form_tag rails_admin.import_url(@abstract_model.to_param), :multipart => true do |f| -%>
   <%= file_field_tag :file %>
+
+  <p>
+  <%= check_box_tag :update_if_exists %> Update if Exists<br />
+  Update lookup field
+  <select name="update_lookup">
+    <% @abstract_model.model.new.attributes.keys.each do |key| -%>
+  	<option value="<%= key %>"><%= key %></option>
+	<% end -%>
+  </select>
+  </p>
+
   <% [@abstract_model.model.belongs_to_fields, @abstract_model.model.many_fields].flatten.each do |field| -%>
+  <div style="display:inline-block; width: 45%;background:#cecece;margin: 5px;padding: 5px;">
   <label style="width:200px;"><%= field %> mapping</label>&nbsp;&nbsp;
   <select name="<%= field %>">
     <% field.to_s.classify.constantize.new.attributes.keys.each do |key| -%>
   	<option value="<%= key %>"><%= key %></option>
 	<% end -%>
-  <select><br /><br />
-  <% end -%>
+  <select>
+  </div>
+  <% end -%><br />
   <%= submit_tag "Upload", :disable_with => "Uploading..." %>
 <% end -%>

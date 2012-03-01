@@ -80,20 +80,23 @@ module RailsAdminImport
         end
  
         label_method = RailsAdminImport.config(self).label
+
+        update = params.has_key?(:update_if_exists) && params[:update_if_exists] ? params[:update_lookup].to_sym : nil
  
         file.each do |row|
-          object = self.import_new(row, map)
+          object = self.import_initialize(row, map, update)
           object.import_belongs_to_data(associated_map, row, map)
           object.import_many_data(associated_map, row, map)
           object.before_import_save(row, map)
 
           object.import_files(row, map)
 
+          verb = object.new_record? ? "Create" : "Update"
           if object.errors.empty?
             if object.save
-              results[:success] << "Created: #{object.send(label_method)}"
+              results[:success] << "#{verb}d: #{object.send(label_method)}"
             else
-              results[:error] << "Failed to create: #{object.send(label_method)}. Errors: #{object.errors.full_messages.join(', ')}."
+              results[:error] << "Failed to #{verb}: #{object.send(label_method)}. Errors: #{object.errors.full_messages.join(', ')}."
             end
           else
             results[:error] << "Errors before save: #{object.send(label_method)}. Errors: #{object.errors.full_messages.join(', ')}."
@@ -103,12 +106,22 @@ module RailsAdminImport
         results
       end
   
-      def import_new(row, map)
+      def import_initialize(row, map, update)
         new_attrs = {}
         self.import_fields.each do |key|
           new_attrs[key] = row[map[key]] if map[key]
         end
-        self.new(new_attrs)
+
+        item = nil
+        if update.present?
+          item = self.send("find_by_#{update}", row[map[update]])
+        end 
+
+        if item.nil?
+          item = self.new(new_attrs)
+        end
+
+        item
       end
     end
    
@@ -122,7 +135,7 @@ module RailsAdminImport
       end
 
       def import_files(row, map)
-        if self.valid?
+        if self.new_record? && self.valid?
           self.class.file_fields.each do |key|
             if map[key] && !row[map[key]].nil?
               begin
@@ -136,7 +149,7 @@ module RailsAdminImport
               end
             end
           end
-		end
+        end
       end
 
       def import_belongs_to_data(associated_map, row, map)
