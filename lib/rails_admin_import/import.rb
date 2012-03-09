@@ -125,55 +125,53 @@ module RailsAdminImport
       end
     end
    
-    module InstanceMethods
-      def before_import_save(*args)
-        # Meant to be overridden to do special actions 
-      end
+    def before_import_save(*args)
+      # Meant to be overridden to do special actions
+    end
 
-      def import_display
-        self.id
-      end
+    def import_display
+      self.id
+    end
 
-      def import_files(row, map)
-        if self.new_record? && self.valid?
-          self.class.file_fields.each do |key|
-            if map[key] && !row[map[key]].nil?
-              begin
-                # Strip file
-                row[map[key]] = row[map[key]].gsub(/\s+/, "")
-                format = row[map[key]].match(/[a-z0-9]+$/)
-                open("#{Rails.root}/tmp/uploads/#{self.permalink}.#{format}", 'wb') { |file| file << open(row[map[key]]).read }
-                self.send("#{key}=", File.open("#{Rails.root}/tmp/uploads/#{self.permalink}.#{format}"))
-              rescue Exception => e
-                self.errors.add(:base, "Import error: #{e.inspect}")
-              end
+    def import_files(row, map)
+      if self.new_record? && self.valid?
+        self.class.file_fields.each do |key|
+          if map[key] && !row[map[key]].nil?
+            begin
+              # Strip file
+              row[map[key]] = row[map[key]].gsub(/\s+/, "")
+              format = row[map[key]].match(/[a-z0-9]+$/)
+              open("#{Rails.root}/tmp/uploads/#{self.permalink}.#{format}", 'wb') { |file| file << open(row[map[key]]).read }
+              self.send("#{key}=", File.open("#{Rails.root}/tmp/uploads/#{self.permalink}.#{format}"))
+            rescue Exception => e
+              self.errors.add(:base, "Import error: #{e.inspect}")
             end
           end
         end
       end
+    end
 
-      def import_belongs_to_data(associated_map, row, map)
-        self.class.belongs_to_fields.each do |key|
-          if map.has_key?(key) && row[map[key]] != ""
-            self.send("#{key}_id=", associated_map[key][row[map[key]]])
-          end
+    def import_belongs_to_data(associated_map, row, map)
+      self.class.belongs_to_fields.each do |key|
+        if map.has_key?(key) && row[map[key]] != ""
+          self.send("#{key}_id=", associated_map[key][row[map[key]]])
         end
       end
-  
-      def import_many_data(associated_map, row, map)
-        self.class.many_fields.each do |key|
-          values = []
-  
-          map[key] ||= []
-          map[key].each do |pos|
-            if row[pos] != "" && associated_map[key][row[pos]]
-              values << associated_map[key][row[pos]]
-            end
+    end
+
+    def import_many_data(associated_map, row, map)
+      self.class.many_fields.each do |key|
+        values = []
+
+        map[key] ||= []
+        map[key].each do |pos|
+          if row[pos] != "" && associated_map[key][row[pos]]
+            values << associated_map[key][row[pos]]
           end
-  
-          if values.any?
-            self.send("#{key.to_s.pluralize}=", values)
-          end
+        end
+
+        if values.any?
+          self.send("#{key.to_s.pluralize}=", values)
         end
       end
     end
