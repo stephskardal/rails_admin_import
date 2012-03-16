@@ -119,6 +119,10 @@ module RailsAdminImport
 
         if item.nil?
           item = self.new(new_attrs)
+        else
+          new_attrs.each do |k, v|
+            item.update_column(k, v)
+          end
         end
 
         item
