@@ -99,6 +99,7 @@ module RailsAdminImport
               results[:error] << "Failed to #{verb}: #{object.send(label_method)}. Errors: #{object.errors.full_messages.join(', ')}."
             end
           else
+Rails.logger.warn "steph: #{object.inspect}"
             results[:error] << "Errors before save: #{object.send(label_method)}. Errors: #{object.errors.full_messages.join(', ')}."
           end
         end
@@ -145,8 +146,8 @@ module RailsAdminImport
               # Strip file
               row[map[key]] = row[map[key]].gsub(/\s+/, "")
               format = row[map[key]].match(/[a-z0-9]+$/)
-              open("#{Rails.root}/tmp/uploads/#{self.permalink}.#{format}", 'wb') { |file| file << open(row[map[key]]).read }
-              self.send("#{key}=", File.open("#{Rails.root}/tmp/uploads/#{self.permalink}.#{format}"))
+              open("#{Rails.root}/tmp/#{self.permalink}.#{format}", 'wb') { |file| file << open(row[map[key]]).read }
+              self.send("#{key}=", File.open("#{Rails.root}/tmp/#{self.permalink}.#{format}"))
             rescue Exception => e
               self.errors.add(:base, "Import error: #{e.inspect}")
             end
