@@ -121,9 +121,8 @@ Rails.logger.warn "steph: #{object.inspect}"
         if item.nil?
           item = self.new(new_attrs)
         else
-          new_attrs.each do |k, v|
-            item.update_column(k, v)
-          end
+          item.attributes = new_attrs.except(update.to_sym)
+          item.save
         end
 
         item
