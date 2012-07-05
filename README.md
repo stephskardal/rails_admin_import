@@ -8,7 +8,7 @@ Installation
 
 * First, add to Gemfile:
     
-        gem "rails_admin_import", :git => "git://github.com/stephskardal/demo.git"
+        gem "rails_admin_import", :git => "git://github.com/stephskardal/rails_admin_import.git"
 
 * Next, mount in your application by adding:
 
