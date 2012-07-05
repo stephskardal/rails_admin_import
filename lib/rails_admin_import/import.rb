@@ -99,7 +99,6 @@ module RailsAdminImport
               results[:error] << "Failed to #{verb}: #{object.send(label_method)}. Errors: #{object.errors.full_messages.join(', ')}."
             end
           else
-Rails.logger.warn "steph: #{object.inspect}"
             results[:error] << "Errors before save: #{object.send(label_method)}. Errors: #{object.errors.full_messages.join(', ')}."
           end
         end

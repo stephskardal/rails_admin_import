@@ -32,7 +32,7 @@ Installation
           end
         end
 
-* Define instance methods to be hooked into the import process:
+* (Optional) Define instance methods to be hooked into the import process, if special/additional processing is required on the data:
 
         # some model
         def before_import_save(row, map)
