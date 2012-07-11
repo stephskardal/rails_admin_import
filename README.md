@@ -48,6 +48,9 @@ Installation
           ...
         end
 
+* TODO: Right now, import doesn't work for fields ending in s, because inflector fails in models ending in s singularly. Belongs_to and many
+  mapping needs to be updated to use klasses instead of symbols
+
   Refer to RailAdmin documentation on custom actions that must be present in this block.
 
 TODO
