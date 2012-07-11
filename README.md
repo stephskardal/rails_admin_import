@@ -42,11 +42,11 @@ Installation
 
 * "import" action must be added inside config.actions block in main application RailsAdmin configuration.
 
-  config.actions do
-    ...
-    import
-
-  end
+        config.actions do
+          ...
+          import
+          ...
+        end
 
   Refer to RailAdmin documentation on custom actions that must be present in this block.
 
