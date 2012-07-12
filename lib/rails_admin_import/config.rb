@@ -9,6 +9,7 @@ module RailsAdminImport
       #
       # @see RailsAdminImport::Config.model
       attr_reader :registry
+      attr_accessor :logging
 
       # Loads a model configuration instance from the registry or registers
       # a new one if one is yet to be added.
@@ -35,6 +36,7 @@ module RailsAdminImport
       # @see RailsAdminImport::Config.registry
       def reset
         @registry = {}
+        @logging = false
       end
 
       # Reset a provided model's configuration.

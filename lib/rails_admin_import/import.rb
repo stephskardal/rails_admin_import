@@ -59,6 +59,12 @@ module RailsAdminImport
         end
 
         file = CSV.new(params[:file].tempfile)
+
+        if RailsAdminImport.config.logging
+          FileUtils.copy(params[:file].tempfile, "#{Rails.root}/log/import/#{Time.now.strftime("%Y-%m-%d-%H-%M-%S")}-import.csv")
+          logger = Logger.new("#{Rails.root}/log/import/import.log")
+        end
+
         map = {}
   
         file.readline.each_with_index do |key, i|
@@ -95,11 +101,14 @@ module RailsAdminImport
           verb = object.new_record? ? "Create" : "Update"
           if object.errors.empty?
             if object.save
+              logger.info "#{Time.now.to_s}: #{verb}d: #{object.send(label_method)}" if RailsAdminImport.config.logging
               results[:success] << "#{verb}d: #{object.send(label_method)}"
             else
+              logger.info "#{Time.now.to_s}: Failed to #{verb}: #{object.send(label_method)}. Errors: #{object.errors.full_messages.join(', ')}." if RailsAdminImport.config.logging
               results[:error] << "Failed to #{verb}: #{object.send(label_method)}. Errors: #{object.errors.full_messages.join(', ')}."
             end
           else
+            logger.info "#{Time.now.to_s}: Errors before save: #{object.send(label_method)}. Errors: #{object.errors.full_messages.join(', ')}." if RailsAdminImport.config.logging
             results[:error] << "Errors before save: #{object.send(label_method)}. Errors: #{object.errors.full_messages.join(', ')}."
           end
         end
