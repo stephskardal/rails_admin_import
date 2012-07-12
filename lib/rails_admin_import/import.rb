@@ -6,10 +6,11 @@ module RailsAdminImport
   
     module ClassMethods
       def file_fields
+        attrs = []
         if self.methods.include?(:attachment_definitions) && !self.attachment_definitions.nil?
-          return self.attachment_definitions.keys
+          attrs = self.attachment_definitions.keys
         end
-        [] 
+        attrs - RailsAdminImport.config(self).excluded_fields 
       end
   
       def import_fields
