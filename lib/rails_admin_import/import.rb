@@ -58,7 +58,9 @@ module RailsAdminImport
           return results = { :success => [], :error => ["You must select a file."] }
         end
 
-        file = CSV.new(params[:file].tempfile)
+        text = File.read(params[:file].tempfile)
+        clean = text.gsub(/\n$/, '')
+        file = CSV.new(clean)
 
         if RailsAdminImport.config.logging
           FileUtils.copy(params[:file].tempfile, "#{Rails.root}/log/import/#{Time.now.strftime("%Y-%m-%d-%H-%M-%S")}-import.csv")
