@@ -74,6 +74,12 @@ module RailsAdminImport
           else
             map[key.to_sym] = i 
           end
+        end
+ 
+        update = params.has_key?(:update_if_exists) && params[:update_if_exists] ? params[:update_lookup].to_sym : nil
+
+        if update && !map.has_key?(params[:update_lookup].to_sym)
+          return results = { :success => [], :error => ["Your file must contain a column for the 'Update lookup field' you selected."] }
         end 
   
         results = { :success => [], :error => [] }
@@ -88,8 +94,6 @@ module RailsAdminImport
  
         label_method = RailsAdminImport.config(self).label
 
-        update = params.has_key?(:update_if_exists) && params[:update_if_exists] ? params[:update_lookup].to_sym : nil
- 
         file.each do |row|
           object = self.import_initialize(row, map, update)
           object.import_belongs_to_data(associated_map, row, map)

@@ -1,11 +1,11 @@
 <% if @response -%>
 <% if @response.has_key?(:error) -%>
-<div class="alert-message error">
+<div class="alert-error alert">
 <%= @response[:error] %>
 </div>
 <% end -%>
 <% if @response.has_key?(:notice) -%>
-<div class="alert-message notice">
+<div class="alert-success alert">
 <%= @response[:notice] %>
 </div>
 <% end -%>
