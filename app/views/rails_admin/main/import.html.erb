@@ -76,8 +76,8 @@
 </table>
 
 <%= form_tag rails_admin.import_url(@abstract_model.to_param), :multipart => true do |f| -%>
+  <h5 style="color:red;">Please limit upload file to <%= RailsAdminImport.config.line_item_limit %> line items.</h5>
   <%= file_field_tag :file %>
-
   <p>
   <%= check_box_tag :update_if_exists %> Update if Exists<br />
   Update lookup field

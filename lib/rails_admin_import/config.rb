@@ -10,6 +10,7 @@ module RailsAdminImport
       # @see RailsAdminImport::Config.model
       attr_reader :registry
       attr_accessor :logging
+      attr_accessor :line_item_limit
 
       # Loads a model configuration instance from the registry or registers
       # a new one if one is yet to be added.
@@ -37,6 +38,7 @@ module RailsAdminImport
       def reset
         @registry = {}
         @logging = false
+        @line_item_limit = 1000
       end
 
       # Reset a provided model's configuration.
