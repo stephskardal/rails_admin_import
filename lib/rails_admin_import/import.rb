@@ -58,17 +58,17 @@ module RailsAdminImport
           return results = { :success => [], :error => ["You must select a file."] }
         end
 
+        if RailsAdminImport.config.logging
+          FileUtils.copy(params[:file].tempfile, "#{Rails.root}/log/import/#{Time.now.strftime("%Y-%m-%d-%H-%M-%S")}-import.csv")
+          logger = Logger.new("#{Rails.root}/log/import/import.log")
+        end
+
         text = File.read(params[:file].tempfile)
         clean = text.gsub(/\n$/, '')
         file_check = CSV.new(clean)
 
         if file_check.readlines.size > RailsAdminImport.config.line_item_limit
           return results = { :success => [], :error => ["Please limit upload file to #{RailsAdminImport.config.line_item_limit} line items."] }
-        end
-
-        if RailsAdminImport.config.logging
-          FileUtils.copy(params[:file].tempfile, "#{Rails.root}/log/import/#{Time.now.strftime("%Y-%m-%d-%H-%M-%S")}-import.csv")
-          logger = Logger.new("#{Rails.root}/log/import/import.log")
         end
 
         map = {}
