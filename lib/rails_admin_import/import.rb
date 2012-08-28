@@ -54,77 +54,82 @@ module RailsAdminImport
       end 
   
       def run_import(params)
-        if !params.has_key?(:file)
-          return results = { :success => [], :error => ["You must select a file."] }
-        end
-
-        if RailsAdminImport.config.logging
-          FileUtils.copy(params[:file].tempfile, "#{Rails.root}/log/import/#{Time.now.strftime("%Y-%m-%d-%H-%M-%S")}-import.csv")
-          logger = Logger.new("#{Rails.root}/log/import/import.log")
-        end
-
-        text = File.read(params[:file].tempfile)
-        clean = text.gsub(/\n$/, '')
-        file_check = CSV.new(clean)
-
-        if file_check.readlines.size > RailsAdminImport.config.line_item_limit
-          return results = { :success => [], :error => ["Please limit upload file to #{RailsAdminImport.config.line_item_limit} line items."] }
-        end
-
-        map = {}
-  
-        file = CSV.new(clean)
-        file.readline.each_with_index do |key, i|
-          if self.many_fields.include?(key.to_sym)
-            map[key.to_sym] ||= []
-            map[key.to_sym] << i
-          else
-            map[key.to_sym] = i 
+        begin
+          if !params.has_key?(:file)
+            return results = { :success => [], :error => ["You must select a file."] }
           end
-        end
- 
-        update = params.has_key?(:update_if_exists) && params[:update_if_exists] ? params[:update_lookup].to_sym : nil
 
-        if update && !map.has_key?(params[:update_lookup].to_sym)
-          return results = { :success => [], :error => ["Your file must contain a column for the 'Update lookup field' you selected."] }
-        end 
+          if RailsAdminImport.config.logging
+            FileUtils.copy(params[:file].tempfile, "#{Rails.root}/log/import/#{Time.now.strftime("%Y-%m-%d-%H-%M-%S")}-import.csv")
+            logger = Logger.new("#{Rails.root}/log/import/import.log")
+          end
+        
+          text = File.read(params[:file].tempfile)
+          clean = text.gsub(/\n$/, '')
+          file_check = CSV.new(clean)
+
+          if file_check.readlines.size > RailsAdminImport.config.line_item_limit
+            return results = { :success => [], :error => ["Please limit upload file to #{RailsAdminImport.config.line_item_limit} line items."] }
+          end
   
-        results = { :success => [], :error => [] }
-  
-        associated_map = {}
-        self.belongs_to_fields.flatten.each do |field|
-          associated_map[field] = field.to_s.classify.constantize.all.inject({}) { |hash, c| hash[c.send(params[field]).to_s] = c.id; hash }
-        end
-        self.many_fields.flatten.each do |field|
-          associated_map[field] = field.to_s.classify.constantize.all.inject({}) { |hash, c| hash[c.send(params[field]).to_s] = c; hash }
-        end
- 
-        label_method = RailsAdminImport.config(self).label
-
-        file.each do |row|
-          object = self.import_initialize(row, map, update)
-          object.import_belongs_to_data(associated_map, row, map)
-          object.import_many_data(associated_map, row, map)
-          object.before_import_save(row, map)
-
-          object.import_files(row, map)
-
-          verb = object.new_record? ? "Create" : "Update"
-          if object.errors.empty?
-            if object.save
-              logger.info "#{Time.now.to_s}: #{verb}d: #{object.send(label_method)}" if RailsAdminImport.config.logging
-              results[:success] << "#{verb}d: #{object.send(label_method)}"
+          map = {}
+    
+          file = CSV.new(clean)
+          file.readline.each_with_index do |key, i|
+            if self.many_fields.include?(key.to_sym)
+              map[key.to_sym] ||= []
+              map[key.to_sym] << i
             else
-              logger.info "#{Time.now.to_s}: Failed to #{verb}: #{object.send(label_method)}. Errors: #{object.errors.full_messages.join(', ')}." if RailsAdminImport.config.logging
-              results[:error] << "Failed to #{verb}: #{object.send(label_method)}. Errors: #{object.errors.full_messages.join(', ')}."
+              map[key.to_sym] = i 
             end
-          else
-            logger.info "#{Time.now.to_s}: Errors before save: #{object.send(label_method)}. Errors: #{object.errors.full_messages.join(', ')}." if RailsAdminImport.config.logging
-            results[:error] << "Errors before save: #{object.send(label_method)}. Errors: #{object.errors.full_messages.join(', ')}."
           end
-        end
+   
+          update = params.has_key?(:update_if_exists) && params[:update_if_exists] ? params[:update_lookup].to_sym : nil
   
-        results
+          if update && !map.has_key?(params[:update_lookup].to_sym)
+            return results = { :success => [], :error => ["Your file must contain a column for the 'Update lookup field' you selected."] }
+          end 
+    
+          results = { :success => [], :error => [] }
+    
+          associated_map = {}
+          self.belongs_to_fields.flatten.each do |field|
+            associated_map[field] = field.to_s.classify.constantize.all.inject({}) { |hash, c| hash[c.send(params[field]).to_s] = c.id; hash }
+          end
+          self.many_fields.flatten.each do |field|
+            associated_map[field] = field.to_s.classify.constantize.all.inject({}) { |hash, c| hash[c.send(params[field]).to_s] = c; hash }
+          end
+   
+          label_method = RailsAdminImport.config(self).label
+  
+          file.each do |row|
+            object = self.import_initialize(row, map, update)
+            object.import_belongs_to_data(associated_map, row, map)
+            object.import_many_data(associated_map, row, map)
+            object.before_import_save(row, map)
+  
+            object.import_files(row, map)
+  
+            verb = object.new_record? ? "Create" : "Update"
+            if object.errors.empty?
+              if object.save
+                logger.info "#{Time.now.to_s}: #{verb}d: #{object.send(label_method)}" if RailsAdminImport.config.logging
+                results[:success] << "#{verb}d: #{object.send(label_method)}"
+              else
+                logger.info "#{Time.now.to_s}: Failed to #{verb}: #{object.send(label_method)}. Errors: #{object.errors.full_messages.join(', ')}." if RailsAdminImport.config.logging
+                results[:error] << "Failed to #{verb}: #{object.send(label_method)}. Errors: #{object.errors.full_messages.join(', ')}."
+              end
+            else
+              logger.info "#{Time.now.to_s}: Errors before save: #{object.send(label_method)}. Errors: #{object.errors.full_messages.join(', ')}." if RailsAdminImport.config.logging
+              results[:error] << "Errors before save: #{object.send(label_method)}. Errors: #{object.errors.full_messages.join(', ')}."
+            end
+          end
+    
+          results
+        rescue Exception => e
+          logger.info "#{Time.now.to_s}: Unknown exception in import: #{e.inspect}"
+          return results = { :success => [], :error => ["Could not upload. Unexpected error: #{e.to_s}"] }
+        end
       end
   
       def import_initialize(row, map, update)
