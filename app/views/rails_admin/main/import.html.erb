@@ -30,7 +30,7 @@
       <div class="controls">
         <ul>
         <% @abstract_model.model.belongs_to_fields.each do |field| -%>
-          <li><%= field %></li>
+          <li><a href="<%= url_for(:action => :index, :model_name => field) %>"><%= field.to_s.titleize %></a></li>
         <% end -%>
         </ul>
         <p class="help-block">These fields map to other items in the database, lookup via attribute selected below.</p>
@@ -49,7 +49,7 @@
         <p class="help-block">These must be a downloadable URL.</p>
       </div>
     </div>
-    <% end -%>
+    <% end -%>  
     <% if @abstract_model.model.many_fields.any? -%>
     <div class="control-group">
       <label class="control-label" data-original-title="Click to reverse selection" onclick="jQuery(this).siblings('.controls').find('input').click()" rel="tooltip">Belongs To Fields</label>
@@ -117,7 +117,7 @@
     </legend>
     <% [@abstract_model.model.belongs_to_fields, @abstract_model.model.many_fields].flatten.each do |field| -%>
     <div class="control-group">
-      <label class="control-label" for="csv_options_encoding_to"><%= field %> mapping</label>
+      <label class="control-label" for="csv_options_encoding_to"><a href="<%= url_for(:action => :index, :model_name => field) %>"><%= field.to_s.titleize %></a> mapping</label>
       <div class="controls">
         <select name="<%= field %>">
           <% field.to_s.classify.constantize.new.attributes.keys.each do |key| -%>
