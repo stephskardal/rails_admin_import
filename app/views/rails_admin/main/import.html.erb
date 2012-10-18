@@ -1,102 +1,143 @@
 <% if @response -%>
 <% if @response.has_key?(:error) -%>
-<div class="alert-error alert">
-<%= @response[:error] %>
-</div>
+<div class="alert-error alert"><%= @response[:error] %></div>
 <% end -%>
 <% if @response.has_key?(:notice) -%>
-<div class="alert-success alert">
-<%= @response[:notice] %>
-</div>
+<div class="alert-success alert"><%= @response[:notice] %></div>
 <% end -%>
 <% end -%>
 
-<h1>Import <%= @abstract_model.to_param.titleize %></h1>
+<%= form_tag rails_admin.import_url(@abstract_model.to_param), :multipart => true, :class => 'form-horizontal' do |f| -%>
+  <fieldset>
+    <legend>
+      <i class="icon-chevron-down"></i>
+      Select fields to import
+    </legend>
+    <div class="control-group">
+      <label class="control-label" data-original-title="Click to reverse selection" onclick="jQuery(this).siblings('.controls').find('input').click()" rel="tooltip">Fields from <%= @abstract_model.to_param %></label>
+      <div class="controls">
+        <ul>
+        <% @abstract_model.model.import_fields.each do |field| -%>
+          <li><%= field %></li>
+        <% end -%>
+        </ul>
+        <p class="help-block">The following fields may be included in the import file.</p>
+      </div>
+    </div>
+    <% if @abstract_model.model.belongs_to_fields.any? -%>
+    <div class="control-group">
+      <label class="control-label" data-original-title="Click to reverse selection" onclick="jQuery(this).siblings('.controls').find('input').click()" rel="tooltip">Belongs To Fields</label>
+      <div class="controls">
+        <ul>
+        <% @abstract_model.model.belongs_to_fields.each do |field| -%>
+          <li><%= field %></li>
+        <% end -%>
+        </ul>
+        <p class="help-block">These fields map to other items in the database, lookup via attribute selected below.</p>
+      </div>
+    </div>
+    <% end -%>
+    <% if @abstract_model.model.file_fields.any? -%>
+    <div class="control-group">
+      <label class="control-label" data-original-title="Click to reverse selection" onclick="jQuery(this).siblings('.controls').find('input').click()" rel="tooltip">Belongs To Fields</label>
+      <div class="controls">
+        <ul>
+        <% @abstract_model.model.file_fields.each do |field| -%>
+          <li><%= field %></li>
+        <% end -%>
+        </ul>
+        <p class="help-block">These must be a downloadable URL.</p>
+      </div>
+    </div>
+    <% end -%>
+    <% if @abstract_model.model.many_fields.any? -%>
+    <div class="control-group">
+      <label class="control-label" data-original-title="Click to reverse selection" onclick="jQuery(this).siblings('.controls').find('input').click()" rel="tooltip">Belongs To Fields</label>
+      <div class="controls">
+        <ul>
+        <% @abstract_model.model.many_fields.each do |field| -%>
+          <li><%= field %></li>
+        <% end -%>
+        </ul>
+        <p class="help-block">These fields map to other columns in the database, lookup via attribute selected below. There may be multiple columns with this header in the spreadsheet.</p>
+      </div>
+    </div>
+    <% end -%>
+    <% if RailsAdminImport.config(@abstract_model.model).extra_fields.any? -%>
+    <div class="control-group">
+      <label class="control-label" data-original-title="Click to reverse selection" onclick="jQuery(this).siblings('.controls').find('input').click()" rel="tooltip">Belongs To Fields</label>
+      <div class="controls">
+        <ul>
+        <% RailsAdminImport.config(@abstract_model.model).extra_fields.each do |field| -%>
+          <li><%= field %></li>
+        <% end -%>
+        </ul>
+        <p class="help-block">Additional application specific fields.</p>
+      </div>
+    </div>
+    <% end -%>
+  </fieldset>
+  <fieldset>
+    <legend>
+      <i class="icon-chevron-down"></i>
+      Upload file
+    </legend>
+    <div class="control-group">
+      <label class="control-label" data-original-title="Click to reverse selection" onclick="jQuery(this).siblings('.controls').find('input').click()" rel="tooltip">File</label>
+      <div class="controls">
+        <%= file_field_tag :file %>
+        <p class="help-block">Please limit upload file to <%= RailsAdminImport.config.line_item_limit %> line items.</p>
+      </div>
+    </div>
+    <div class="control-group">
+      <label class="control-label" data-original-title="Click to reverse selection" onclick="jQuery(this).siblings('.controls').find('input').click()" rel="tooltip">Update if exists</label>
+      <div class="controls">
+        <label class="checkbox">
+          <%= check_box_tag :update_if_exists %>
+        </label>
+      </div>
+    </div>
+    <div class="control-group">
+      <label class="control-label" data-original-title="Click to reverse selection" onclick="jQuery(this).siblings('.controls').find('input').click()" rel="tooltip">Update lookup field</label>
+      <div class="controls">
+        <select name="update_lookup">
+          <% @abstract_model.model.new.attributes.keys.each do |key| -%>
+          <option value="<%= key %>"><%= key %></option>
+          <% end -%>
+        </select>
+      </div>
+    </div>
 
-<small>The following fields may be included in the import file</small>
-<table width="100%" cellpadding="0" cellspacing="0">
-<tr>
-<td width="20%" valign="top">
-<h3>Standard Fields</h3>
-<ul>
-<% @abstract_model.model.import_fields.each do |field| -%>
-<li><%= field %></li>
-<% end -%>
-</ul>
-</td>
-
-<% if @abstract_model.model.belongs_to_fields.any? -%>
-<td width="20%" valign="top">
-<h3>Belongs To Fields</h3>
-<ul>
-<% @abstract_model.model.belongs_to_fields.each do |field| -%>
-<li><%= field %></li>
-<% end -%>
-</ul>
-<small>These fields map to other items in the database, lookup via attribute selected below.</small>
-</td>
-<% end -%>
-
-<% if @abstract_model.model.file_fields.any? -%>
-<td width="20%" valign="top">
-<h3>File Fields</h3>
-<ul>
-<% @abstract_model.model.file_fields.each do |field| -%>
-<li><%= field %></li>
-<% end -%>
-</ul>
-<small>These must be a downloadable URL.</small>
-</td>
-<% end -%>
-
-<% if @abstract_model.model.many_fields.any? -%>
-<td width="20%" valign="top">
-<h3>Multiple Fields</h3>
-<ul>
-<% @abstract_model.model.many_fields.each do |field| -%>
-<li><%= field %></li>
-<% end -%>
-</ul>
-<small>These fields map to other columns in the database, lookup via attribute selected below. There may be multiple columns with this header in the spreadsheet.</small>
-</td>
-<% end -%>
-
-<% if RailsAdminImport.config(@abstract_model.model).extra_fields.any? -%>
-<td width="20%" valign="top">
-<h3>Extra Fields</h3>
-<ul>
-<% RailsAdminImport.config(@abstract_model.model).extra_fields.each do |field| -%>
-<li><%= field %></li>
-<% end -%>
-</ul>
-<small>Additional application specific fields.</small>
-</td>
-<% end -%>
-	</tr>
-</table>
-
-<%= form_tag rails_admin.import_url(@abstract_model.to_param), :multipart => true do |f| -%>
-  <h5 style="color:red;">Please limit upload file to <%= RailsAdminImport.config.line_item_limit %> line items.</h5>
-  <%= file_field_tag :file %>
-  <p>
-  <%= check_box_tag :update_if_exists %> Update if Exists<br />
-  Update lookup field
-  <select name="update_lookup">
-    <% @abstract_model.model.new.attributes.keys.each do |key| -%>
-  	<option value="<%= key %>"><%= key %></option>
-	<% end -%>
-  </select>
-  </p>
-
-  <% [@abstract_model.model.belongs_to_fields, @abstract_model.model.many_fields].flatten.each do |field| -%>
-  <div style="display:inline-block; width: 45%;background:#cecece;margin: 5px;padding: 5px;">
-  <label style="width:200px;"><%= field %> mapping</label>&nbsp;&nbsp;
-  <select name="<%= field %>">
-    <% field.to_s.classify.constantize.new.attributes.keys.each do |key| -%>
-  	<option value="<%= key %>"><%= key %></option>
-	<% end -%>
-  <select>
+  </fieldset>
+  <% if @abstract_model.model.belongs_to_fields.any? -%>
+  <fieldset>
+    <legend>
+      <i class="icon-chevron-down"></i>
+      Related fields mapping
+    </legend>
+    <% [@abstract_model.model.belongs_to_fields, @abstract_model.model.many_fields].flatten.each do |field| -%>
+    <div class="control-group">
+      <label class="control-label" for="csv_options_encoding_to"><%= field %> mapping</label>
+      <div class="controls">
+        <select name="<%= field %>">
+          <% field.to_s.classify.constantize.new.attributes.keys.each do |key| -%>
+          <option value="<%= key %>"><%= key %></option>
+          <% end -%>
+        </select>
+      </div>
+    </div>
+    <% end -%>
+  </fieldset>
+  <% end -%>
+  <div class="form-actions">
+    <button class="btn btn-primary" name="commit" type="submit" data-disable-with="Uploading...">
+      <i class="icon-white icon-ok"></i>
+      Import
+    </button>
+    <button class="btn" name="_continue" type="submit">
+      <i class="icon-remove"></i>
+      Cancel
+    </button>
+    <!--<%= submit_tag "Upload", :disable_with => "Uploading..." %>-->
   </div>
-  <% end -%><br />
-  <%= submit_tag "Upload", :disable_with => "Uploading..." %>
 <% end -%>
