@@ -63,9 +63,9 @@ module RailsAdminImport
             FileUtils.copy(params[:file].tempfile, "#{Rails.root}/log/import/#{Time.now.strftime("%Y-%m-%d-%H-%M-%S")}-import.csv")
             logger = Logger.new("#{Rails.root}/log/import/import.log")
           end
-        
+
           text = File.read(params[:file].tempfile)
-          clean = text.gsub(/\n$/, '')
+          clean = text.force_encoding('BINARY').encode('UTF-8', :undef => :replace, :replace => '').gsub(/\n$/, '')
           file_check = CSV.new(clean)
 
           if file_check.readlines.size > RailsAdminImport.config.line_item_limit
@@ -73,7 +73,7 @@ module RailsAdminImport
           end
   
           map = {}
-    
+   
           file = CSV.new(clean)
           file.readline.each_with_index do |key, i|
             if self.many_fields.include?(key.to_sym)
