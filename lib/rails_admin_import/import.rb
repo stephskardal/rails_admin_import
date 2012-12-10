@@ -207,6 +207,8 @@ module RailsAdminImport
   end
 end
 
-class ActiveRecord::Base
-  include RailsAdminImport::Import
+if defined? ActiveRecord::Base
+  class ActiveRecord::Base
+    include RailsAdminImport::Import
+  end
 end
