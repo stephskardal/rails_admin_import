@@ -14,11 +14,17 @@ module RailsAdminImport
       end
   
       def import_fields
-        fields = []  
-
-        fields = self.new.attributes.keys.collect { |key| key.to_sym }
+        fields = []
+        import_config = RailsAdminImport.config(self)
+        
+        if import_config.included_fields.size > 0
+          fields = import_config.included_fields.dup
+        else
+          fields = self.new.attributes.keys.collect { |key| key.to_sym }
+        end
   
         self.belongs_to_fields.each do |key|
+          fields.delete(key)
           fields.delete("#{key}_id".to_sym)
         end
   
@@ -29,7 +35,7 @@ module RailsAdminImport
           fields.delete("#{key}_updated_at".to_sym)
         end
  
-        excluded_fields = RailsAdminImport.config(self).excluded_fields 
+        excluded_fields = import_config.excluded_fields 
         [:id, :created_at, :updated_at, excluded_fields].flatten.each do |key|
           fields.delete(key)
         end
@@ -38,23 +44,33 @@ module RailsAdminImport
       end
  
       def belongs_to_fields
-        attrs = self.reflections.select { |k, v| v.macro == :belongs_to }.keys
-        attrs - RailsAdminImport.config(self).excluded_fields 
+        attrs = self.model_associations.select { |k, v| [:belongs_to, :embedded_in].include?(v.macro) }.keys.collect(&:to_sym)
+        fields = RailsAdminImport.config(self).included_fields
+        attrs.select{|attr| fields.include?(attr)}# - RailsAdminImport.config(self).excluded_fields 
       end
   
       def many_fields
         attrs = []
-        self.reflections.each do |k, v|
-          if [:has_and_belongs_to_many, :has_many].include?(v.macro)
-            attrs << k.to_s.singularize.to_sym
+        self.model_associations.each do |k, v|
+          if [:has_and_belongs_to_many, :has_many, :embeds_many].include?(v.macro)
+            attrs << k.to_sym#.to_s.singularize.to_sym
           end
         end
-
-        attrs - RailsAdminImport.config(self).excluded_fields 
-      end 
+        
+        fields = RailsAdminImport.config(self).included_fields
+        attrs.select{|attr| fields.include?(attr)}# - RailsAdminImport.config(self).excluded_fields 
+      end
+      
+      def model_associations
+        # handle Mongoid or ActiveRecord
+        associations = self.respond_to?(:relations) ? self.relations : self.reflections
+      end
   
       def run_import(params)
-        begin
+        logger = Rails.logger
+        import_config = RailsAdminImport.config(self)
+        
+        # begin
           if !params.has_key?(:file)
             return results = { :success => [], :error => ["You must select a file."] }
           end
@@ -83,10 +99,14 @@ module RailsAdminImport
               map[key.to_sym] = i 
             end
           end
-   
-          update = params.has_key?(:update_if_exists) && params[:update_if_exists] ? params[:update_lookup].to_sym : nil
-  
-          if update && !map.has_key?(params[:update_lookup].to_sym)
+          
+          if import_config.update_lookup_field
+            update = import_config.update_lookup_field
+          elsif !params[:update_lookup].blank?
+            update = params[:update_lookup].to_sym
+          end
+          
+          if update && !map.has_key?(update)
             return results = { :success => [], :error => ["Your file must contain a column for the 'Update lookup field' you selected."] }
           end 
     
@@ -100,13 +120,15 @@ module RailsAdminImport
             associated_map[field] = field.to_s.classify.constantize.all.inject({}) { |hash, c| hash[c.send(params[field]).to_s] = c; hash }
           end
    
-          label_method = RailsAdminImport.config(self).label
-  
+          label_method = import_config.label
+          before_import_save = import_config.before_import_save
+          
           file.each do |row|
             object = self.import_initialize(row, map, update)
             object.import_belongs_to_data(associated_map, row, map)
             object.import_many_data(associated_map, row, map)
-            object.before_import_save(row, map)
+            
+            before_import_save.call(object, row, map) if before_import_save
   
             object.import_files(row, map)
   
@@ -116,8 +138,8 @@ module RailsAdminImport
                 logger.info "#{Time.now.to_s}: #{verb}d: #{object.send(label_method)}" if RailsAdminImport.config.logging
                 results[:success] << "#{verb}d: #{object.send(label_method)}"
               else
-                logger.info "#{Time.now.to_s}: Failed to #{verb}: #{object.send(label_method)}. Errors: #{object.errors.full_messages.join(', ')}." if RailsAdminImport.config.logging
-                results[:error] << "Failed to #{verb}: #{object.send(label_method)}. Errors: #{object.errors.full_messages.join(', ')}."
+                logger.info "#{Time.now.to_s}: Failed to #{verb.downcase}: #{object.send(label_method)}. Errors: #{object.errors.full_messages.join(', ')}." if RailsAdminImport.config.logging
+                results[:error] << "Failed to #{verb.downcase}: #{object.send(label_method)}. Errors: #{object.errors.full_messages.join(', ')}."
               end
             else
               logger.info "#{Time.now.to_s}: Errors before save: #{object.send(label_method)}. Errors: #{object.errors.full_messages.join(', ')}." if RailsAdminImport.config.logging
@@ -126,10 +148,10 @@ module RailsAdminImport
           end
     
           results
-        rescue Exception => e
-          logger.info "#{Time.now.to_s}: Unknown exception in import: #{e.inspect}"
-          return results = { :success => [], :error => ["Could not upload. Unexpected error: #{e.to_s}"] }
-        end
+        # rescue Exception => e
+          # logger.info "#{Time.now.to_s}: Unknown exception in import: #{e.inspect}"
+          # return results = { :success => [], :error => ["Could not upload. Unexpected error: #{e.to_s}"] }
+        # end
       end
   
       def import_initialize(row, map, update)
@@ -137,17 +159,13 @@ module RailsAdminImport
         self.import_fields.each do |key|
           new_attrs[key] = row[map[key]] if map[key]
         end
-
-        item = nil
-        if update.present?
-          item = self.send("find_by_#{update}", row[map[update]])
-        end 
-
-        if item.nil?
-          item = self.new(new_attrs)
-        else
-          item.attributes = new_attrs.except(update.to_sym)
+        
+        # model#where(update => value).first is more ORM compatible (works with Mongoid)
+        if update.present? && (item = self.send(:where, update => row[map[update]]).first)
+          item.assign_attributes new_attrs.except(update.to_sym), :as => RailsAdmin.config.attr_accessible_role
           item.save
+        else
+          item = self.new(new_attrs)
         end
 
         item

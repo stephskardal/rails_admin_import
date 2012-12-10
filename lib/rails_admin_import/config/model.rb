@@ -11,6 +11,10 @@ module RailsAdminImport
         :id
       end
 
+      register_instance_option(:included_fields) do
+        []
+      end
+
       register_instance_option(:excluded_fields) do
         []
       end
@@ -18,6 +22,16 @@ module RailsAdminImport
       register_instance_option(:extra_fields) do
         []
       end
+      
+      register_instance_option(:update_lookup_field) do
+        nil
+      end
+      
+      # params to callback will be (model, row, map)
+      register_instance_option(:before_import_save) do
+        nil
+      end
+      
     end
   end
 end
