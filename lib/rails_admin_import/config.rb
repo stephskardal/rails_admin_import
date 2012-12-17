@@ -25,9 +25,8 @@ module RailsAdminImport
       #
       # @see RailsAdminImport::Config.registry
       def model(entity, &block)
-        key = entity.name.to_sym
-
-        config = @registry[key] ||= RailsAdminImport::Config::Model.new(entity)
+        key     = entity.name.to_sym
+        config  = @registry[key] ||= RailsAdminImport::Config::Model.new(entity)
         config.instance_eval(&block) if block
         config
       end
@@ -36,9 +35,9 @@ module RailsAdminImport
       #
       # @see RailsAdminImport::Config.registry
       def reset
-        @registry = {}
-        @logging = false
-        @line_item_limit = 1000
+        @registry         = {}
+        @logging          = false
+        @line_item_limit  = 1000
       end
 
       # Reset a provided model's configuration.

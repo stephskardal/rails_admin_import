@@ -5,60 +5,57 @@ module RailsAdminImport
     extend ActiveSupport::Concern
   
     module ClassMethods
+      def import_config
+        @import_config ||= RailsAdminImport.config(self)
+      end
+      
       def file_fields
-        attrs = []
         if self.methods.include?(:attachment_definitions) && !self.attachment_definitions.nil?
           attrs = self.attachment_definitions.keys
+        else
+          attrs = []
         end
-        attrs - RailsAdminImport.config(self).excluded_fields 
+        
+        attrs - import_config.excluded_fields
       end
   
       def import_fields
         fields = []
-        import_config = RailsAdminImport.config(self)
         
-        if import_config.included_fields.size > 0
+        if import_config.included_fields.any?
           fields = import_config.included_fields.dup
         else
           fields = self.new.attributes.keys.collect { |key| key.to_sym }
         end
-  
+        
         self.belongs_to_fields.each do |key|
           fields.delete(key)
           fields.delete("#{key}_id".to_sym)
         end
-  
+        
         self.file_fields.each do |key|
           fields.delete("#{key}_file_name".to_sym)
           fields.delete("#{key}_content_type".to_sym)
           fields.delete("#{key}_file_size".to_sym)
           fields.delete("#{key}_updated_at".to_sym)
         end
- 
-        excluded_fields = import_config.excluded_fields 
-        [:id, :created_at, :updated_at, excluded_fields].flatten.each do |key|
+        
+        [:id, :created_at, :updated_at, import_config.excluded_fields].flatten.each do |key|
           fields.delete(key)
         end
-  
+        
         fields
       end
  
       def belongs_to_fields
-        attrs = self.model_associations.select { |k, v| [:belongs_to, :embedded_in].include?(v.macro) }.keys.collect(&:to_sym)
-        fields = RailsAdminImport.config(self).included_fields
-        attrs.select{|attr| fields.include?(attr)}# - RailsAdminImport.config(self).excluded_fields 
+        attrs = self.model_associations.select{|k, v| [:belongs_to, :embedded_in].include?(v.macro) }.keys.collect(&:to_sym)
+        attrs.select{|attr| import_config.included_fields.include?(attr)}# - import_config.excluded_fields 
       end
   
       def many_fields
-        attrs = []
-        self.model_associations.each do |k, v|
-          if [:has_and_belongs_to_many, :has_many, :embeds_many].include?(v.macro)
-            attrs << k.to_sym#.to_s.singularize.to_sym
-          end
-        end
-        
-        fields = RailsAdminImport.config(self).included_fields
-        attrs.select{|attr| fields.include?(attr)}# - RailsAdminImport.config(self).excluded_fields 
+        associations  = [:has_and_belongs_to_many, :has_many, :embeds_many]
+        attrs         = self.model_associations.select{|k, v| associations.include?(v.macro) }.keys.collect(&:to_sym)
+        attrs.select{|attr| import_config.included_fields.include?(attr)}# - import_config.excluded_fields 
       end
       
       def model_associations
@@ -66,9 +63,8 @@ module RailsAdminImport
         associations = self.respond_to?(:relations) ? self.relations : self.reflections
       end
   
-      def run_import(params)
+      def run_import(params, role, current_user)
         logger = Rails.logger
-        import_config = RailsAdminImport.config(self)
         
         # begin
           if !params.has_key?(:file)
@@ -80,17 +76,17 @@ module RailsAdminImport
             logger = Logger.new("#{Rails.root}/log/import/import.log")
           end
 
-          text = File.read(params[:file].tempfile)
-          clean = text.force_encoding('BINARY').encode('UTF-8', :undef => :replace, :replace => '').gsub(/\n$/, '')
-          file_check = CSV.new(clean)
+          text        = File.read(params[:file].tempfile)
+          clean       = text.force_encoding('BINARY').encode('UTF-8', :undef => :replace, :replace => '').gsub(/\n$/, '')
+          file_check  = CSV.new(clean)
 
           if file_check.readlines.size > RailsAdminImport.config.line_item_limit
             return results = { :success => [], :error => ["Please limit upload file to #{RailsAdminImport.config.line_item_limit} line items."] }
           end
   
-          map = {}
-   
-          file = CSV.new(clean)
+          map         = {}
+          file        = CSV.new(clean)
+          
           file.readline.each_with_index do |key, i|
             if self.many_fields.include?(key.to_sym)
               map[key.to_sym] ||= []
@@ -111,30 +107,59 @@ module RailsAdminImport
           end 
     
           results = { :success => [], :error => [] }
-    
           associated_map = {}
+          
           self.belongs_to_fields.flatten.each do |field|
             associated_map[field] = field.to_s.classify.constantize.all.inject({}) { |hash, c| hash[c.send(params[field]).to_s] = c.id; hash }
           end
+          
           self.many_fields.flatten.each do |field|
             associated_map[field] = field.to_s.classify.constantize.all.inject({}) { |hash, c| hash[c.send(params[field]).to_s] = c; hash }
           end
    
-          label_method = import_config.label
-          before_import_save = import_config.before_import_save
+          label_method        = import_config.label
+          before_import_save  = import_config.before_import_save
+          
+          # handle nesting in parent object
+          if import_config.create_parent
+            parent_object = import_config.create_parent.call(role, current_user)
+            nested_field  = import_config.nested_field
+          end
           
           file.each do |row|
-            object = self.import_initialize(row, map, lookup_field_name)
+            new_attrs = {}
+            
+            self.import_fields.each do |key|
+              new_attrs[key] = row[map[key]] if map[key]
+            end
+            
+            lookup_field_value = row[map[lookup_field_name]] unless lookup_field_name.blank?
+            
+            object = self.import_initialize(new_attrs, lookup_field_name, lookup_field_value)
             object.import_belongs_to_data(associated_map, row, map)
             object.import_many_data(associated_map, row, map)
             
-            before_import_save.call(object, row, map) if before_import_save
-  
+            if before_import_save
+              before_import_save_args = [object, row, map, role, current_user]
+              before_import_save_args << parent_object if parent_object
+              
+              callback_result         = before_import_save.call(*before_import_save_args)
+              skip_nested_save        = callback_result == false && !parent_object.nil?
+            end
+            
             object.import_files(row, map)
-  
+            
+            if parent_object
+              parent_object.send(nested_field) << object
+            end
+            
             verb = object.new_record? ? "Create" : "Update"
+            
             if object.errors.empty?
-              if object.save
+              if skip_nested_save
+                logger.info "#{Time.now.to_s}: Skipped nested save: #{object.send(label_method)}" if RailsAdminImport.config.logging
+                results[:success] << "Skipped nested save: #{object.send(label_method)}"
+              elsif object.save
                 logger.info "#{Time.now.to_s}: #{verb}d: #{object.send(label_method)}" if RailsAdminImport.config.logging
                 results[:success] << "#{verb}d: #{object.send(label_method)}"
               else
@@ -146,36 +171,37 @@ module RailsAdminImport
               results[:error] << "Errors before save: #{object.send(label_method)}. Errors: #{object.errors.full_messages.join(', ')}."
             end
           end
+          
+          if parent_object
+            import_config.before_parent_save.call(parent_object, role, current_user) if import_config.before_parent_save
+            
+            if parent_object.save
+              logger.info "#{Time.now.to_s}: Saved #{parent_object.class.name}" if RailsAdminImport.config.logging
+              results[:success].unshift "Saved: #{parent_object.send(parent_label_method)}"
+            else
+              logger.info "#{Time.now.to_s}: Failed to save #{parent_object.class.name}. Errors: #{parent_object.errors.full_messages.join(', ')}." if RailsAdminImport.config.logging
+              results[:error].unshift "Failed to save #{parent_object.class.name}. Errors: #{parent_object.errors.full_messages.join(', ')}."
+            end
+          end
     
           results
-        rescue Exception => e
-          logger.info "#{Time.now.to_s}: Unknown exception in import: #{e.inspect}"
-          return results = { :success => [], :error => ["Could not upload. Unexpected error: #{e.to_s}"] }
-        end
+        # rescue Exception => e
+          # logger.info "#{Time.now.to_s}: Unknown exception in import: #{e.inspect}"
+          # return results = { :success => [], :error => ["Could not upload. Unexpected error: #{e.to_s}"] }
+        # end
       end
   
-      def import_initialize(row, map, lookup_field_name)
-        new_attrs = {}
-        self.import_fields.each do |key|
-          new_attrs[key] = row[map[key]] if map[key]
-        end
-        
+      def import_initialize(new_attrs, lookup_field, lookup_value)
         # model#where(lookup_field_name => value).first is more ORM compatible (works with Mongoid)
-        if lookup_field_name.present? && (item = self.send(:where, lookup_field_name => row[map[lookup_field_name]]).first)
-          item.assign_attributes new_attrs.except(lookup_field_name.to_sym), :as => RailsAdmin.config.attr_accessible_role
-          item.save
+        if lookup_field.present? && (item = self.send(:where, lookup_field => lokup_value).first)
+          item.assign_attributes new_attrs.except(lookup_field.to_sym), :as => RailsAdmin.config.attr_accessible_role
+          #item.save
         else
-          item = self.new(new_attrs)
+          item = self.new(new_attrs, :as => RailsAdmin.config.attr_accessible_role)
         end
-
-        item
       end
     end
-   
-    def before_import_save(*args)
-      # Meant to be overridden to do special actions
-    end
-
+    
     def import_display
       self.id
     end

@@ -27,8 +27,27 @@ module RailsAdminImport
         nil
       end
       
-      # params to callback will be (model, row, map)
+      # params to callback will be (model, row, map, role, current_user)
+      # return false to cancel save when importing nested collection
       register_instance_option(:before_import_save) do
+        nil
+      end
+      
+      ######  Import as nested collection  ######
+      
+      register_instance_option(:nested_field) do
+        nil
+      end
+      
+      # lambda that returns a parent instance
+      # receives args: role, current_user
+      register_instance_option(:create_parent) do
+        nil
+      end
+      
+      # param to callback will be (parent)
+      # receives args: parent_object, role, current_user
+      register_instance_option(:before_parent_save) do
         nil
       end
       

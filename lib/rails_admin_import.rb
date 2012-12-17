@@ -5,11 +5,11 @@ require "rails_admin_import/config"
 module RailsAdminImport
   def self.config(entity = nil, &block)
     if entity
-    RailsAdminImport::Config.model(entity, &block)
+      RailsAdminImport::Config.model(entity, &block)
     elsif block_given? && ENV['SKIP_RAILS_ADMIN_INITIALIZER'] != "true"
       block.call(RailsAdminImport::Config)
-  else
-    RailsAdminImport::Config
+    else
+      RailsAdminImport::Config
     end
   end
 
@@ -26,12 +26,16 @@ module RailsAdmin
       class Import < Base
         RailsAdmin::Config::Actions.register(self)
         
-        register_instance_option :collection do
+        register_instance_option(:collection) do
           true
         end
 
-        register_instance_option :http_methods do
+        register_instance_option(:http_methods) do
           [:get, :post]
+        end
+
+        register_instance_option(:link_icon) do
+          'icon-folder-open'
         end
 
         register_instance_option :controller do
@@ -39,17 +43,13 @@ module RailsAdmin
             @response = {}
 
             if request.post?
-              results = @abstract_model.model.run_import(params)
-              @response[:notice] = results[:success].join("<br />").html_safe if results[:success].any?
-              @response[:error] = results[:error].join("<br />").html_safe if results[:error].any?
+              results             = @abstract_model.model.run_import(params, _attr_accessible_role, _current_user)
+              @response[:notice]  = results[:success].join("<br />").html_safe  if results[:success].any?
+              @response[:error]   = results[:error].join("<br />").html_safe    if results[:error].any?
             end
 
             render :action => @action.template_name
           end
-        end
-
-        register_instance_option :link_icon do
-          'icon-folder-open'
         end
       end
     end
