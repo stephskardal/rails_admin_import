@@ -101,12 +101,12 @@ module RailsAdminImport
           end
           
           if import_config.update_lookup_field
-            update = import_config.update_lookup_field
+            lookup_field_name = import_config.update_lookup_field
           elsif !params[:update_lookup].blank?
-            update = params[:update_lookup].to_sym
+            lookup_field_name = params[:update_lookup].to_sym
           end
           
-          if update && !map.has_key?(update)
+          if lookup_field_name && !map.has_key?(lookup_field_name)
             return results = { :success => [], :error => ["Your file must contain a column for the 'Update lookup field' you selected."] }
           end 
     
@@ -124,7 +124,7 @@ module RailsAdminImport
           before_import_save = import_config.before_import_save
           
           file.each do |row|
-            object = self.import_initialize(row, map, update)
+            object = self.import_initialize(row, map, lookup_field_name)
             object.import_belongs_to_data(associated_map, row, map)
             object.import_many_data(associated_map, row, map)
             
@@ -148,21 +148,21 @@ module RailsAdminImport
           end
     
           results
-        # rescue Exception => e
-          # logger.info "#{Time.now.to_s}: Unknown exception in import: #{e.inspect}"
-          # return results = { :success => [], :error => ["Could not upload. Unexpected error: #{e.to_s}"] }
-        # end
+        rescue Exception => e
+          logger.info "#{Time.now.to_s}: Unknown exception in import: #{e.inspect}"
+          return results = { :success => [], :error => ["Could not upload. Unexpected error: #{e.to_s}"] }
+        end
       end
   
-      def import_initialize(row, map, update)
+      def import_initialize(row, map, lookup_field_name)
         new_attrs = {}
         self.import_fields.each do |key|
           new_attrs[key] = row[map[key]] if map[key]
         end
         
-        # model#where(update => value).first is more ORM compatible (works with Mongoid)
-        if update.present? && (item = self.send(:where, update => row[map[update]]).first)
-          item.assign_attributes new_attrs.except(update.to_sym), :as => RailsAdmin.config.attr_accessible_role
+        # model#where(lookup_field_name => value).first is more ORM compatible (works with Mongoid)
+        if lookup_field_name.present? && (item = self.send(:where, lookup_field_name => row[map[lookup_field_name]]).first)
+          item.assign_attributes new_attrs.except(lookup_field_name.to_sym), :as => RailsAdmin.config.attr_accessible_role
           item.save
         else
           item = self.new(new_attrs)
