@@ -193,7 +193,7 @@ module RailsAdminImport
   
       def import_initialize(new_attrs, lookup_field, lookup_value)
         # model#where(lookup_field_name => value).first is more ORM compatible (works with Mongoid)
-        if lookup_field.present? && (item = self.send(:where, lookup_field => lokup_value).first)
+        if lookup_field.present? && (item = self.send(:where, lookup_field => lookup_value).first)
           item.assign_attributes new_attrs.except(lookup_field.to_sym), :as => RailsAdmin.config.attr_accessible_role
           #item.save
         else
