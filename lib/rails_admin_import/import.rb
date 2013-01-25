@@ -177,11 +177,14 @@ module RailsAdminImport
             
             if parent_object.save
               logger.info "#{Time.now.to_s}: Saved #{parent_object.class.name}" if RailsAdminImport.config.logging
-              results[:success].unshift "Saved: #{parent_object.send(parent_label_method)}"
+              results[:success].unshift "Saved: #{parent_object}"
             else
               logger.info "#{Time.now.to_s}: Failed to save #{parent_object.class.name}. Errors: #{parent_object.errors.full_messages.join(', ')}." if RailsAdminImport.config.logging
               results[:error].unshift "Failed to save #{parent_object.class.name}. Errors: #{parent_object.errors.full_messages.join(', ')}."
             end
+            
+            import_config.after_parent_save.call(parent_object, role, current_user) if import_config.after_parent_save
+            
           end
     
           results
@@ -192,12 +195,13 @@ module RailsAdminImport
       end
   
       def import_initialize(new_attrs, lookup_field, lookup_value)
+        mass_assignment_role = RailsAdmin.config.attr_accessible_role.call
         # model#where(lookup_field_name => value).first is more ORM compatible (works with Mongoid)
         if lookup_field.present? && (item = self.send(:where, lookup_field => lookup_value).first)
-          item.assign_attributes new_attrs.except(lookup_field.to_sym), :as => RailsAdmin.config.attr_accessible_role
+          item.assign_attributes new_attrs.except(lookup_field.to_sym), :as => mass_assignment_role
           #item.save
         else
-          item = self.new(new_attrs, :as => RailsAdmin.config.attr_accessible_role)
+          item = self.new(new_attrs, :as => mass_assignment_role)
         end
       end
     end

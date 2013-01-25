@@ -24,9 +24,9 @@ module RailsAdminImport
       # Returns given model's configuration
       #
       # @see RailsAdminImport::Config.registry
-      def model(entity, &block)
-        key     = entity.name.to_sym
-        config  = @registry[key] ||= RailsAdminImport::Config::Model.new(entity)
+      def model(entity_name, &block)
+        key     = entity_name.is_a?(String) ? entity_name.to_sym : entity_name.name.to_sym
+        config  = @registry[key] ||= RailsAdminImport::Config::Model.new(key.to_s)
         config.instance_eval(&block) if block
         config
       end

@@ -4,7 +4,7 @@ require 'rails_admin_import/config/base'
 module RailsAdminImport
   module Config
     class Model < RailsAdminImport::Config::Base
-      def initialize(entity)
+      def initialize(entity_name)
       end
 
       register_instance_option(:label) do
@@ -48,6 +48,9 @@ module RailsAdminImport
       # param to callback will be (parent)
       # receives args: parent_object, role, current_user
       register_instance_option(:before_parent_save) do
+        nil
+      end
+      register_instance_option(:after_parent_save) do
         nil
       end
       
