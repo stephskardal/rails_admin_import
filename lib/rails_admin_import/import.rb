@@ -47,8 +47,8 @@ module RailsAdminImport
         fields
       end
  
-      def belongs_to_fields
-        attrs = self.model_associations.select{|k, v| [:belongs_to, :embedded_in].include?(v.macro) }.keys.collect(&:to_sym)
+      def belongs_to_fields(klass = self)
+        attrs = klass.model_associations.select{|k, v| [:belongs_to, :embedded_in].include?(v.macro) }.keys.collect(&:to_sym)
         attrs.select{|attr| import_config.included_fields.include?(attr)}# - import_config.excluded_fields 
       end
   
@@ -200,6 +200,7 @@ module RailsAdminImport
         if lookup_field.present? && (item = self.send(:where, lookup_field => lookup_value).first)
           item.assign_attributes new_attrs.except(lookup_field.to_sym), :as => mass_assignment_role
           #item.save
+          item
         else
           item = self.new(new_attrs, :as => mass_assignment_role)
         end

@@ -23,7 +23,7 @@
     </fieldset>
     
     <% associated_fields = [@abstract_model.model.belongs_to_fields, @abstract_model.model.many_fields].flatten %>
-    <% if associated_fields.size > 0 %>
+    <% if associated_fields.any? %>
       <fieldset>
         <% associated_fields.each do |field| -%>
           <legend><%= field %> mapping</legend>
@@ -59,10 +59,10 @@
 <h2>Field Options</h2>
 
 <p class="lead">
-  The following fields may be included in the import file
+  The following fields may be included in the import file:
 </p>
 
-<table class="table">
+<table class="table pull-left">
   <tr>
     <td valign="top">
       <h3>Standard Fields</h3>

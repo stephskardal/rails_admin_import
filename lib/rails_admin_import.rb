@@ -41,6 +41,9 @@ module RailsAdmin
         register_instance_option :controller do
           Proc.new do
             @response = {}
+            
+            # make sure class has import-related methods
+            @abstract_model.model.send :include, ::RailsAdminImport::Import
 
             if request.post?
               results             = @abstract_model.model.run_import(params, _attr_accessible_role, _current_user)
