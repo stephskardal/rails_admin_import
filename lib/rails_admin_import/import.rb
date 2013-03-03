@@ -101,8 +101,6 @@ module RailsAdminImport
           elsif !params[:update_lookup].blank?
             lookup_field_name = params[:update_lookup].to_sym
           end
-          
-          debugger
 
           if lookup_field_name && !map.has_key?(lookup_field_name)
             return results = { 
@@ -170,7 +168,11 @@ module RailsAdminImport
                 results[:success] << "Skipped nested save: #{object.send(label_method)}"
               elsif object.save
                 logger.info "#{Time.now.to_s}: #{verb}d: #{object.send(label_method)}" if RailsAdminImport.config.logging
-                results[:success] << "#{verb}d: #{object.send(label_method)}"
+                
+                # TODO - replace this concatenated string with a named route. 
+                # I couldn't figure out how to reference a named route from ithin RailsAdmin
+                results[:success] << "#{verb}d: <a href=\"#{object.id}\">#{object.send(label_method)}</a>"
+
               else
                 logger.info "#{Time.now.to_s}: Failed to #{verb.downcase}: #{object.send(label_method)}. Errors: #{object.errors.full_messages.join(', ')}." if RailsAdminImport.config.logging
                 results[:error] << "Failed to #{verb.downcase}: #{object.send(label_method)}. Errors: #{object.errors.full_messages.join(', ')}."
