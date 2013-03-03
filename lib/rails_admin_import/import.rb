@@ -84,15 +84,15 @@ module RailsAdminImport
             return results = { :success => [], :error => ["Please limit upload file to #{RailsAdminImport.config.line_item_limit} line items."] }
           end
   
-          map         = {}
+          map         = HashWithIndifferentAccess.new {}
           file        = CSV.new(clean)
           
           file.readline.each_with_index do |key, i|
             if self.many_fields.include?(key.to_sym)
-              map[key.to_sym] ||= []
-              map[key.to_sym] << i
+              map[key.downcase.to_sym] ||= []
+              map[key.downcase.to_sym] << i
             else
-              map[key.to_sym] = i 
+              map[key.downcase.to_sym] = i 
             end
           end
           
@@ -102,8 +102,17 @@ module RailsAdminImport
             lookup_field_name = params[:update_lookup].to_sym
           end
           
+          debugger
+
           if lookup_field_name && !map.has_key?(lookup_field_name)
-            return results = { :success => [], :error => ["Your file must contain a column for the 'Update lookup field' you selected."] }
+            return results = { 
+              :success => [], 
+              :error => [
+                "Your file must contain a column for the 'Update lookup field' you selected.", 
+                "The current 'Upate lookup field' is '#{lookup_field_name}'.", 
+                "The columns found were #{map.keys}"
+              ] 
+            }
           end 
     
           results = { :success => [], :error => [] }
