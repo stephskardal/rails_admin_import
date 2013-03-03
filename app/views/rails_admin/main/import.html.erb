@@ -1,6 +1,19 @@
+<% if @response -%>
+  <% if @response.has_key?(:error) -%>
+    <div class="alert-error alert">
+      <%= @response[:error] %>
+    </div>
+  <% end -%>
+  <% if @response.has_key?(:notice) -%>
+    <div class="alert-success alert">
+      <%= @response[:notice] %>
+    </div>
+  <% end -%>
+<% end -%>
+
 <%= form_tag rails_admin.import_url(@abstract_model.to_param), :multipart => true do |f| -%>
   
-  <div class="well pull-right">
+  <div class="well">
     
     <fieldset>
       <legend>Upload CSV</legend>
@@ -41,19 +54,6 @@
 
   </div>
   
-<% end -%>
-
-<% if @response -%>
-  <% if @response.has_key?(:error) -%>
-    <div class="alert-error alert">
-      <%= @response[:error] %>
-    </div>
-  <% end -%>
-  <% if @response.has_key?(:notice) -%>
-    <div class="alert-success alert">
-      <%= @response[:notice] %>
-    </div>
-  <% end -%>
 <% end -%>
 
 <h2>Field Options</h2>
