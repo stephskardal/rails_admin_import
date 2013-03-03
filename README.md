@@ -40,6 +40,10 @@ Installation
           self.import_nested_data(row, map)
         end
 
+        def after_import_save(row, map)
+          
+        end
+
 * "import" action must be added inside config.actions block in main application RailsAdmin configuration: config/initializers/rails_admin.rb.
 
         config.actions do
