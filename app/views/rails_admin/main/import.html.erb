@@ -11,114 +11,170 @@
   <% end -%>
 <% end -%>
 
-<%= form_tag rails_admin.import_url(@abstract_model.to_param), :multipart => true do |f| -%>
-  
-  <div class="well">
-    
-    <fieldset>
-      <legend>Upload CSV</legend>
-      <label>Choose a file</label>
-      <%= file_field_tag :file %>
-      <span class="help-block">
-        <i class="icon icon-warning-sign"></i> 
-        limit file to <%= RailsAdminImport.config.line_item_limit %> line items.
-      </span>
+<div class="row-fluid">
+  <div class="span6" >
+    <%= form_tag rails_admin.import_url(@abstract_model.to_param), :multipart => true do |f| -%>
       
-      <% unless RailsAdminImport.config(@abstract_model.model).update_lookup_field %>
-        <label>Update existing records?</label>
-        <select name="update_lookup">
-          <option value="">Import as new records</option>
-          <% @abstract_model.model.new.attributes.keys.each do |key| -%>
-            <option value="<%= key %>">Update by <%= key %></option>
-          <% end -%>
-        </select>
-      <% end %>
-    </fieldset>
-    
-    <% associated_fields = [@abstract_model.model.belongs_to_fields, @abstract_model.model.many_fields].flatten %>
-    <% if associated_fields.any? %>
-      <fieldset>
-        <% associated_fields.each do |field| -%>
-          <legend><%= field %> mapping</legend>
-          <select name="<%= field %>">
-            <% field_meta = @abstract_model.model.model_associations[field] %>
-            <% (field_meta ? field_meta.class_name : field.to_s.classify).constantize.new.attributes.keys.each do |key| -%>
-              <option value="<%= key %>"><%= key %></option>
+      <div class="well">
+        
+        <fieldset>
+          <legend>Upload CSV, JSON, or XML file</legend>
+          <p class="text-warning">Only CSV work currentlly! JSON and XML to come!</p>
+          <label>Choose a file</label>
+          <%= file_field_tag :file %>
+          <span class="help-block">
+            <i class="icon icon-warning-sign"></i> 
+            limit file to <%= RailsAdminImport.config.line_item_limit %> line items.
+          </span>
+          
+          <% unless RailsAdminImport.config(@abstract_model.model).update_lookup_field %>
+            <label>Update existing records?</label>
+            <select name="update_lookup">
+              <option value="">Import as new records</option>
+              <% @abstract_model.model.new.attributes.keys.each do |key| -%>
+                <option value="<%= key %>">Update by <%= key %></option>
+              <% end -%>
+            </select>
+          <% end %>
+        </fieldset>
+        
+        <% associated_fields = [@abstract_model.model.belongs_to_fields, @abstract_model.model.many_fields].flatten %>
+        <% if associated_fields.any? %>
+          <fieldset>
+            <% associated_fields.each do |field| -%>
+              <legend><%= field %> mapping</legend>
+              <select name="<%= field %>">
+                <% field_meta = @abstract_model.model.model_associations[field] %>
+                <% (field_meta ? field_meta.class_name : field.to_s.classify).constantize.new.attributes.keys.each do |key| -%>
+                  <option value="<%= key %>"><%= key %></option>
+                <% end -%>
+              <select>
             <% end -%>
-          <select>
-        <% end -%>
-      </fieldset>
-    <% end %>
-      
-    <%= submit_tag "Upload", :disable_with => "Uploading...", :class => "btn btn-primary" %>
+          </fieldset>
+        <% end %>
+          
+        <%= submit_tag "Upload", :disable_with => "Uploading...", :class => "btn btn-primary" %>
 
+      </div>
+      
+    <% end -%>
+    </div>
+    <div class="span6" >
+    <%= form_tag rails_admin.import_url(@abstract_model.to_param), :multipart => true do |f| -%>
+      
+      <div class="well">
+        
+        <fieldset>
+          <legend>Pull from a RSS file</legend>
+          <label>Choose a file</label>
+          <%= url_field_tag :file %>
+          <span class="help-block">
+            <i class="icon icon-warning-sign"></i> 
+            limit file to <%= RailsAdminImport.config.line_item_limit %> line items.
+          </span>
+          
+          <% unless RailsAdminImport.config(@abstract_model.model).update_lookup_field %>
+            <label>Update existing records?</label>
+            <select name="update_lookup">
+              <option value="">Import as new records</option>
+              <% @abstract_model.model.new.attributes.keys.each do |key| -%>
+                <option value="<%= key %>">Update by <%= key %></option>
+              <% end -%>
+            </select>
+          <% end %>
+        </fieldset>
+        
+        <% associated_fields = [@abstract_model.model.belongs_to_fields, @abstract_model.model.many_fields].flatten %>
+        <% if associated_fields.any? %>
+          <fieldset>
+            <% associated_fields.each do |field| -%>
+              <legend><%= field %> mapping</legend>
+              <select name="<%= field %>">
+                <% field_meta = @abstract_model.model.model_associations[field] %>
+                <% (field_meta ? field_meta.class_name : field.to_s.classify).constantize.new.attributes.keys.each do |key| -%>
+                  <option value="<%= key %>"><%= key %></option>
+                <% end -%>
+              <select>
+            <% end -%>
+          </fieldset>
+        <% end %>
+          
+        <%= submit_tag "Pull", :disable_with => "Pull...", :class => "btn btn-primary" %>
+
+      </div>
+    </div>
   </div>
-  
 <% end -%>
 
-<h2>Field Options</h2>
+<div class="row-fluid">
+  <div class="span6">
+    <h2>Field Options</h2>
 
-<p class="lead">
-  The following fields may be included in the import file:
-</p>
+    <p class="lead">
+      The following fields may be included in the import file:
+    </p>
+  </div>
 
-<table class="table pull-left">
-  <tr>
-    <td valign="top">
-      <h3>Standard Fields</h3>
-      <ul>
-        <% @abstract_model.model.import_fields.each do |field| -%>
-          <li><%= field %></li>
+  <div class="span6">
+    <table class="table">
+      <tr>
+        <td valign="top">
+          <h3>Standard Fields</h3>
+          <ul>
+            <% @abstract_model.model.import_fields.each do |field| -%>
+              <li><%= field %></li>
+            <% end -%>
+          </ul>
+        </td>
+        
+        <% if @abstract_model.model.belongs_to_fields.any? -%>
+          <td valign="top">
+            <h3>Belongs To Fields</h3>
+            <ul>
+              <% @abstract_model.model.belongs_to_fields.each do |field| -%>
+                <li><%= field %></li>
+              <% end -%>
+            </ul>
+            <small>These fields map to other items in the database, lookup via attribute selected below.</small>
+          </td>
         <% end -%>
-      </ul>
-    </td>
-    
-    <% if @abstract_model.model.belongs_to_fields.any? -%>
-      <td valign="top">
-        <h3>Belongs To Fields</h3>
-        <ul>
-          <% @abstract_model.model.belongs_to_fields.each do |field| -%>
-            <li><%= field %></li>
-          <% end -%>
-        </ul>
-        <small>These fields map to other items in the database, lookup via attribute selected below.</small>
-      </td>
-    <% end -%>
-    
-    <% if @abstract_model.model.file_fields.any? -%>
-      <td valign="top">
-        <h3>File Fields</h3>
-        <ul>
-          <% @abstract_model.model.file_fields.each do |field| -%>
-            <li><%= field %></li>
-          <% end -%>
-        </ul>
-        <small>These must be a downloadable URL.</small>
-      </td>
-    <% end -%>
-    
-    <% if @abstract_model.model.many_fields.any? -%>
-      <td valign="top">
-        <h3>Multiple Fields</h3>
-        <ul>
-          <% @abstract_model.model.many_fields.each do |field| -%>
-            <li><%= field %></li>
-          <% end -%>
-        </ul>
-        <small>These fields map to other columns in the database, lookup via attribute selected below. There may be multiple columns with this header in the spreadsheet.</small>
-      </td>
-    <% end -%>
-    
-    <% if RailsAdminImport.config(@abstract_model.model).extra_fields.any? -%>
-      <td valign="top">
-        <h3>Extra Fields</h3>
-        <ul>
-          <% RailsAdminImport.config(@abstract_model.model).extra_fields.each do |field| -%>
-            <li><%= field %></li>
-          <% end -%>
-        </ul>
-        <small>Additional application specific fields.</small>
-      </td>
-    <% end -%>
-  </tr>
-</table>
+        
+        <% if @abstract_model.model.file_fields.any? -%>
+          <td valign="top">
+            <h3>File Fields</h3>
+            <ul>
+              <% @abstract_model.model.file_fields.each do |field| -%>
+                <li><%= field %></li>
+              <% end -%>
+            </ul>
+            <small>These must be a downloadable URL.</small>
+          </td>
+        <% end -%>
+        
+        <% if @abstract_model.model.many_fields.any? -%>
+          <td valign="top">
+            <h3>Multiple Fields</h3>
+            <ul>
+              <% @abstract_model.model.many_fields.each do |field| -%>
+                <li><%= field %></li>
+              <% end -%>
+            </ul>
+            <small>These fields map to other columns in the database, lookup via attribute selected below. There may be multiple columns with this header in the spreadsheet.</small>
+          </td>
+        <% end -%>
+        
+        <% if RailsAdminImport.config(@abstract_model.model).extra_fields.any? -%>
+          <td valign="top">
+            <h3>Extra Fields</h3>
+            <ul>
+              <% RailsAdminImport.config(@abstract_model.model).extra_fields.each do |field| -%>
+                <li><%= field %></li>
+              <% end -%>
+            </ul>
+            <small>Additional application specific fields.</small>
+          </td>
+        <% end -%>
+      </tr>
+    </table>
+  </div>
+</div>
