@@ -137,21 +137,11 @@ module RailsAdminImport
         # end
         #######
         
+        # for each of the items in the rss file...
         rss.entries.each do |entry|
-          
-          puts entry.inspect
 
-          new_attrs = {
-            :title => entry.title,      # => "Ruby Http Client Library Performance"
-            # entry.url        # => "http://www.pauldix.net/2009/01/ruby-http-client-library-performance.html"
-            # entry.author     # => "Paul Dix"
-            # entry.summary    # => "..."
-            :body => entry.summary,    # => "..."
-            # entry.published  # => Thu Jan 29 17:00:19 UTC 2009 # it's a Time object
-            :published_at => entry.published
-          }
-
-          # debugger
+          # Excute the Procs in rss_mapping with the entry from the rss item
+          new_attrs = Hash[import_config.rss_mapping.map{ |k, v| [k, v.call(entry)] }]
           
           # self.import_fields.each do |key|
           #   new_attrs[key] = row[map[key]] if map[key]
@@ -159,7 +149,7 @@ module RailsAdminImport
           
           # lookup_field_value = row[map[lookup_field_name]] unless lookup_field_name.blank?
           
-          object = self.import_initialize(new_attrs, :title, entry.title)
+          object = self.import_initialize(new_attrs, :title, new_attrs[:title])
           # object.import_belongs_to_data(associated_map, row, map)
           # object.import_many_data(associated_map, row, map)
           

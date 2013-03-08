@@ -4,6 +4,7 @@ require 'rails_admin_import/config/base'
 module RailsAdminImport
   module Config
     class Model < RailsAdminImport::Config::Base
+
       def initialize(entity_name)
       end
 
@@ -25,6 +26,10 @@ module RailsAdminImport
       
       register_instance_option(:update_lookup_field) do
         nil
+      end
+
+      register_instance_option(:rss_mapping) do
+        {}
       end
       
       # params to callback will be (model, row, map, role, current_user)
