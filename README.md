@@ -24,35 +24,38 @@ Installation
           config.model User do
           
             # Fields to make available for import (whitelist)
-            
             included_fields do
               [:field1, :field2, :field3]
             end
             
             # Fields to skip (blacklist)
-            
             excluded_fields do
               [:field1, :field2, :field3]
             end
             
             # Custom methods to get/set the values on? (Not in use?)
-            
             extra_fields do
               [:field3, :field4, :field5]
             end
             
             # Name of the method on the model to use in alert messages indicating success/failure of import
-            
             label :name
             
             # Specifies the field to use to find existing records (when nil, admin page shows dropdown with options)
-            
             update_lookup_field do
               :email
             end
             
-            # Define instance methods to be hooked into the import process, if special/additional processing is required on the data
+            # map fields to an RSS feed
+            rss_mapping do
+              {
+                :title => Proc.new{ |item| item.title  + item.published.to_s },
+                :body => Proc.new{ |item| item.summary },
+                :published_at => Proc.new{ |item| item.published }
+              }
+            end
             
+            # Define instance methods to be hooked into the import process, if special/additional processing is required on the data
             before_import_save do
               # block must return an object that responds to the "call" method
               lambda do |model, row, map|
