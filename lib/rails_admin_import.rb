@@ -16,6 +16,13 @@ module RailsAdminImport
   def self.reset
     RailsAdminImport::Config.reset
   end
+  
+  module Helper
+    def self.include?(list, value)
+      value = value.to_s.downcase
+      list.any?{ |other| other.to_s.downcase.casecmp(value) == 0 }
+    end
+  end
 end
 
 require 'rails_admin/config/actions'

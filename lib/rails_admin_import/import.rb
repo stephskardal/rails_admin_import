@@ -84,8 +84,8 @@ module RailsAdminImport
             return results = { :success => [], :error => ["Please limit upload file to #{RailsAdminImport.config.line_item_limit} line items."] }
           end
   
-          map         = {}
-          file        = CSV.new(clean)
+          map   = {}
+          file  = CSV.new(clean)
           
           file.readline.each_with_index do |key, i|
             if self.many_fields.include?(key.to_sym)
@@ -186,6 +186,8 @@ module RailsAdminImport
             import_config.after_parent_save.call(parent_object, role, current_user) if import_config.after_parent_save
             
           end
+          
+          import_config.after_import.call(results) if import_config.after_import
     
           results
         # rescue Exception => e

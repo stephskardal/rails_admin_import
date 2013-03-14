@@ -33,6 +33,10 @@ module RailsAdminImport
         nil
       end
       
+      # callback that receives results array
+      register_instance_option(:after_import) do
+        nil
+      end
       ######  Import as nested collection  ######
       
       register_instance_option(:nested_field) do
