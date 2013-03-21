@@ -12,32 +12,17 @@
 <% end -%>
 
 <div class="row-fluid">
-  <div class="span4" >
-    <div class="well" >
-      <legend>File types accepted</legend>
-
-      <ul>
-        <li>CSV</li>
-        <li><del>XML</del></li>
-        <li><del>JSON</del></li>
-        <li><del>YAML</del></li>
-        <li><del>RSS</del></li>
-      </ul>
-        
-      <span class="help-block">
-        <i class="icon icon-warning-sign"></i> 
-        limit file to <%= RailsAdminImport.config.line_item_limit %> line items.
-      </span>
-    </div>
-  </div>
-
-  <div class="span4" >
+  <div class="span6" >
     <%= form_tag rails_admin.import_url(@abstract_model.to_param), :multipart => true do |f| -%>
 
       <div class="well">
         
         <fieldset>
-          <legend>Import from a file</legend>
+          <legend>Upload a file</legend>
+
+          <%= select_tag(:type,  options_for_select([:rss, :csv])) %>
+
+
           <!-- <label>Choose a file</label> -->
           <%= file_field_tag :file %>
           <!-- <span class="help-block">
@@ -78,20 +63,23 @@
     <% end -%>
     </div>
 
-    <div class="span4" >
+    <div class="span6" >
       <%= form_tag rails_admin.import_url(@abstract_model.to_param), :multipart => true do |f| -%>
         
         <div class="well">
         
           <fieldset>
-          <legend>Import from a RSS</legend>
+          <legend>Import from a URL</legend>
 
-          <label>Choose a file</label>
+          <%= select_tag(:type,  options_for_select([:rss, :csv])) %>
+
           <%= url_field_tag :file, "http://adamwong246.tumblr.com/rss" %>
           <!-- <span class="help-block">
             <i class="icon icon-warning-sign"></i> 
             limit file to <%= RailsAdminImport.config.line_item_limit %> line items.
           </span> -->
+
+
           
           <% unless RailsAdminImport.config(@abstract_model.model).update_lookup_field %>
             <label>Update existing records?</label>
