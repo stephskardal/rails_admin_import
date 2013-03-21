@@ -66,7 +66,12 @@ module RailsAdminImport
       def run_import(param_file, param_update_lookup_field = nil, associated_map = nil, file_type, role, user)
 
         if (param_file.is_a? String) 
-          temp_file =  open(param_file)
+          temp_file = Tempfile.new('foo')
+          begin
+             open(param_file) { |data| temp_file.write data.read }
+          ensure
+             temp_file.close
+          end
         elsif param_file.is_a? ActionDispatch::Http::UploadedFile
           temp_file = param_file.tempfile
         else
@@ -74,7 +79,7 @@ module RailsAdminImport
         end
 
         if RailsAdminImport.config.logging
-          FileUtils.copy(temp_file, "#{Rails.root}/log/import/#{Time.now.strftime("%Y-%m-%d-%H-%M-%S")}-import.csv")
+          FileUtils.copy(temp_file, "#{Rails.root}/log/import/#{Time.now.strftime("%Y-%m-%d-%H-%M-%S")}-import")
           logger = Logger.new("#{Rails.root}/log/import/import.log")
         end
 
