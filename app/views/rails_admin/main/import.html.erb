@@ -18,9 +18,9 @@
       <div class="well">
         
         <fieldset>
-          <legend>Upload a file</legend>
+          <legend>Upload a file from your computer</legend>
 
-          <%= select_tag(:type,  options_for_select([:rss, :csv])) %>
+          <%= select_tag(:type,  options_for_select(@file_types_accepted)) %>
 
 
           <!-- <label>Choose a file</label> -->
@@ -69,9 +69,9 @@
         <div class="well">
         
           <fieldset>
-          <legend>Import from a URL</legend>
+          <legend>Download a file from a URL</legend>
 
-          <%= select_tag(:type,  options_for_select([:rss, :csv])) %>
+          <%= select_tag(:type,  options_for_select(@file_types_accepted)) %>
 
           <%= url_field_tag :file, "http://adamwong246.tumblr.com/rss" %>
           <!-- <span class="help-block">

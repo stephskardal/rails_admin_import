@@ -40,6 +40,8 @@ module RailsAdmin
 
         register_instance_option :controller do
           Proc.new do
+            @file_types_accepted = [:csv, :json, :rss]
+            
             @response = {}
 
             # make sure class has import-related methods
@@ -51,11 +53,9 @@ module RailsAdmin
               end
 
               associated_map = {}
-
               @abstract_model.model.belongs_to_fields.flatten.each do |field|
                 associated_map[field] = field.to_s.classify.constantize.all.inject({}) { |hash, c| hash[c.send(params[field]).to_s] = c.id; hash }
               end
-              
               @abstract_model.model.many_fields.flatten.each do |field|
                 associated_map[field] = field.to_s.classify.constantize.all.inject({}) { |hash, c| hash[c.send(params[field]).to_s] = c; hash }
               end
@@ -69,10 +69,9 @@ module RailsAdmin
                 _current_user
               )
 
-
-
               @response[:notice]  = results[:success].join("<br />").html_safe  if results[:success].any?
               @response[:error]   = results[:error].join("<br />").html_safe    if results[:error].any?
+
             end
 
             # if request.post?

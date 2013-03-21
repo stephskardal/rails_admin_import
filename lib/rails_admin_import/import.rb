@@ -84,13 +84,20 @@ module RailsAdminImport
           lookup_field_name = param_update_lookup_field.to_sym
         end
 
-        if file_type == :csv
-          return csv_import(temp_file, lookup_field_name, associated_map, role, user)
-        elsif file_type == :rss
-          return rss_import(temp_file, lookup_field_name, role, user)
-        else
-          return { :success => [], :error => ["Could not recognize the file type: #{file_type.to_s}"] }
+        begin
+          if file_type == :csv
+            return csv_import(temp_file, lookup_field_name, associated_map, role, user)
+          elsif file_type == :rss
+            return rss_import(temp_file, lookup_field_name, role, user)
+          else
+            return { :success => [], :error => ["Could not recognize the file type: #{file_type.to_s}"] }
+          end
+        rescue Exception => e
+          # debugger
+
+          return { :success => [], :error => ["Failed to parse #{file_type.to_s} file. " + e.class.to_s + ", " + e.message] }
         end
+
 
       end
 
