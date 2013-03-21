@@ -73,7 +73,7 @@
 
           <%= select_tag(:type,  options_for_select(@file_types_accepted)) %>
 
-          <%= url_field_tag :file, "http://adamwong246.tumblr.com/rss" %>
+          <%= url_field_tag :file %>
           <!-- <span class="help-block">
             <i class="icon icon-warning-sign"></i> 
             limit file to <%= RailsAdminImport.config.line_item_limit %> line items.
