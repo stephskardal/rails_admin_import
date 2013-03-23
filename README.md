@@ -1,7 +1,11 @@
-Rails Admin Import functionality
+rails_admin_import++ 
 ========
 
-Plugin functionality to add generic import to Rails Admin interface. This fork specifically adds the ability to ignore duplicate records by some column. 
+Plugin functionality to add generic import to Rails Admin interface. This fork expands upon the 'official' gem.
+* The ability to ignore duplicate records by the lookup field. 
+* The ability to import records from a url.
+* The ability to import a block of raw text.
+* Accepts CSV, JSON and RSS 
 
 Installation
 ========

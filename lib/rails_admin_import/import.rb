@@ -5,6 +5,11 @@ module RailsAdminImport
     extend ActiveSupport::Concern
   
     module ClassMethods
+
+      def file_formats_accepted
+        [:csv, :json, :rss]
+      end
+
       def import_config
         @import_config ||= RailsAdminImport.config(self)
       end
@@ -63,20 +68,34 @@ module RailsAdminImport
         associations = self.respond_to?(:relations) ? self.relations : self.reflections
       end
 
-      def run_import(param_file, param_update_lookup_field = nil, associated_map = nil, file_type, role, user)
+      # input = data to process
+      # input_type = :upload, :raw_text, :url
+      # input_format = :json, :rss, :csv
+      # input, input_type, input_format, param_update_lookup_field = nil, associated_map = nil, role, user
+      def run_import(opts)
 
-        if (param_file.is_a? String) 
-          temp_file = Tempfile.new('foo')
-          begin
-             open(param_file) { |data| temp_file.write data.read }
-          ensure
-             temp_file.close
+        # debugger
+
+        case opts[:type]
+          when :url
+            temp_file = Tempfile.new('foo')
+            begin
+               open(opts[:input]) { |data| temp_file.write data.read }
+            ensure
+               temp_file.close
+            end
+          when :upload
+            temp_file = opts[:input].tempfile
+          when :raw_text
+            temp_file = Tempfile.new('foo')
+            begin
+               temp_file.write opts[:input]
+            ensure
+               temp_file.close
+            end
+          else
+            return { :success => [], :error => ["You must choose a :type of "] }
           end
-        elsif param_file.is_a? ActionDispatch::Http::UploadedFile
-          temp_file = param_file.tempfile
-        else
-          return { :success => [], :error => ["Couldn't parse your file."] }
-        end
 
         if RailsAdminImport.config.logging
           FileUtils.copy(temp_file, "#{Rails.root}/log/import/#{Time.now.strftime("%Y-%m-%d-%H-%M-%S")}-import")
@@ -85,25 +104,20 @@ module RailsAdminImport
 
         if import_config.update_lookup_field
           lookup_field_name = import_config.update_lookup_field
-        elsif !param_update_lookup_field.blank?
-          lookup_field_name = param_update_lookup_field.to_sym
+        elsif !opts[:lookup].blank?
+          lookup_field_name = opts[:lookup].to_sym
         end
 
-        
-          if file_type == :csv
-            return csv_import(temp_file, lookup_field_name, associated_map, role, user)
-          elsif file_type == :json
-            return json_import(temp_file, lookup_field_name, associated_map, role, user)
-          elsif file_type == :rss
-            return rss_import(temp_file, lookup_field_name, role, user)
+        case opts[:format]
+          when :csv
+            return csv_import(temp_file, opts[:lookup], opts[:associated_map], opts[:role], opts[:user])
+          when :json
+            return json_import(temp_file, opts[:lookup], opts[:associated_map], opts[:role], opts[:user])
+          when :rss
+            return rss_import(temp_file, opts[:lookup], opts[:associated_map], opts[:role], opts[:user])
           else
             return { :success => [], :error => ["Could not recognize the file type: #{file_type.to_s}"] }
           end
-        # rescue Exception => e
-        #   # debugger
-
-        #   return { :success => [], :error => ["Failed to parse #{file_type.to_s} file. " + e.class.to_s + ", " + e.message] }
-        # end
       end
 
       def rss_import(temp_file, lookup_field_name, role, current_user)
@@ -156,6 +170,9 @@ module RailsAdminImport
       end #end rss_import()
 
       def csv_import(temp_file, lookup_field_name, associated_map, role, current_user)
+
+         
+
         text        = File.read(temp_file)
         clean       = text.force_encoding('BINARY').encode('UTF-8', :undef => :replace, :replace => '').gsub(/\n$/, '')
         file_check  = CSV.new(clean)
@@ -166,6 +183,8 @@ module RailsAdminImport
 
         map         = HashWithIndifferentAccess.new {}
         file        = CSV.new(clean)
+
+        debugger
         
         file.readline.each_with_index do |key, i|
           if self.many_fields.include?(key.to_sym)
