@@ -68,13 +68,14 @@ module RailsAdminImport
         associations = self.respond_to?(:relations) ? self.relations : self.reflections
       end
 
-      # input = data to process
-      # input_type = :upload, :raw_text, :url
-      # input_format = :json, :rss, :csv
-      # input, input_type, input_format, param_update_lookup_field = nil, associated_map = nil, role, user
-      def run_import(opts)
-
-        # debugger
+      # opts[:input]            -> data to process
+      # opts[:type]             -> :upload, :raw_text, or :url
+      # opts[:format]           -> see file_formats_accepted()
+      # opts[:lookup]           -> the field to which identifies existing records
+      # opts[:associated_map]   -> ?
+      # opts[:role]             -> role
+      # opts[:user]             -> user
+      def rails_admin_import(opts)
 
         case opts[:type]
           when :url
@@ -94,11 +95,11 @@ module RailsAdminImport
                temp_file.close
             end
           else
-            return { :success => [], :error => ["You must choose a :type of "] }
+            return { :success => [], :error => ["You must choose a opts[:type] of: #{this.file_formats_accepted.join(', ')} "] }
           end
 
         if RailsAdminImport.config.logging
-          FileUtils.copy(temp_file, "#{Rails.root}/log/import/#{Time.now.strftime("%Y-%m-%d-%H-%M-%S")}-import")
+          FileUtils.copy(temp_file, "#{Rails.root}/log/import/#{Time.now.strftime("%Y-%m-%d-%H-%M-%S")}-#{opts[:type]}-#{opts[:format]}")
           logger = Logger.new("#{Rails.root}/log/import/import.log")
         end
 
@@ -114,7 +115,7 @@ module RailsAdminImport
           when :json
             return json_import(temp_file, opts[:lookup], opts[:associated_map], opts[:role], opts[:user])
           when :rss
-            return rss_import(temp_file, opts[:lookup], opts[:associated_map], opts[:role], opts[:user])
+            return rss_import(temp_file, opts[:lookup], opts[:role], opts[:user])
           else
             return { :success => [], :error => ["Could not recognize the file type: #{file_type.to_s}"] }
           end
@@ -170,9 +171,6 @@ module RailsAdminImport
       end #end rss_import()
 
       def csv_import(temp_file, lookup_field_name, associated_map, role, current_user)
-
-         
-
         text        = File.read(temp_file)
         clean       = text.force_encoding('BINARY').encode('UTF-8', :undef => :replace, :replace => '').gsub(/\n$/, '')
         file_check  = CSV.new(clean)
@@ -183,8 +181,6 @@ module RailsAdminImport
 
         map         = HashWithIndifferentAccess.new {}
         file        = CSV.new(clean)
-
-        debugger
         
         file.readline.each_with_index do |key, i|
           if self.many_fields.include?(key.to_sym)
@@ -194,12 +190,6 @@ module RailsAdminImport
             map[key.downcase.to_sym] = i 
           end
         end
-        
-        # if import_config.update_lookup_field
-        #   lookup_field_name = import_config.update_lookup_field
-        # elsif !params[:update_lookup].blank?
-        #   lookup_field_name = params[:update_lookup].to_sym
-        # end
 
         if lookup_field_name && !map.has_key?(lookup_field_name)
           return results = { 
@@ -213,15 +203,6 @@ module RailsAdminImport
         end 
   
         results = { :success => [], :error => [] }
-        # associated_map = {}
-        
-        # self.belongs_to_fields.flatten.each do |field|
-        #   associated_map[field] = field.to_s.classify.constantize.all.inject({}) { |hash, c| hash[c.send(params[field]).to_s] = c.id; hash }
-        # end
-        
-        # self.many_fields.flatten.each do |field|
-        #   associated_map[field] = field.to_s.classify.constantize.all.inject({}) { |hash, c| hash[c.send(params[field]).to_s] = c; hash }
-        # end
  
         label_method        = import_config.label
         before_import_save  = import_config.before_import_save

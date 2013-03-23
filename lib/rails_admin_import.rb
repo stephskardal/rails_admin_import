@@ -39,17 +39,16 @@ module RailsAdmin
         end
 
         register_instance_option :controller do
-          Proc.new do
-            
-
+          Proc.new do          
             # make sure class has import-related methods
             @abstract_model.model.send :include, ::RailsAdminImport::Import
-
-            # debugger
 
             @file_formats_accepted = @abstract_model.model.file_formats_accepted
 
             @response = {}
+
+
+            # debugger
 
             if request.post?
               # if !params.has_key?(:input)
@@ -57,40 +56,38 @@ module RailsAdmin
               # end
 
               associated_map = {}
-              @abstract_model.model.belongs_to_fields.flatten.each do |field|
-                associated_map[field] = field.to_s.classify.constantize.all.inject({}) { |hash, c| hash[c.send(params[field]).to_s] = c.id; hash }
-              end
-              @abstract_model.model.many_fields.flatten.each do |field|
-                associated_map[field] = field.to_s.classify.constantize.all.inject({}) { |hash, c| hash[c.send(params[field]).to_s] = c; hash }
-              end
-
-              # debugger
+              # @abstract_model.model.belongs_to_fields.flatten.each do |field|
+              #   associated_map[field] = field.to_s.classify.constantize.all.inject({}) { |hash, c| hash[c.send(params[field]).to_s] = c.id; hash }
+              # end
+              # @abstract_model.model.many_fields.flatten.each do |field|
+              #   associated_map[field] = field.to_s.classify.constantize.all.inject({}) { |hash, c| hash[c.send(params[field]).to_s] = c; hash }
+              # end
 
               if params[:upload]
-                results = @abstract_model.model.run_import({
+                results = @abstract_model.model.rails_admin_import({
                   input: params[:upload],
                   type: :upload,
-                  format: params[:input_format].to_sym, # :csv, :json, :rss etc
+                  format: params[:input_format].to_sym, 
                   lookup: params[:update_lookup],
                   associated_map: associated_map,
                   role: _attr_accessible_role, 
                   user: _current_user
                 })
               elsif params[:raw_text]
-                results = @abstract_model.model.run_import({
+                results = @abstract_model.model.rails_admin_import({
                   input: params[:raw_text],
                   type: :raw_text,
-                  format: params[:input_format].to_sym, # :csv, :json, :rss etc
+                  format: params[:input_format].to_sym,
                   lookup: params[:update_lookup],
                   associated_map: associated_map,
                   role: _attr_accessible_role, 
                   user: _current_user
                 })
               elsif params[:url]
-                results = @abstract_model.model.run_import({
+                results = @abstract_model.model.rails_admin_import({
                   input: params[:url],
                   type: :url,
-                  format: params[:input_format].to_sym, # :csv, :json, :rss etc
+                  format: params[:input_format].to_sym,
                   lookup: params[:update_lookup],
                   associated_map: associated_map,
                   role: _attr_accessible_role, 
@@ -99,9 +96,6 @@ module RailsAdmin
               else
                 results = { :success => [], :error => ["Failed"] }
               end
-
-
-              
 
               @response[:notice]  = results[:success].join("<br />").html_safe  if results[:success].any?
               @response[:error]   = results[:error].join("<br />").html_safe    if results[:error].any?

@@ -12,14 +12,80 @@
 <% end -%>
 
 <div class="row-fluid">
+  <div class="span6">
+    <table class="table">
+      <tr>
+        <td valign="top">
+          <h2>Standard Fields</h2>
+          <ul>
+            <% @abstract_model.model.import_fields.each do |field| -%>
+              <li><%= field %></li>
+            <% end -%>
+          </ul>
+        </td>        
+        <% if @abstract_model.model.belongs_to_fields.any? -%>
+          <td valign="top">
+            <h3>Belongs To Fields</h3>
+            <ul>
+              <% @abstract_model.model.belongs_to_fields.each do |field| -%>
+                <li><%= field %></li>
+              <% end -%>
+            </ul>
+            <small>These fields map to other items in the database, lookup via attribute selected below.</small>
+          </td>
+        <% end -%>        
+        <% if @abstract_model.model.file_fields.any? -%>
+          <td valign="top">
+            <h3>File Fields</h3>
+            <ul>
+              <% @abstract_model.model.file_fields.each do |field| -%>
+                <li><%= field %></li>
+              <% end -%>
+            </ul>
+            <small>These must be a downloadable URL.</small>
+          </td>
+        <% end -%>          
+        <% if @abstract_model.model.many_fields.any? -%>
+          <td valign="top">
+            <h3>Multiple Fields</h3>
+            <ul>
+              <% @abstract_model.model.many_fields.each do |field| -%>
+                <li><%= field %></li>
+              <% end -%>
+            </ul>
+            <small>These fields map to other columns in the database, lookup via attribute selected below. There may be multiple columns with this header in the spreadsheet.</small>
+          </td>
+        <% end -%>        
+        <% if RailsAdminImport.config(@abstract_model.model).extra_fields.any? -%>
+          <td valign="top">
+            <h3>Extra Fields</h3>
+            <ul>
+              <% RailsAdminImport.config(@abstract_model.model).extra_fields.each do |field| -%>
+                <li><%= field %></li>
+              <% end -%>
+            </ul>
+            <small>Additional application specific fields.</small>
+          </td>
+        <% end -%>
+      </tr>
+    </table>
+  </div>
+
+  <div class="span6">
+    <h2>RSS mapping</h2>
+
+    Maybe put the RSS mapping here? It might require extra dependencies... Is it worth it?
+
+  </div>
+</div>
+
+<div class="row-fluid">
   <div class="span4" >
     <%= form_tag rails_admin.import_url(@abstract_model.to_param), :multipart => true do |f| -%>
       <div class="well">
         <fieldset>
           <legend>Input some text</legend>
-          <label>Choose a file</label>
           <%= select_tag(:input_format,  options_for_select(@file_formats_accepted)) %>
-          
           
           <%= text_area_tag :raw_text %>
 
@@ -141,64 +207,5 @@
   
 </div> 
 
-<div class="row-fluid">
-  <div class="span12">
-    <table class="table">
-      <tr>
-        <td valign="top">
-          <h2>Standard Fields</h2>
-          <ul>
-            <% @abstract_model.model.import_fields.each do |field| -%>
-              <li><%= field %></li>
-            <% end -%>
-          </ul>
-        </td>        
-        <% if @abstract_model.model.belongs_to_fields.any? -%>
-          <td valign="top">
-            <h3>Belongs To Fields</h3>
-            <ul>
-              <% @abstract_model.model.belongs_to_fields.each do |field| -%>
-                <li><%= field %></li>
-              <% end -%>
-            </ul>
-            <small>These fields map to other items in the database, lookup via attribute selected below.</small>
-          </td>
-        <% end -%>        
-        <% if @abstract_model.model.file_fields.any? -%>
-          <td valign="top">
-            <h3>File Fields</h3>
-            <ul>
-              <% @abstract_model.model.file_fields.each do |field| -%>
-                <li><%= field %></li>
-              <% end -%>
-            </ul>
-            <small>These must be a downloadable URL.</small>
-          </td>
-        <% end -%>          
-        <% if @abstract_model.model.many_fields.any? -%>
-          <td valign="top">
-            <h3>Multiple Fields</h3>
-            <ul>
-              <% @abstract_model.model.many_fields.each do |field| -%>
-                <li><%= field %></li>
-              <% end -%>
-            </ul>
-            <small>These fields map to other columns in the database, lookup via attribute selected below. There may be multiple columns with this header in the spreadsheet.</small>
-          </td>
-        <% end -%>        
-        <% if RailsAdminImport.config(@abstract_model.model).extra_fields.any? -%>
-          <td valign="top">
-            <h3>Extra Fields</h3>
-            <ul>
-              <% RailsAdminImport.config(@abstract_model.model).extra_fields.each do |field| -%>
-                <li><%= field %></li>
-              <% end -%>
-            </ul>
-            <small>Additional application specific fields.</small>
-          </td>
-        <% end -%>
-      </tr>
-    </table>
-  </div>
-</div>
+
 
