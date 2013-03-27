@@ -13,6 +13,7 @@ To do
 * Add XML support
 * Testing
 
+![alt text](https://raw.github.com/adamwong246/rails_admin_import/master/screenshot.jpeg "Logo Title Text 1")
 Installation
 ========
 
