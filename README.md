@@ -1,11 +1,17 @@
 rails_admin_import++ 
 ========
 
+It's got more features than the "official" gem but needs a lot of testing. Highly experimental work in progress.
+
 Plugin functionality to add generic import to Rails Admin interface. This fork expands upon the 'official' gem.
 * The ability to ignore duplicate records by the lookup field. 
 * The ability to import records from a url.
 * The ability to import a block of raw text.
 * Accepts CSV, JSON and RSS 
+
+To do
+* Add XML support
+* Testing
 
 Installation
 ========
