@@ -1,7 +1,7 @@
 module RailsAdminImport
   module Config
     class Base
-      def initialize(parent = nil)
+      def initialize(parent_name = nil)
       end
 
       # Register an instance option for this object only

@@ -1,14 +1,25 @@
-Rails Admin Import functionality
+rails_admin_import++ 
 ========
 
-Plugin functionality to add generic import to Rails Admin interface
+It's got more features than the "official" gem but needs a lot of testing. Highly experimental work in progress.
 
+Plugin functionality to add generic import to Rails Admin interface. This fork expands upon the 'official' gem.
+* The ability to ignore duplicate records by the lookup field. 
+* The ability to import records from a url.
+* The ability to import a block of raw text.
+* Accepts CSV, JSON and RSS 
+
+To do
+* Add XML support
+* Testing
+
+![alt text](https://raw.github.com/adamwong246/rails_admin_import/master/screenshot.jpeg "Logo Title Text 1")
 Installation
 ========
 
 * First, add to Gemfile:
     
-        gem "rails_admin_import", :git => "git://github.com/stephskardal/rails_admin_import.git"
+        gem "rails_admin_import", :git => "git://github.com/joelvh/rails_admin_import.git"
 
 * Next, mount in your application by adding following line to your config/routes.rb:
 
@@ -22,27 +33,54 @@ Installation
 
         RailsAdminImport.config do |config| 
           config.model User do
+          
+            # Fields to make available for import (whitelist)
+            included_fields do
+              [:field1, :field2, :field3]
+            end
+            
+            # Fields to skip (blacklist)
             excluded_fields do
               [:field1, :field2, :field3]
             end
-            label :name
+            
+            # Custom methods to get/set the values on? (Not in use?)
             extra_fields do
               [:field3, :field4, :field5]
             end
+            
+            # Name of the method on the model to use in alert messages indicating success/failure of import
+            label :name
+            
+            # Specifies the field to use to find existing records (when nil, admin page shows dropdown with options)
+            update_lookup_field do
+              :email
+            end
+            
+            # map fields to an RSS feed
+            rss_mapping do
+              {
+                :title => Proc.new{ |item| item.title  + item.published.to_s },
+                :body => Proc.new{ |item| item.summary },
+                :published_at => Proc.new{ |item| item.published }
+              }
+            end
+            
+            # Define instance methods to be hooked into the import process, if special/additional processing is required on the data
+            before_import_save do
+              # block must return an object that responds to the "call" method
+              lambda do |model, row, map|
+                # skip confirmation email when importing Devise User model
+                model.skip_confirmation!
+              end
           end
-        end
-
-* (Optional) Define instance methods to be hooked into the import process, if special/additional processing is required on the data:
-
-        # some model
-        def before_import_save(row, map)
-          self.set_permalink
-          self.import_nested_data(row, map)
         end
 
 * "import" action must be added inside config.actions block in main application RailsAdmin configuration: config/initializers/rails_admin.rb.
 
         config.actions do
+          # to include all actions, make sure you specify "all", otherwise only the "import" action will be available
+          all
           ...
           import
           ...
@@ -62,4 +100,4 @@ TODO
 Copyright
 ========
 
-Copyright (c) 2011 End Point & Steph Skardal. See LICENSE.txt for further details.
+Copyright (c) 2012 End Point & Steph Skardal. See LICENSE.txt for further details.
