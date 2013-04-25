@@ -5,11 +5,11 @@ require "rails_admin_import/config"
 module RailsAdminImport
   def self.config(entity = nil, &block)
     if entity
-    RailsAdminImport::Config.model(entity, &block)
+      RailsAdminImport::Config.model(entity, &block)
     elsif block_given? && ENV['SKIP_RAILS_ADMIN_INITIALIZER'] != "true"
       block.call(RailsAdminImport::Config)
-  else
-    RailsAdminImport::Config
+    else
+      RailsAdminImport::Config
     end
   end
 

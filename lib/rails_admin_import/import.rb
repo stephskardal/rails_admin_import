@@ -1,4 +1,5 @@
 require 'open-uri'
+require "rails_admin_import/import_logger"
   
 module RailsAdminImport
   module Import
@@ -61,13 +62,13 @@ module RailsAdminImport
 
           if RailsAdminImport.config.logging
             FileUtils.copy(params[:file].tempfile, "#{Rails.root}/log/import/#{Time.now.strftime("%Y-%m-%d-%H-%M-%S")}-import.csv")
-            logger = Logger.new("#{Rails.root}/log/import/import.log")
           end
 
-          text = File.read(params[:file].tempfile)
-          clean = text.force_encoding('BINARY').encode('UTF-8', :undef => :replace, :replace => '').gsub(/\n$/, '')
+          text       = File.read(params[:file].tempfile)
+          clean      = text.force_encoding('BINARY').encode('UTF-8', :undef => :replace, :replace => '').gsub(/\n$/, '')
           file_check = CSV.new(clean)
-
+          logger     = ImportLogger.new
+     
           if file_check.readlines.size > RailsAdminImport.config.line_item_limit
             return results = { :success => [], :error => ["Please limit upload file to #{RailsAdminImport.config.line_item_limit} line items."] }
           end
@@ -113,14 +114,14 @@ module RailsAdminImport
             verb = object.new_record? ? "Create" : "Update"
             if object.errors.empty?
               if object.save
-                logger.info "#{Time.now.to_s}: #{verb}d: #{object.send(label_method)}" if RailsAdminImport.config.logging
+                logger.info "#{Time.now.to_s}: #{verb}d: #{object.send(label_method)}"
                 results[:success] << "#{verb}d: #{object.send(label_method)}"
               else
-                logger.info "#{Time.now.to_s}: Failed to #{verb}: #{object.send(label_method)}. Errors: #{object.errors.full_messages.join(', ')}." if RailsAdminImport.config.logging
+                logger.info "#{Time.now.to_s}: Failed to #{verb}: #{object.send(label_method)}. Errors: #{object.errors.full_messages.join(', ')}."
                 results[:error] << "Failed to #{verb}: #{object.send(label_method)}. Errors: #{object.errors.full_messages.join(', ')}."
               end
             else
-              logger.info "#{Time.now.to_s}: Errors before save: #{object.send(label_method)}. Errors: #{object.errors.full_messages.join(', ')}." if RailsAdminImport.config.logging
+              logger.info "#{Time.now.to_s}: Errors before save: #{object.send(label_method)}. Errors: #{object.errors.full_messages.join(', ')}."
               results[:error] << "Errors before save: #{object.send(label_method)}. Errors: #{object.errors.full_messages.join(', ')}."
             end
           end
