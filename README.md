@@ -1,3 +1,9 @@
+Request for Contributors / Core Contributors
+========
+
+I apologize for my extreme lack of attention to this repository since it was created. I see that several users have forked this gem and applied updates. I'd be interested in giving core push access to this main repository for any interested in being involved in maintaining it. Please contact me if you are interested at steph at endpoint dot com. 
+
+
 Rails Admin Import functionality
 ========
 
