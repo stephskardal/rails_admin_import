@@ -39,7 +39,7 @@
     <% end -%>
     <% if @abstract_model.model.file_fields.any? -%>
     <div class="control-group">
-      <label class="control-label" data-original-title="Click to reverse selection" onclick="jQuery(this).siblings('.controls').find('input').click()" rel="tooltip">Belongs To Fields</label>
+      <label class="control-label" data-original-title="Click to reverse selection" onclick="jQuery(this).siblings('.controls').find('input').click()" rel="tooltip">File Fields</label>
       <div class="controls">
         <ul>
         <% @abstract_model.model.file_fields.each do |field| -%>
@@ -52,7 +52,7 @@
     <% end -%>  
     <% if @abstract_model.model.many_fields.any? -%>
     <div class="control-group">
-      <label class="control-label" data-original-title="Click to reverse selection" onclick="jQuery(this).siblings('.controls').find('input').click()" rel="tooltip">Belongs To Fields</label>
+      <label class="control-label" data-original-title="Click to reverse selection" onclick="jQuery(this).siblings('.controls').find('input').click()" rel="tooltip">Many To Many Fields</label>
       <div class="controls">
         <ul>
         <% @abstract_model.model.many_fields.each do |field| -%>
@@ -109,12 +109,13 @@
     </div>
 
   </fieldset>
-  <% if @abstract_model.model.belongs_to_fields.any? -%>
+  <% if @abstract_model.model.belongs_to_fields.any? || @abstract_model.model.many_fields.any? -%>
   <fieldset>
     <legend>
       <i class="icon-chevron-down"></i>
       Related fields mapping
     </legend>
+
     <% [@abstract_model.model.belongs_to_fields, @abstract_model.model.many_fields].flatten.each do |field| -%>
     <div class="control-group">
       <label class="control-label" for="csv_options_encoding_to"><a href="<%= url_for(:action => :index, :model_name => field) %>"><%= field.to_s.titleize %></a> mapping</label>
