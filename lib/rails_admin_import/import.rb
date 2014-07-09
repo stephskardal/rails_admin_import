@@ -47,12 +47,12 @@ module RailsAdminImport
         attrs = []
         self.reflections.each do |k, v|
           if [:has_and_belongs_to_many, :has_many].include?(v.macro)
-            attrs << k.to_s.singularize.to_sym
+            attrs << k.to_s.to_sym
           end
         end
 
         attrs - RailsAdminImport.config(self).excluded_fields 
-      end 
+      end
   
       def run_import(params)
         begin
@@ -151,17 +151,14 @@ module RailsAdminImport
           item.attributes = new_attrs.except(update.to_sym)
           item.save
         end
-
         item
       end
     end
    
     def before_import_save(*args)
-      # Meant to be overridden to do special actions
     end
 
-	def after_import_save(*args)
-      # Meant to be overridden to do special actions
+    def after_import_save(*args)
     end
 
     def import_display
@@ -169,15 +166,17 @@ module RailsAdminImport
     end
 
     def import_files(row, map)
-      if self.new_record? && self.valid?
+      if self.valid?
         self.class.file_fields.each do |key|
           if map[key] && !row[map[key]].nil?
             begin
-              # Strip file
               row[map[key]] = row[map[key]].gsub(/\s+/, "")
+
               format = row[map[key]].match(/[a-z0-9]+$/)
-              open("#{Rails.root}/tmp/#{self.permalink}.#{format}", 'wb') { |file| file << open(row[map[key]]).read }
-              self.send("#{key}=", File.open("#{Rails.root}/tmp/#{self.permalink}.#{format}"))
+              permalink = row[map[key]].split('/').last.gsub!('.'+format.to_s,'')
+              
+              open("#{Rails.root}/tmp/#{permalink}.#{format}", 'wb') { |file| file << open(row[map[key]]).read }
+              self.send("#{key}=", File.open("#{Rails.root}/tmp/#{permalink}.#{format}"))
             rescue Exception => e
               self.errors.add(:base, "Import error: #{e.inspect}")
             end
