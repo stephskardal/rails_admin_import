@@ -64,8 +64,8 @@ module RailsAdminImport
             FileUtils.copy(params[:file].tempfile, "#{Rails.root}/log/import/#{Time.now.strftime("%Y-%m-%d-%H-%M-%S")}-import.csv")
           end
 
-          text       = File.read(params[:file].tempfile)
-          clean      = text.force_encoding('BINARY').encode('UTF-8', :undef => :replace, :replace => '').gsub(/\n$/, '')
+          text       = File.read(params[:file].tempfile).strip!
+          clean      = text.force_encoding('BINARY').encode('UTF-8', :undef => :replace, :replace => '').gsub(/\n$/, '').gsub(/\r$/, '')
           file_check = CSV.new(clean)
           logger     = ImportLogger.new
      
