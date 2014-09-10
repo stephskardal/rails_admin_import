@@ -15,6 +15,14 @@ module RailsAdminImport
         []
       end
 
+      register_instance_option(:parse_fields) do
+        Proc.new do |importer, row, map|
+          importer.import_fields.inject({}) do |new_attrs, key|
+            new_attrs[key] = row[map[key]] if map[key]
+          end
+        end
+      end
+
       register_instance_option(:excluded_fields) do
         []
       end
@@ -23,8 +31,8 @@ module RailsAdminImport
         []
       end
       
-      register_instance_option(:update_lookup_field) do
-        nil
+      register_instance_option(:update_lookup_fields) do
+        []
       end
       
       # params to callback will be (model, row, map, role, current_user)

@@ -96,13 +96,13 @@ module RailsAdminImport
             end
           end
           
-          if import_config.update_lookup_field
-            lookup_field_name = import_config.update_lookup_field
-          elsif !params[:update_lookup].blank?
-            lookup_field_name = params[:update_lookup].to_sym
+          if import_config.update_lookup_fields.any?
+            lookup_field_names = import_config.update_lookup_fields.map(&:to_sym)
+          elsif params[:update_lookup_fields].present?
+            lookup_field_names = params[:update_lookup_fields].map(&:to_sym)
           end
           
-          if lookup_field_name && !map.has_key?(lookup_field_name)
+          if lookup_field_names && !(map.keys & lookup_field_names).any?
             return results = { :success => [], :error => ["Your file must contain a column for the 'Update lookup field' you selected."] }
           end 
     
@@ -127,15 +127,13 @@ module RailsAdminImport
           end
           
           file.each do |row|
-            new_attrs = {}
+            new_attrs = import_config.parse_fields(self, row, map)
             
-            self.import_fields.each do |key|
-              new_attrs[key] = row[map[key]] if map[key]
+            lookup_criteria = lookup_field_names.inject({}) do |criteria, field_name|
+              criteria.merge(field_name => row[map[field_name]])
             end
             
-            lookup_field_value = row[map[lookup_field_name]] unless lookup_field_name.blank?
-            
-            object = self.import_initialize(new_attrs, lookup_field_name, lookup_field_value)
+            object = self.import_initialize(new_attrs, lookup_criteria)
             object.import_belongs_to_data(associated_map, row, map)
             object.import_many_data(associated_map, row, map)
             
@@ -196,11 +194,11 @@ module RailsAdminImport
         # end
       end
   
-      def import_initialize(new_attrs, lookup_field, lookup_value)
+      def import_initialize(new_attrs, lookup_criteria)
         mass_assignment_role = RailsAdmin.config.attr_accessible_role.call
         # model#where(lookup_field_name => value).first is more ORM compatible (works with Mongoid)
-        if lookup_field.present? && (item = self.send(:where, lookup_field => lookup_value).first)
-          item.assign_attributes new_attrs.except(lookup_field.to_sym), :as => mass_assignment_role
+        if lookup_criteria.any? && (item = self.send(:where, lookup_criteria).first)
+          item.assign_attributes new_attrs.except(lookup_criteria.keys), :as => mass_assignment_role
           #item.save
           item
         else

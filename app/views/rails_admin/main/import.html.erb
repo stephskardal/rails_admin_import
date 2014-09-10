@@ -11,10 +11,9 @@
         limit file to <%= RailsAdminImport.config.line_item_limit %> line items.
       </span>
       
-      <% unless RailsAdminImport.config(@abstract_model.model).update_lookup_field %>
-        <label>Update existing records?</label>
-        <select name="update_lookup">
-          <option value="">Import as new records</option>
+      <% unless RailsAdminImport.config(@abstract_model.model).update_lookup_fields %>
+        <label>Update existing records? (select none to import as new records)</label>
+        <select name="update_lookup_fields" multiple="multiple" size="5">
           <% @abstract_model.model.new.attributes.keys.each do |key| -%>
             <option value="<%= key %>">Update by <%= key %></option>
           <% end -%>
