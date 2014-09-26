@@ -205,7 +205,7 @@ module RailsAdminImport
         end
 
         if values.any?
-          self.send("#{key.to_s.pluralize}=", values)
+          self.send("#{key.to_s.pluralize}").push(values)
         end
       end
     end
