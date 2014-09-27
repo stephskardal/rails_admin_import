@@ -95,10 +95,10 @@ module RailsAdminImport
     
           associated_map = {}
           self.belongs_to_fields.flatten.each do |field|
-            associated_map[field] = field.to_s.classify.constantize.all.inject({}) { |hash, c| hash[c.send(params[field]).to_s] = c.id; hash }
+            associated_map[field] = self.reflections[field].klass.all.inject({}) { |hash, c| hash[c.send(params[field]).to_s] = c.id; hash }
           end
           self.many_fields.flatten.each do |field|
-            associated_map[field] = field.to_s.classify.constantize.all.inject({}) { |hash, c| hash[c.send(params[field]).to_s] = c; hash }
+            associated_map[field] = self.reflections[field].klass.all.inject({}) { |hash, c| hash[c.send(params[field]).to_s] = c; hash }
           end
    
           label_method = RailsAdminImport.config(self).label

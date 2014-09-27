@@ -30,7 +30,7 @@
       <div class="controls">
         <ul>
         <% @abstract_model.model.belongs_to_fields.each do |field| -%>
-          <li><a href="<%= url_for(:action => :index, :model_name => field) %>"><%= field.to_s.titleize %></a></li>
+          <li><a href="<%= url_for(:action => :index, :model_name => @abstract_model.model.reflections[field].class_name.underscore) %>"><%= field.to_s.titleize %></a></li>
         <% end -%>
         </ul>
         <p class="help-block">These fields map to other items in the database, lookup via attribute selected below.</p>
@@ -118,10 +118,10 @@
 
     <% [@abstract_model.model.belongs_to_fields, @abstract_model.model.many_fields].flatten.each do |field| -%>
     <div class="control-group">
-      <label class="control-label" for="csv_options_encoding_to"><a href="<%= url_for(:action => :index, :model_name => field) %>"><%= field.to_s.titleize %></a> mapping</label>
+      <label class="control-label" for="csv_options_encoding_to"><a href="<%= url_for(:action => :index, :model_name => @abstract_model.model.reflections[field].class_name.underscore) %>"><%= field.to_s.titleize %></a> mapping</label>
       <div class="controls">
         <select name="<%= field %>">
-          <% field.to_s.classify.constantize.new.attributes.keys.each do |key| -%>
+          <% @abstract_model.model.reflections[field].klass.new.attributes.keys.each do |key| -%>
           <option value="<%= key %>"><%= key %></option>
           <% end -%>
         </select>
