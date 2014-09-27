@@ -11,6 +11,10 @@ module RailsAdminImport
         :name
       end
 
+      register_instance_option(:mapping_key) do
+        :name
+      end
+
       register_instance_option(:excluded_fields) do
         # Don't import PaperTrail versions
         [:versions]

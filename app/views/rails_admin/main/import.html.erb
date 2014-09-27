@@ -102,7 +102,7 @@
       <div class="controls">
         <select name="update_lookup">
           <% @abstract_model.model.new.attributes.keys.each do |key| -%>
-          <option value="<%= key %>"<%= key.to_s == "name" ? ' selected="selected"' : '' %>><%= key %></option>
+          <option value="<%= key %>"<%= key.to_s == RailsAdminImport.config(@abstract_model.model).mapping_key.to_s ? ' selected="selected"' : '' %>><%= key %></option>
           <% end -%>
         </select>
       </div>
@@ -122,7 +122,7 @@
       <div class="controls">
         <select name="<%= field %>">
           <% @abstract_model.model.reflections[field].klass.new.attributes.keys.each do |key| -%>
-          <option value="<%= key %>"<%= key.to_s == "name" ? ' selected="selected"' : '' %>><%= key %></option>
+          <option value="<%= key %>"<%= key.to_s == RailsAdminImport.config(@abstract_model.model.reflections[field].klass).mapping_key.to_s ? ' selected="selected"' : '' %>><%= key %></option>
           <% end -%>
         </select>
       </div>
