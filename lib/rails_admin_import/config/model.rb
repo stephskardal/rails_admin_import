@@ -8,11 +8,12 @@ module RailsAdminImport
       end
 
       register_instance_option(:label) do
-        :id
+        :name
       end
 
       register_instance_option(:excluded_fields) do
-        []
+        # Don't import PaperTrail versions
+        [:versions]
       end
 
       register_instance_option(:extra_fields) do
