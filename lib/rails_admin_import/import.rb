@@ -77,6 +77,7 @@ module RailsAdminImport
    
           file = CSV.new(clean)
           file.readline.each_with_index do |key, i|
+            key = key.parameterize.underscore
             if self.many_fields.include?(key.to_sym)
               map[key.to_sym] ||= []
               map[key.to_sym] << i
