@@ -1,7 +1,7 @@
 rails_admin_import++ 
 ========
 
-*This app is basically abandoned. Though it has a good use case, I can no longer pretend to need (or care) about it. If you are interested, please fork it!*
+*This app is basically abandoned. Though it has a good use case, I can no longer pretend to need (or care) about it. If you are interested, please fork it! Message me if you get a really good fork going and I'll put a link here.*
 
 It's got more features than the "official" gem but needs a lot of testing. 
 
