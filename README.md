@@ -1,7 +1,8 @@
 rails_admin_import++ 
 ========
 
-It's got more features than the "official" gem but needs a lot of testing. Highly experimental work in progress.
+*This app is basically abandoned. Though it has a good use case, I can no longer pretend to need (or care) about it. If you are interested, please fork it!*
+It's got more features than the "official" gem but needs a lot of testing. 
 
 Plugin functionality to add generic import to Rails Admin interface. This fork expands upon the 'official' gem.
 * The ability to ignore duplicate records by the lookup field. 
