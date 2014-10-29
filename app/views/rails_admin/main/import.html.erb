@@ -52,7 +52,7 @@
     <% end -%>  
     <% if @abstract_model.model.many_fields.any? -%>
     <div class="control-group">
-      <label class="control-label" data-original-title="Click to reverse selection" onclick="jQuery(this).siblings('.controls').find('input').click()" rel="tooltip">Belongs To Fields</label>
+      <label class="control-label" data-original-title="Click to reverse selection" onclick="jQuery(this).siblings('.controls').find('input').click()" rel="tooltip">Has Many Fields</label>
       <div class="controls">
         <ul>
         <% @abstract_model.model.many_fields.each do |field| -%>
