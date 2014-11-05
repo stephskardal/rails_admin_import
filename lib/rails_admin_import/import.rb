@@ -65,7 +65,7 @@ module RailsAdminImport
           end
 
           text       = File.read(params[:file].tempfile)
-          clean      = text.force_encoding('BINARY').encode('UTF-8', :undef => :replace, :replace => '').gsub(/\n$/, '')
+          clean      = text #.force_encoding('BINARY').encode('UTF-8', :undef => :replace, :replace => '').gsub(/\n$/, '')
           file_check = CSV.new(clean)
           logger     = ImportLogger.new
      
