@@ -39,7 +39,7 @@ module RailsAdminImport
       end
  
       def belongs_to_fields
-        attrs = self.reflections.select { |k, v| v.macro == :belongs_to }.keys
+        attrs = self.reflections.select { |k, v| v.macro == :belongs_to && ! v.options.has_key?(:polymorphic) }.keys
         attrs - RailsAdminImport.config(self).excluded_fields 
       end
   
