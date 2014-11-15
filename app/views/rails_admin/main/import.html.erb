@@ -109,7 +109,7 @@
     </div>
 
   </fieldset>
-  <% if @abstract_model.model.belongs_to_fields.any? -%>
+  <% if @abstract_model.model.belongs_to_fields.any? || @abstract_model.model.many_fields.any? -%>
   <fieldset>
     <legend>
       <i class="icon-chevron-down"></i>
