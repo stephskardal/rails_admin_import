@@ -15,9 +15,13 @@ module RailsAdminImport
       end
   
       def import_fields
-        fields = []  
+        if RailsAdminImport.config(self).included_fields.any?
+          fields = RailsAdminImport.config(self).included_fields.dup
+        else
+          fields = self.new.attributes.keys.collect { |key| key.to_sym }
+        end
 
-        fields = self.new.attributes.keys.collect { |key| key.to_sym }
+
   
         self.belongs_to_fields.each do |key|
           fields.delete("#{key}_id".to_sym)

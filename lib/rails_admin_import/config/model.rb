@@ -18,6 +18,10 @@ module RailsAdminImport
       register_instance_option(:extra_fields) do
         []
       end
+
+      register_instance_option(:included_fields) do
+        []
+      end
     end
   end
 end
