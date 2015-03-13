@@ -43,7 +43,7 @@ module RailsAdminImport
       end
  
       def belongs_to_fields
-        attrs = self.reflections.select { |k, v| v.macro == :belongs_to && ! v.options.has_key?(:polymorphic) }.keys
+        attrs = self.reflections.select { |k, v| v.macro == :belongs_to && ! v.options.has_key?(:polymorphic) }.keys.map(&:to_sym)
         attrs - RailsAdminImport.config(self).excluded_fields 
       end
   
@@ -56,6 +56,10 @@ module RailsAdminImport
         end
 
         attrs - RailsAdminImport.config(self).excluded_fields 
+      end
+
+      def association_class(field)
+        self.reflections[field.to_s].klass
       end
   
       def run_import(params)
@@ -100,10 +104,10 @@ module RailsAdminImport
     
           associated_map = {}
           self.belongs_to_fields.flatten.each do |field|
-            associated_map[field] = self.reflections[field].klass.all.inject({}) { |hash, c| hash[c.send(params[field]).to_s] = c.id; hash }
+            associated_map[field] = association_class(field).all.inject({}) { |hash, c| hash[c.send(params[field]).to_s] = c.id; hash }
           end
           self.many_fields.flatten.each do |field|
-            associated_map[field] = self.reflections[field].klass.all.inject({}) { |hash, c| hash[c.send(params[field]).to_s] = c; hash }
+            associated_map[field] = association_class(field).all.inject({}) { |hash, c| hash[c.send(params[field]).to_s] = c; hash }
           end
    
           label_method = RailsAdminImport.config(self).label

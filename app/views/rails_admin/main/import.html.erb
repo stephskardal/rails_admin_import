@@ -30,7 +30,7 @@
       <div class="controls">
         <ul>
         <% @abstract_model.model.belongs_to_fields.each do |field| -%>
-          <li><a href="<%= url_for(:action => :index, :model_name => @abstract_model.model.reflections[field].class_name.underscore) %>"><%= field.to_s.titleize %></a></li>
+          <li><a href="<%= url_for(:action => :index, :model_name => @abstract_model.model.association_class(field).name.underscore) %>"><%= field.to_s.titleize %></a></li>
         <% end -%>
         </ul>
         <p class="help-block"><%= t('admin.import.help.belongs_to_fields') %></p>
@@ -118,11 +118,11 @@
 
     <% [@abstract_model.model.belongs_to_fields, @abstract_model.model.many_fields].flatten.each do |field| -%>
     <div class="control-group">
-      <label class="control-label" for="csv_options_encoding_to"><a href="<%= url_for(:action => :index, :model_name => @abstract_model.model.reflections[field].class_name.underscore) %>"><%= field.to_s.titleize %></a> t('admin.import.mapping')</label>
+      <label class="control-label" for="csv_options_encoding_to"><a href="<%= url_for(:action => :index, :model_name => @abstract_model.model.association_class(field).name.underscore) %>"><%= field.to_s.titleize %></a> t('admin.import.mapping')</label>
       <div class="controls">
         <select name="<%= field %>">
-          <% @abstract_model.model.reflections[field].klass.new.attributes.keys.each do |key| -%>
-          <option value="<%= key %>"<%= key.to_s == RailsAdminImport.config(@abstract_model.model.reflections[field].klass).mapping_key.to_s ? ' selected="selected"' : '' %>><%= key %></option>
+          <% @abstract_model.model.association_class(field).new.attributes.keys.each do |key| -%>
+          <option value="<%= key %>"<%= key.to_s == RailsAdminImport.config(@abstract_model.model.association_class(field)).mapping_key.to_s ? ' selected="selected"' : '' %>><%= key %></option>
           <% end -%>
         </select>
       </div>
