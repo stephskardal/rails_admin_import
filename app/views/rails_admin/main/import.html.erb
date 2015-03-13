@@ -11,68 +11,68 @@
   <fieldset>
     <legend>
       <i class="icon-chevron-down"></i>
-      Fields to import
+      <%= t('admin.import.legend.fields') %>
     </legend>
     <div class="control-group">
-      <label class="control-label" data-original-title="Click to reverse selection" onclick="jQuery(this).siblings('.controls').find('input').click()" rel="tooltip">Fields from <%= @abstract_model.to_param %></label>
+      <label class="control-label" data-original-title="Click to reverse selection" onclick="jQuery(this).siblings('.controls').find('input').click()" rel="tooltip"><%= t('admin.import.fields_from', model: @abstract_model.to_param) %></label>
       <div class="controls">
         <ul>
         <% @abstract_model.model.import_fields.each do |field| -%>
           <li><%= field %></li>
         <% end -%>
         </ul>
-        <p class="help-block">The following fields may be included in the import file.</p>
+        <p class="help-block"><%= t('admin.import.help.fields') %></p>
       </div>
     </div>
     <% if @abstract_model.model.belongs_to_fields.any? -%>
     <div class="control-group">
-      <label class="control-label" data-original-title="Click to reverse selection" onclick="jQuery(this).siblings('.controls').find('input').click()" rel="tooltip">Belongs To Fields</label>
+      <label class="control-label" data-original-title="Click to reverse selection" onclick="jQuery(this).siblings('.controls').find('input').click()" rel="tooltip"><%= t('admin.import.belongs_to_fields') %></label>
       <div class="controls">
         <ul>
         <% @abstract_model.model.belongs_to_fields.each do |field| -%>
           <li><a href="<%= url_for(:action => :index, :model_name => @abstract_model.model.reflections[field].class_name.underscore) %>"><%= field.to_s.titleize %></a></li>
         <% end -%>
         </ul>
-        <p class="help-block">These fields map to other items in the database, lookup via attribute selected below.</p>
+        <p class="help-block"><%= t('admin.import.help.belongs_to_fields') %></p>
       </div>
     </div>
     <% end -%>
     <% if @abstract_model.model.file_fields.any? -%>
     <div class="control-group">
-      <label class="control-label" data-original-title="Click to reverse selection" onclick="jQuery(this).siblings('.controls').find('input').click()" rel="tooltip">File Fields</label>
+      <label class="control-label" data-original-title="Click to reverse selection" onclick="jQuery(this).siblings('.controls').find('input').click()" rel="tooltip"><%= t('admin.import.belongs_to_fields') %></label>
       <div class="controls">
         <ul>
         <% @abstract_model.model.file_fields.each do |field| -%>
           <li><%= field %></li>
         <% end -%>
         </ul>
-        <p class="help-block">These must be a downloadable URL.</p>
+        <p class="help-block"><%= t('admin.import.help.file_fields') %></p>
       </div>
     </div>
     <% end -%>  
     <% if @abstract_model.model.many_fields.any? -%>
     <div class="control-group">
-      <label class="control-label" data-original-title="Click to reverse selection" onclick="jQuery(this).siblings('.controls').find('input').click()" rel="tooltip">Many To Many Fields</label>
+      <label class="control-label" data-original-title="Click to reverse selection" onclick="jQuery(this).siblings('.controls').find('input').click()" rel="tooltip"><%= t('admin.import.has_many_fields') %></label>
       <div class="controls">
         <ul>
         <% @abstract_model.model.many_fields.each do |field| -%>
           <li><%= field %></li>
         <% end -%>
         </ul>
-        <p class="help-block">These fields map to other columns in the database, lookup via attribute selected below. There may be multiple columns with this header in the spreadsheet.</p>
+        <p class="help-block"><%= t('admin.import.help.has_many_fields') %></p>
       </div>
     </div>
     <% end -%>
     <% if RailsAdminImport.config(@abstract_model.model).extra_fields.any? -%>
     <div class="control-group">
-      <label class="control-label" data-original-title="Click to reverse selection" onclick="jQuery(this).siblings('.controls').find('input').click()" rel="tooltip">Belongs To Fields</label>
+      <label class="control-label" data-original-title="Click to reverse selection" onclick="jQuery(this).siblings('.controls').find('input').click()" rel="tooltip"><%= t('admin.import.belongs_to_fields') %></label>
       <div class="controls">
         <ul>
         <% RailsAdminImport.config(@abstract_model.model).extra_fields.each do |field| -%>
           <li><%= field %></li>
         <% end -%>
         </ul>
-        <p class="help-block">Additional application specific fields.</p>
+        <p class="help-block"><%= t('admin.import.help.extra_fields') %></p>
       </div>
     </div>
     <% end -%>
@@ -80,17 +80,17 @@
   <fieldset>
     <legend>
       <i class="icon-chevron-down"></i>
-      Upload file
+      <%= t('admin.import.legend.upload') %>
     </legend>
     <div class="control-group">
-      <label class="control-label" data-original-title="Click to reverse selection" onclick="jQuery(this).siblings('.controls').find('input').click()" rel="tooltip">File</label>
+      <label class="control-label" data-original-title="Click to reverse selection" onclick="jQuery(this).siblings('.controls').find('input').click()" rel="tooltip"><%= t('admin.import.file') %></label>
       <div class="controls">
         <%= file_field_tag :file %>
-        <p class="help-block">Please limit upload file to <%= RailsAdminImport.config.line_item_limit %> line items.</p>
+        <p class="help-block"><%= t('admin.import.help.file_limit', limit: RailsAdminImport.config.line_item_limit) %></p>
       </div>
     </div>
     <div class="control-group">
-      <label class="control-label" data-original-title="Click to reverse selection" onclick="jQuery(this).siblings('.controls').find('input').click()" rel="tooltip">Update if exists</label>
+      <label class="control-label" data-original-title="Click to reverse selection" onclick="jQuery(this).siblings('.controls').find('input').click()" rel="tooltip"><%= t('admin.import.update_if_exists') %></label>
       <div class="controls">
         <label class="checkbox">
           <%= check_box_tag :update_if_exists %>
@@ -98,7 +98,7 @@
       </div>
     </div>
     <div class="control-group">
-      <label class="control-label" data-original-title="Click to reverse selection" onclick="jQuery(this).siblings('.controls').find('input').click()" rel="tooltip">Update lookup field</label>
+      <label class="control-label" data-original-title="Click to reverse selection" onclick="jQuery(this).siblings('.controls').find('input').click()" rel="tooltip"><%= t('admin.import.update_lookup') %></label>
       <div class="controls">
         <select name="update_lookup">
           <% @abstract_model.model.new.attributes.keys.each do |key| -%>
@@ -113,12 +113,12 @@
   <fieldset>
     <legend>
       <i class="icon-chevron-down"></i>
-      Related fields mapping
+      <%= t('admin.import.legend.mapping') %>
     </legend>
 
     <% [@abstract_model.model.belongs_to_fields, @abstract_model.model.many_fields].flatten.each do |field| -%>
     <div class="control-group">
-      <label class="control-label" for="csv_options_encoding_to"><a href="<%= url_for(:action => :index, :model_name => @abstract_model.model.reflections[field].class_name.underscore) %>"><%= field.to_s.titleize %></a> mapping</label>
+      <label class="control-label" for="csv_options_encoding_to"><a href="<%= url_for(:action => :index, :model_name => @abstract_model.model.reflections[field].class_name.underscore) %>"><%= field.to_s.titleize %></a> t('admin.import.mapping')</label>
       <div class="controls">
         <select name="<%= field %>">
           <% @abstract_model.model.reflections[field].klass.new.attributes.keys.each do |key| -%>
@@ -133,11 +133,11 @@
   <div class="form-actions">
     <button class="btn btn-primary" name="commit" type="submit" data-disable-with="Uploading...">
       <i class="icon-white icon-ok"></i>
-      Import
+      <%= t('admin.form.save') %>
     </button>
     <button class="btn" name="_continue" type="submit">
       <i class="icon-remove"></i>
-      Cancel
+      <%= t('admin.form.cancel') %>
     </button>
     <!--<%= submit_tag "Upload", :disable_with => "Uploading..." %>-->
   </div>
