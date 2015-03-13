@@ -1,36 +1,33 @@
-- params = request.params.except(:action, :controller, :utf8, :page, :per_page, :format, :authenticity_token)
 - visible_fields = @model_config.export.with(view: self, object: @abstract_model.model.new, controller: self.controller).visible_fields
 
 = form_tag import_path(@abstract_model), method: 'post', class: 'form-horizontal denser' do
 
   %input{name: "send_data", type: "hidden", value: "true"}/
-  %fieldset{id: 'fields_to_export'}
+  %fieldset
     %legend
       %i.icon-chevron-down
-      = t('admin.export.select')
+      = t('admin.import.legend.fields')
     .form-group.control-group
-      .controls
-        .col-sm-2
-        %label.col-sm-10.checkbox{for: 'check_all'}
-          = check_box_tag 'all', 'all', true, { id: 'check_all' }
-          = t('admin.export.select_all_fields')
-    .form-group.control-group
-      %label.col-sm-2.control-label{rel: 'tooltip', :'data-original-title' => t('admin.export.click_to_reverse_selection'), onclick: 'jQuery(this).siblings(".controls").find("input").click()'}= t('admin.export.fields_from', name: @model_config.label_plural.downcase)
+      %label.col-sm-2.control-label= t('admin.import.fields_from', model: @model_config.label.downcase)
       .col-sm-10.controls
-        - visible_fields.select{ |f| !f.association? || f.association.polymorphic? }.each do |field|
-          - list = field.virtual? ? 'methods' : 'only'
-          - if field.association? && field.association.polymorphic?
-            %label.checkbox{for: "schema_#{list}_#{field.method_name}"}
-              = check_box_tag "schema[#{list}][]", field.method_name, true, { id: "schema_#{list}_#{field.method_name}" }
-              = field.label + " [id]"
-            - polymorphic_type_column_name = @abstract_model.properties.find {|p| field.association.foreign_type == p.name }.name
-            %label.checkbox{for: "schema_#{list}_#{polymorphic_type_column_name}"}
-              = check_box_tag "schema[#{list}][]", polymorphic_type_column_name, true, { id: "schema_#{list}_#{polymorphic_type_column_name}" }
-              = capitalize_first_letter(field.label) + " [type]"
-          - else
-            %label.checkbox{for: "schema_#{list}_#{field.name}"}
-              = check_box_tag "schema[#{list}][]", field.name, true, { id: "schema_#{list}_#{field.name}" }
-              = capitalize_first_letter(field.label)
+        %ul.list-unstyled
+          -# TODO: don't pollute model with import_fields
+          -# Set up @model_config.import.with(view: self, object: @abstract_model.model.new, controller: self.controller).import_fields
+          - @abstract_model.model.import_fields.each do |field|
+            %li
+              %label= field
+        %p.help-block= t('admin.import.help.fields')
+
+    -# TODO: model pollution
+    - if @abstract_model.model.belongs_to_fields.any?
+      .form-group.control-group
+        %label.col-sm-2.control-label= t('admin.import.belongs_to_fields')
+        .col-sm-10.controls
+          %ul.list-unstyled
+            - @abstract_model.model.belongs_to_fields.each do |field|
+              %li
+                %label= link_to field.to_s.titleize, url_for(:action => :index, :model_name => @abstract_model.model.association_class(field).name.underscore)
+          %p.help-block= t('admin.import.help.belongs_to_fields')
 
     - visible_fields.select{ |f| f.association? && !f.association.polymorphic? }.each do |field|
       - fields = field.associated_model_config.export.with(controller: self.controller, view: self, object: (associated_model = field.associated_model_config.abstract_model.model).new).visible_fields.select{ |f| !f.association? }
@@ -70,7 +67,7 @@
 
   %br
   .form-actions
-    %input{type: :hidden, name: 'return_to', value: (params[:return_to].presence || request.referer)}
+    %input{type: :hidden, name: 'return_to', value: (request.params[:return_to].presence || request.referer)}
     %button.btn.btn-primary{type: "submit", name: 'csv'}
       %i.icon-white.icon-ok
       = t("admin.export.confirmation", name: 'csv')
