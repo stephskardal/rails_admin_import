@@ -14,6 +14,15 @@ module RailsAdmin
           [:get, :post]
         end
 
+        # FIXME: Remove. this kind of option doesn't appear in other actions
+        register_instance_option :label do
+          [:name, :id]
+        end
+
+        register_instance_option :mapping_key do
+          :name
+        end
+
         register_instance_option :controller do
           Proc.new do
             @response = {}
