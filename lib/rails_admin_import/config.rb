@@ -1,5 +1,6 @@
 require 'rails_admin_import/config/model'
 # require 'active_support/core_ext/class/attribute_accessors'
+require "rails_admin_import/config/section"
 
 module RailsAdminImport
   module Config
