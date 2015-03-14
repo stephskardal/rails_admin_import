@@ -63,6 +63,9 @@
       </div>
     </div>
     <% end -%>
+
+
+
     <% if RailsAdminImport.config(@abstract_model.model).extra_fields.any? -%>
     <div class="control-group">
       <label class="control-label" data-original-title="Click to reverse selection" onclick="jQuery(this).siblings('.controls').find('input').click()" rel="tooltip"><%= t('admin.import.belongs_to_fields') %></label>

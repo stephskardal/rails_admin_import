@@ -7,74 +7,55 @@
     %legend
       %i.icon-chevron-down
       = t('admin.import.legend.fields')
-    .form-group.control-group
-      %label.col-sm-2.control-label= t('admin.import.fields_from', model: @model_config.label.downcase)
-      .col-sm-10.controls
-        %ul.list-unstyled
-          -# TODO: don't pollute model with import_fields
-          -# Set up @model_config.import.with(view: self, object: @abstract_model.model.new, controller: self.controller).import_fields
-          - @abstract_model.model.import_fields.each do |field|
-            %li
-              %label= field
-        %p.help-block= t('admin.import.help.fields')
 
-    -# TODO: model pollution
-    - if @abstract_model.model.belongs_to_fields.any?
-      .form-group.control-group
-        %label.col-sm-2.control-label= t('admin.import.belongs_to_fields')
-        .col-sm-10.controls
-          %ul.list-unstyled
-            - @abstract_model.model.belongs_to_fields.each do |field|
-              %li
-                %label= link_to field.to_s.titleize, url_for(:action => :index, :model_name => @abstract_model.model.association_class(field).name.underscore)
-          %p.help-block= t('admin.import.help.belongs_to_fields')
-
-    - visible_fields.select{ |f| f.association? && !f.association.polymorphic? }.each do |field|
-      - fields = field.associated_model_config.export.with(controller: self.controller, view: self, object: (associated_model = field.associated_model_config.abstract_model.model).new).visible_fields.select{ |f| !f.association? }
-      .form-group.control-group
-        %label.col-sm-2.control-label{rel: 'tooltip', :'data-original-title' => t('admin.export.click_to_reverse_selection'), onclick: 'jQuery(this).siblings(".controls").find("input").click()'}= t('admin.export.fields_from_associated', name: field.label.downcase)
-        .col-sm-10.controls
-          - fields.each do |associated_model_field|
-            - list = associated_model_field.virtual? ? 'methods' : 'only'
-            %label.checkbox{for: "schema_include_#{field.name}_#{list}_#{associated_model_field.name}"}
-              = check_box_tag "schema[include][#{field.name}][#{list}][]", associated_model_field.name, true, { id: "schema_include_#{field.name}_#{list}_#{associated_model_field.name}" }
-              = capitalize_first_letter(associated_model_field.label)
+    -# TODO: don't pollute the model class with import_fields
+    -# Set up @model_config.import.with(view: self, object: @abstract_model.model.new, controller: self.controller).import_fields
+    = render "section", section: "model_fields", fields: @abstract_model.model.import_fields
+    = render "section", section: "belongs_to_fields", fields: @abstract_model.model.belongs_to_fields
+    = render "section", section: "file_fields", fields: @abstract_model.model.file_fields
+    = render "section", section: "has_many_fields", fields: @abstract_model.model.many_fields
+    = render "section", section: "extra_fields", fields: RailsAdminImport.config(@abstract_model.model).extra_fields
 
   %fieldset
     %legend
       %i.icon-chevron-down
-      = t('admin.export.options_for', name: 'csv')
+      = t('admin.import.legend.upload')
     .form-group.control-group
-      - guessed_encoding = @abstract_model.encoding
-      %label.col-sm-2.control-label{for: "csv_options_encoding_to"}= t('admin.export.csv.encoding_to')
+      %label.col-sm-2.control-label{for: "file"}= t("admin.import.file")
       .col-sm-10.controls
-        -# from http://books.google.com/support/partner/bin/answer.py?answer=30990 :
-        = select_tag 'csv_options[encoding_to]', options_for_select(RailsAdmin::CSVConverter::TARGET_ENCODINGS), include_blank: true
-        %p.help-block= t('admin.export.csv.encoding_to_help', name: guessed_encoding)
+        = file_field_tag :file, :class => "form-control"
+        %p.help-block= t('admin.import.help.file_limit', limit: RailsAdminImport.config.line_item_limit)
+    .form-group.control-group
+      %label.col-sm-2.control-label= t("admin.import.update_if_exists")
+      .col-sm-10.controls
+        = check_box_tag :update_if_exists, '1', false, :class => "form-control"
+    .form-group.control-group
+      %label.col-sm-2.control-label{for: "update-lookup"}= t("admin.import.update_lookup")
+      .col-sm-10.controls
+        -# TODO: model pollution, config key
+        = select_tag 'update-lookup', options_for_select(@abstract_model.model.new.attributes.keys, RailsAdminImport.config(@abstract_model.model).mapping_key.to_s), data: { enumeration: true }
 
-    .form-group.control-group
-      %label.col-sm-2.control-label{for: "csv_options_skip_header"}= t('admin.export.csv.skip_header')
-      .col-sm-10.controls
-        %label.checkbox
-          = check_box_tag 'csv_options[skip_header]', 'true'
-        %p.help-block= t('admin.export.csv.skip_header_help')
+  %fieldset
+    %legend
+      %i.icon-chevron-down
+      = t('admin.import.legend.mapping')
 
-    .form-group.control-group
-      %label.col-sm-2.control-label{for: "csv_options_generator_col_sep"}= t('admin.export.csv.col_sep')
-      .col-sm-10.controls
-        = select_tag 'csv_options[generator][col_sep]', options_for_select({ '' => t('admin.export.csv.default_col_sep'), "<comma> ','" => ',', "<semicolon> ';'" => ';', '<tabs>' => "'\t'" })
-        %p.help-block= t('admin.export.csv.col_sep_help', value: t('admin.export.csv.default_col_sep'))
+    - association_fields = [*@abstract_model.model.belongs_to_fields, *@abstract_model.model.many_fields]
+    - association_fields.each do |field|
+      .form-group.control-group
+        %label.col-sm-2.control-label
+          = capitalize_first_letter field.to_s
+          = t("admin.import.mapping")
+        .col-sm-10.controls
+          -# TODO: model pollution, config key
+          = select_tag field, options_for_select(@abstract_model.model.association_class(field).new.attributes.keys, RailsAdminImport.config(@abstract_model.model.association_class(field)).mapping_key.to_s), data: { enumeration: true }
 
   %br
   .form-actions
     %input{type: :hidden, name: 'return_to', value: (request.params[:return_to].presence || request.referer)}
-    %button.btn.btn-primary{type: "submit", name: 'csv'}
+    %button.btn.btn-primary{type: "submit", name: "commit", data: {disable_with: "Uploading..."} }
       %i.icon-white.icon-ok
-      = t("admin.export.confirmation", name: 'csv')
-    %button.btn.btn-info{type: "submit", name: 'json'}
-      = t("admin.export.confirmation", name: 'json')
-    %button.btn.btn-info{type: "submit", name: 'xml'}
-      = t("admin.export.confirmation", name: 'xml')
+      = t("admin.form.save")
     %button.btn{type: "submit", name: "_continue"}
       %i.icon-remove
       = t("admin.form.cancel")
