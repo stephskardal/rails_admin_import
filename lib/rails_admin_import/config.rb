@@ -12,6 +12,7 @@ module RailsAdminImport
       attr_reader :registry
       attr_accessor :logging
       attr_accessor :line_item_limit
+      attr_accessor :default_encoding
 
       # Loads a model configuration instance from the registry or registers
       # a new one if one is yet to be added.
@@ -40,6 +41,7 @@ module RailsAdminImport
         @registry = {}
         @logging = false
         @line_item_limit = 1000
+        @default_encoding = "UTF-8"
       end
 
       # Reset a provided model's configuration.

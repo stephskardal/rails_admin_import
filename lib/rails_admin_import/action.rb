@@ -27,9 +27,10 @@ module RailsAdmin
           Proc.new do
             @response = {}
 
+            # TODO: replace RailsAdminImport.config(@abstract_model.model) by @model_config
+            @importer = RailsAdminImport::Importer.new(@abstract_model, RailsAdminImport.config(@abstract_model.model))
             if request.post?
-              # TODO: don't pollute model with new methods
-              results = @abstract_model.model.run_import(params)
+              results = @importer.run_import(params)
               @response[:notice] = results[:success].join("<br />").html_safe if results[:success].any?
               @response[:error] = results[:error].join("<br />").html_safe if results[:error].any?
             end

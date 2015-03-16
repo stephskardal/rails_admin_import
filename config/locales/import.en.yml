@@ -19,6 +19,7 @@ en:
       update_if_exists: "Update if exists"
       update_lookup: "Update lookup field"
       mapping: "mapping"
+      encoding: "Encoding"
       legend:
         fields: "Fields to import"
         upload: "Upload file"
@@ -30,3 +31,5 @@ en:
         has_many_fields: "These fields map to other columns in the database, lookup via attribute selected below. There may be multiple columns with this header in the spreadsheet."
         extra_fields: "Additional application specific fields."
         file_limit: "Please limit upload file to %{limit} line items."
+        encoding: "Choose file encoding. Leave empty to use the default encoding: (%{name})"
+

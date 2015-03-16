@@ -1,5 +1,3 @@
-- visible_fields = @model_config.export.with(view: self, object: @abstract_model.model.new, controller: self.controller).visible_fields
-
 = form_tag import_path(@abstract_model), method: 'post', class: 'form-horizontal denser' do
 
   %input{name: "send_data", type: "hidden", value: "true"}/
@@ -10,10 +8,10 @@
 
     -# TODO: don't pollute the model class with import_fields
     -# Set up @model_config.import.with(view: self, object: @abstract_model.model.new, controller: self.controller).import_fields
-    = render "section", section: "model_fields", fields: @abstract_model.model.import_fields
-    = render "section", section: "belongs_to_fields", fields: @abstract_model.model.belongs_to_fields
-    = render "section", section: "file_fields", fields: @abstract_model.model.file_fields
-    = render "section", section: "has_many_fields", fields: @abstract_model.model.many_fields
+    = render "section", section: "model_fields", fields: @importer.import_fields
+    = render "section", section: "belongs_to_fields", fields: @importer.belongs_to_fields
+    = render "section", section: "file_fields", fields: @importer.file_fields
+    = render "section", section: "has_many_fields", fields: @importer.many_fields
     = render "section", section: "extra_fields", fields: RailsAdminImport.config(@abstract_model.model).extra_fields
 
   %fieldset
@@ -25,6 +23,12 @@
       .col-sm-10.controls
         = file_field_tag :file, :class => "form-control"
         %p.help-block= t('admin.import.help.file_limit', limit: RailsAdminImport.config.line_item_limit)
+    .form-group.control-group
+      %label.col-sm-2.control-label{for: "encoding"}= t("admin.import.encoding")
+      .col-sm-10.controls
+        = select_tag 'encoding', options_for_select(RailsAdmin::CSVConverter::TARGET_ENCODINGS), include_blank: true
+        %p.help-block= t('admin.import.help.encoding', name: RailsAdminImport.config.default_encoding)
+    -# TODO: switch to rollback transaction if import of one record fails
     .form-group.control-group
       %label.col-sm-2.control-label= t("admin.import.update_if_exists")
       .col-sm-10.controls
