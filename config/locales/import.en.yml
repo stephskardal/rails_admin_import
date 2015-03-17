@@ -25,9 +25,8 @@ en:
         upload: "Upload file"
         mapping: "Related fields mapping"
       help:
-        model_fields: "The following fields may be included in the import file."
-        belongs_to_fields: "These fields map to other items in the database, lookup via attribute selected below."
-        file_fields: "These must be a downloadable URL."
+        model_fields: "The fields above may be included in the import file."
+        belongs_to_fields: "These fields map to other items in the database, lookup via attribute selected above."
         has_many_fields: "These fields map to other columns in the database, lookup via attribute selected below. There may be multiple columns with this header in the spreadsheet."
         extra_fields: "Additional application specific fields."
         file_limit: "Please limit upload file to %{limit} line items."
