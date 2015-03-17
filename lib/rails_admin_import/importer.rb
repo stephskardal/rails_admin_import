@@ -1,4 +1,3 @@
-require 'open-uri'
 require "rails_admin_import/import_logger"
 
 module RailsAdminImport
@@ -11,19 +10,8 @@ module RailsAdminImport
 
     attr_reader :abstract_model, :model, :model_config
 
-    def file_fields
-      unless @file_fields
-        attrs = []
-        if model.methods.include?(:attachment_definitions) && !model.attachment_definitions.nil?
-          attrs = model.attachment_definitions.keys
-        end
-        @file_fields = attrs - model_config.excluded_fields 
-      end
-      @file_fields
-    end
-
     def import_fields
-      unless @import_fields
+      @import_fields ||= begin
         if model_config.included_fields.any?
           fields = model_config.included_fields.map(&:to_s)
         else
@@ -34,35 +22,30 @@ module RailsAdminImport
           fields.delete(model.reflections[key].foreign_key)
         end
 
-        file_fields.each do |key|
-          fields.delete("#{key}_file_name")
-          fields.delete("#{key}_content_type")
-          fields.delete("#{key}_file_size")
-          fields.delete("#{key}_updated_at")
-        end
-
         [:id, :created_at, :updated_at, *model_config.excluded_fields].each do |key|
           fields.delete(key.to_s)
         end
 
-        @import_fields = fields
+        fields
       end
-
-      @import_fields
     end
 
     def belongs_to_fields
-      attrs = model.reflections.select { |field, reflection|
-        reflection.macro == :belongs_to && !reflection.options.has_key?(:polymorphic)
-      }.keys
-      attrs - model_config.excluded_fields 
+      @belongs_to_fields ||= begin
+        attrs = model.reflections.select { |field, reflection|
+          reflection.macro == :belongs_to && !reflection.options.has_key?(:polymorphic)
+        }.keys
+        attrs - model_config.excluded_fields 
+      end
     end
 
     def many_fields
-      attrs = model.reflections.select { |field, reflection|
-        [:has_and_belongs_to_many, :has_many].include? reflection.macro
-      }.keys
-      attrs - model_config.excluded_fields 
+      @many_fields ||= begin
+        attrs = model.reflections.select { |field, reflection|
+          [:has_and_belongs_to_many, :has_many].include? reflection.macro
+        }.keys
+        attrs - model_config.excluded_fields 
+      end
     end
 
     def association_class(field)
@@ -85,12 +68,8 @@ module RailsAdminImport
     class RecordError < StandardError
     end
 
-    def association_mapping(klass, mapping_field)
-      klass.pluck(klass.primary_key, mapping_field).
-        each_with_object({}) { |(pk, mapping_value), hash| hash[mapping_value] = pk }
-    end
-
     def run_import(params)
+      binding.pry
       logger     = ImportLogger.new
       begin
         if !params.has_key?(:file)
@@ -102,6 +81,7 @@ module RailsAdminImport
         end
 
         update = params.fetch(:update_if_exists, false) ? params[:update_lookup] : nil
+        label_method = model_config.label
 
         record_importer = CSVRecordImporter.new(params[:file].tempfile)
         
@@ -110,50 +90,37 @@ module RailsAdminImport
         #   return results = { :success => [], :error => ["Please limit upload file to #{RailsAdminImport.config.line_item_limit} line items."] }
         # end
 
-        # Map all possible associated records to their primary keys
-        # This looks super wasteful
-        associated_map = {}
-        belongs_to_fields.each do |field|
-          associated_map[field] = association_mapping(association_class(field), params[field])
-        end
-        many_fields.each do |field|
-          # TODO: Check if this is useful. The old implementation was
-          # mapping AR classes instead of mapping primary keys
-          associated_map[field] = association_mapping(association_class(field), params[field])
-        end
-
+        results = { :success => [], :error => [] }
 
         record_importer.each_record do |record|
           if update && !record.has_key?(update.to_sym)
             fail RecordError, "Your file must contain a column for the 'Update lookup field' you selected."
           end 
 
-          label_method = model_config.label
+          # FIXME: row used to be an array. Now record is a hash
+          object = find_or_create_object(record, update)
+          import_belongs_to_data(object, record)
+          import_many_data(object, record)
 
-          file.each do |row|
-            object = self.import_initialize(row, map, update)
-            object.import_belongs_to_data(associated_map, row, map)
-            object.import_many_data(associated_map, row, map)
-            object.before_import_save(row, map)
+          perform_model_callback(object, :before_import_save, record)
 
-            object.import_files(row, map)
+          object_label = object.send(label_method)
 
-            verb = object.new_record? ? "Create" : "Update"
-            if object.errors.empty?
-              if object.save
-                logger.info "#{Time.now.to_s}: #{verb}d: #{object.send(label_method)}"
-                results[:success] << "#{verb}d: #{object.send(label_method)}"
-                object.after_import_save(row, map)
-              else
-                logger.info "#{Time.now.to_s}: Failed to #{verb}: #{object.send(label_method)}. Errors: #{object.errors.full_messages.join(', ')}."
-                results[:error] << "Failed to #{verb}: #{object.send(label_method)}. Errors: #{object.errors.full_messages.join(', ')}."
-              end
+          verb = object.new_record? ? "Create" : "Update"
+          if object.errors.empty?
+            if object.save
+              logger.info "#{Time.now.to_s}: #{verb}d: #{object_label}"
+              results[:success] << "#{verb}d: #{object_label}"
+
+              perform_model_callback(object, :after_import_save, record)
             else
-              logger.info "#{Time.now.to_s}: Errors before save: #{object.send(label_method)}. Errors: #{object.errors.full_messages.join(', ')}."
-              results[:error] << "Errors before save: #{object.send(label_method)}. Errors: #{object.errors.full_messages.join(', ')}."
+              logger.info "#{Time.now.to_s}: Failed to #{verb}: #{object_label}. Errors: #{object.errors.full_messages.join(', ')}."
+              results[:error] << "Failed to #{verb}: #{object_label}. Errors: #{object.errors.full_messages.join(', ')}."
             end
+          else
+            logger.info "#{Time.now.to_s}: Errors before save: #{object_label}. Errors: #{object.errors.full_messages.join(', ')}."
+            results[:error] << "Errors before save: #{object_label}. Errors: #{object.errors.full_messages.join(', ')}."
           end
-
         end
 
         # file = CSV.new(clean)
@@ -168,82 +135,79 @@ module RailsAdminImport
         #   end
         # end
 
-        results = { :success => [], :error => [] }
-
 
         results
+      rescue RecordError => e
+        logger.info "#{Time.now.to_s}: Error importing record: #{e.inspect}"
+        return { success: [], error: e.message }
+
       rescue Exception => e
         logger.info "#{Time.now.to_s}: Unknown exception in import: #{e.inspect}"
-        return results = { :success => [], :error => ["Could not upload. Unexpected error: #{e.to_s}"] }
-      end
-
-      # FIXME: what's this cruft?
-      def import_initialize(row, map, update)
-        new_attrs = {}
-        self.import_fields.each do |key|
-          new_attrs[key] = row[map[key]] if map[key] && !row[map[key]].blank?
-        end
-
-        item = nil
-        if update.present?
-          item = self.send("find_by_#{update}", row[map[update]])
-        end 
-
-        if item.nil?
-          item = self.new(new_attrs)
-        else
-          item.attributes = new_attrs.except(update.to_sym)
-          item.save
-        end
-        item
+        return { :success => [], :error => ["Could not upload. Unexpected error: #{e.to_s}"] }
       end
     end
 
+    def perform_model_callback(object, method, record)
+      # TODO: if arity is 2, split record into headers and data to be
+      # compatible with the old version and set a deprecation warning
+      if object.respond_to?(method)
+        object.send(method, record)
+      end
+    end
+
+    def find_or_create_object(record, update)
+      new_attrs = {}
+      import_fields.each do |key|
+        value = record[key]
+        if !value.blank?
+          new_attrs[key] = value
+        end
+      end
+
+      item = nil
+      if update.present?
+        item = model.find_by(update => record[update])
+      end 
+
+      if item.nil?
+        item = model.new(new_attrs)
+      else
+        item.attributes = new_attrs.except(update.to_sym)
+        # FIXME: why is save called here, before the Before save callback??
+        item.save
+      end
+      item
+    end
+
+    # TODO: move this to the model config
     def import_display
       self.id
     end
 
-    def import_files(row, map)
-      if self.valid?
-        self.class.file_fields.each do |key|
-          if map[key] && !row[map[key]].nil?
-            begin
-              row[map[key]] = row[map[key]].gsub(/\s+/, "")
+    def associated_object(field, mapping_field, value)
+      association_class(field).find_by(mapping_field => value)
+    end
 
-              format = row[map[key]].match(/[a-z0-9]+$/)
-              permalink = row[map[key]].split('/').last.gsub!('.'+format.to_s,'')
-
-              open("#{Rails.root}/tmp/#{permalink}.#{format}", 'wb') { |file| file << open(row[map[key]]).read }
-              self.send("#{key}=", File.open("#{Rails.root}/tmp/#{permalink}.#{format}"))
-            rescue Exception => e
-              self.errors.add(:base, "Import error: #{e.inspect}")
-            end
-          end
+    def import_belongs_to_data(object, record)
+      belongs_to_fields.each do |field|
+        value = record[field]
+        if !value.blank?
+          object.send "#{field}=", associated_object(field, params[field], value)
         end
       end
     end
 
-    def import_belongs_to_data(associated_map, row, map)
-      self.class.belongs_to_fields.each do |key|
-        if map.has_key?(key) && row[map[key]] != ""
-          self.send("#{key}_id=", associated_map[key][row[map[key]]])
-        end
-      end
-    end
-
-    def import_many_data(associated_map, row, map)
-      self.class.many_fields.each do |key|
+    def import_many_data(object, record)
+      many_fields.each do |field|
         values = []
-
-        map[key] ||= []
-        map[key].each do |pos|
-          if row[pos] != "" && associated_map[key][row[pos]]
-            values << associated_map[key][row[pos]]
-          end
+        index = record.index(field)
+        until index.nil?
+          values << associated_object(field, params[field], record.field(index))
+          index = record.index(field, index)
         end
 
         if values.any?
-          self.send("#{key.to_s.pluralize}").push(values)
+          object.send "#{field}=", values
         end
       end
     end

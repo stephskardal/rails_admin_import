@@ -10,7 +10,6 @@
     -# Set up @model_config.import.with(view: self, object: @abstract_model.model.new, controller: self.controller).import_fields
     = render "section", section: "model_fields", fields: @importer.import_fields
     = render "section", section: "belongs_to_fields", fields: @importer.belongs_to_fields
-    = render "section", section: "file_fields", fields: @importer.file_fields
     = render "section", section: "has_many_fields", fields: @importer.many_fields
     = render "section", section: "extra_fields", fields: RailsAdminImport.config(@abstract_model.model).extra_fields
 
