@@ -25,14 +25,16 @@ module RailsAdmin
 
         register_instance_option :controller do
           Proc.new do
-            @response = {}
-
             # TODO: replace RailsAdminImport.config(@abstract_model.model) by @model_config
             @importer = RailsAdminImport::Importer.new(@abstract_model, RailsAdminImport.config(@abstract_model.model))
+
             if request.post?
-              results = @importer.run_import(params)
-              @response[:notice] = results[:success].join("<br />").html_safe if results[:success].any?
-              @response[:error] = results[:error].join("<br />").html_safe if results[:error].any?
+              @results = @importer.run_import(params)
+
+              imported = @results[:success]
+              not_imported = @results[:error]
+              @results[:success_message] = t('admin.flash.successful', name: pluralize(imported.count, @model_config.label), action: t('admin.actions.import.done')) unless imported.empty?
+              @results[:error_message] = t('admin.flash.error', name: pluralize(not_imported.count, @model_config.label), action: t('admin.actions.import.done')) unless not_imported.empty?
             end
 
             render :action => @action.template_name

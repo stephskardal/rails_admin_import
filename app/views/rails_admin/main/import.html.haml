@@ -1,4 +1,6 @@
-= form_tag import_path(@abstract_model), method: 'post', class: 'form-horizontal denser' do
+= render "results"
+
+= form_tag import_path(@abstract_model), :multipart => true, class: 'form-horizontal denser' do
 
   %input{name: "send_data", type: "hidden", value: "true"}/
   %fieldset
@@ -36,22 +38,23 @@
       %label.col-sm-2.control-label{for: "update-lookup"}= t("admin.import.update_lookup")
       .col-sm-10.controls
         -# TODO: model pollution, config key
-        = select_tag 'update-lookup', options_for_select(@abstract_model.model.new.attributes.keys, RailsAdminImport.config(@abstract_model.model).mapping_key.to_s), data: { enumeration: true }
+        = select_tag 'update_lookup', options_for_select(@abstract_model.model.new.attributes.keys, RailsAdminImport.config(@abstract_model.model).mapping_key.to_s), data: { enumeration: true }
 
-  %fieldset
-    %legend
-      %i.icon-chevron-down
-      = t('admin.import.legend.mapping')
+  - association_fields = [*@abstract_model.model.belongs_to_fields, *@abstract_model.model.many_fields]
+  - unless association_fields.empty?
+    %fieldset
+      %legend
+        %i.icon-chevron-down
+        = t('admin.import.legend.mapping')
 
-    - association_fields = [*@abstract_model.model.belongs_to_fields, *@abstract_model.model.many_fields]
-    - association_fields.each do |field|
-      .form-group.control-group
-        %label.col-sm-2.control-label
-          = capitalize_first_letter field.to_s
-          = t("admin.import.mapping")
-        .col-sm-10.controls
-          -# TODO: model pollution, config key
-          = select_tag field, options_for_select(@abstract_model.model.association_class(field).new.attributes.keys, RailsAdminImport.config(@abstract_model.model.association_class(field)).mapping_key.to_s), data: { enumeration: true }
+      - association_fields.each do |field|
+        .form-group.control-group
+          %label.col-sm-2.control-label
+            = capitalize_first_letter field.to_s
+            = t("admin.import.mapping")
+          .col-sm-10.controls
+            -# TODO: model pollution, config key
+            = select_tag field, options_for_select(@abstract_model.model.association_class(field).new.attributes.keys, RailsAdminImport.config(@abstract_model.model.association_class(field)).mapping_key.to_s), data: { enumeration: true }
 
   %br
   .form-actions

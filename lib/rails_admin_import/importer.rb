@@ -52,24 +52,49 @@ module RailsAdminImport
       model.reflections[field].klass
     end
 
+    HEADER_CONVERTER = lambda do |header|
+      header.parameterize.underscore
+    end
+
     class CSVRecordImporter
       extend Forwardable
 
       def initialize(filename)
-        @csv = CSV.open(params[:file].tempfile, headers: true)
+        @csv = CSV.open(filename, headers: true, header_converters: HEADER_CONVERTER)
 
         # TODO: set up encoding conversion
         # csv_string = csv_string.encode(@encoding_to, @encoding_from, invalid: :replace, undef: :replace, replace: '?')
       end
 
-      def_delegator :@csv, :each, :each_record
+      attr_reader :csv
+
+      def each_record
+        return enum_for(:each_record) unless block_given?
+        
+        csv.each do |row|
+          yield convert_to_hash(row)
+        end
+      end
+
+      private
+
+      def convert_to_hash(row)
+        row.each_with_object({}) do |(header, value), record|
+          # When multiple columns with the same name exist, wrap the values in an array
+          if record.has_key?(header)
+            record[header] = [*record[header], value]
+          else
+            record[header] = value
+          end
+        end
+      end
     end
 
     class RecordError < StandardError
     end
 
     def run_import(params)
-      binding.pry
+      # binding.pry
       logger     = ImportLogger.new
       begin
         if !params.has_key?(:file)
@@ -80,7 +105,7 @@ module RailsAdminImport
           FileUtils.copy(params[:file].tempfile, "#{Rails.root}/log/import/#{Time.now.strftime("%Y-%m-%d-%H-%M-%S")}-import.csv")
         end
 
-        update = params.fetch(:update_if_exists, false) ? params[:update_lookup] : nil
+        update = params[:update_if_exists] == "1" ? params[:update_lookup] : nil
         label_method = model_config.label
 
         record_importer = CSVRecordImporter.new(params[:file].tempfile)
@@ -93,7 +118,8 @@ module RailsAdminImport
         results = { :success => [], :error => [] }
 
         record_importer.each_record do |record|
-          if update && !record.has_key?(update.to_sym)
+          # binding.pry
+          if update && !record.has_key?(update)
             fail RecordError, "Your file must contain a column for the 'Update lookup field' you selected."
           end 
 
@@ -128,6 +154,7 @@ module RailsAdminImport
         #   key = key.parameterize.underscore
         #   if many_fields.include?(key)
         #     # TODO: Why the array here?
+        #     # Answer: Because many fields can occur multiple times in the CSV file (multiple columns)
         #     map[key] ||= []
         #     map[key] << i
         #   else
@@ -174,7 +201,8 @@ module RailsAdminImport
       else
         item.attributes = new_attrs.except(update.to_sym)
         # FIXME: why is save called here, before the Before save callback??
-        item.save
+        # Remove for now
+        # item.save
       end
       item
     end
