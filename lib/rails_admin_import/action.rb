@@ -25,8 +25,7 @@ module RailsAdmin
 
         register_instance_option :controller do
           Proc.new do
-            # TODO: replace RailsAdminImport.config(@abstract_model.model) by @model_config
-            @importer = RailsAdminImport::Importer.new(@abstract_model, controller: self)
+            @importer = RailsAdminImport::Importer.new(@abstract_model)
 
             if request.post?
               begin

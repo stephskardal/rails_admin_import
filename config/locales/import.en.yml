@@ -30,7 +30,7 @@ en:
         mapping: "Related fields mapping"
       help:
         model_fields: "The fields above may be included in the import file."
-        association_fields: "These fields map to other columns in the database, lookup via attribute selected below. For plural associations, there may be multiple columns with this header in the spreadsheet."
+        association_fields: "These fields map to other columns in the database, lookup via attribute selected below. For \"many\" associations, there may be multiple columns with this header in the spreadsheet."
 
         # TODO: remove
         belongs_to_fields: "These fields map to other items in the database, lookup via attribute selected above."

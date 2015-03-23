@@ -1,12 +1,13 @@
 module RailsAdminImport
-  class RecordImporter
-    def self.add_importer(format, klass)
-      @importers ||= {}
-      @importers[format] = klass
+  module RecordImporter
+    @@registry = {}
+
+    def self.register(format, klass)
+      @@registry[format] = klass
     end
 
     def self.for(format, *args)
-      @importers.fetch(format).new(*args)
+      @@registry.fetch(format).new(*args)
     end
   end
 end

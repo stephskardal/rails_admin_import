@@ -2,54 +2,46 @@ require "rails_admin_import/import_logger"
 
 module RailsAdminImport
   class Importer
-    def initialize(abstract_model, bindings = {})
+    def initialize(abstract_model)
       @abstract_model = abstract_model
-      @model_config = @abstract_model.config
+      @model_config = abstract_model.config
       @model = abstract_model.model
     end
 
     attr_reader :abstract_model, :model, :model_config
 
-    def import_fields
-      @import_fields ||= begin
-        fields = abstract_model.properties
-
-        if model_config.included_fields.any?
-          fields = fields.find_all { |field| model_config.included_fields.include? field.name }
-        end
-
-        foreign_keys = belongs_to_fields.map(&:foreign_key)
-        excluded_fields = [:id, :created_at, :updated_at, *model_config.excluded_fields]
-
-        fields = fields.reject do |field|
-          foreign_keys.include?(field.name) || excluded_fields.include?(field.name)
-        end
-
-        fields
+    def visible_fields(config = model_config)
+      @visible_fields ||= {}
+      @visible_fields[config] ||= config.import.visible_fields.reject do |f|
+        # Exclude id, created_at and updated_at
+        model_config.import.default_excluded_fields.include? f.name
       end
+    end
+
+    def model_fields(config = model_config)
+      @model_fields ||= visible_fields(config).select { |f| !f.association? || f.association.polymorphic? }
+    end
+
+    def association_fields
+      @association_fields ||= visible_fields.select { |f| f.association? && !f.association.polymorphic? }
     end
 
     def belongs_to_fields
-      @belongs_to_fields ||= begin
-        abstract_model.associations.select do |association|
-          association.type == :belongs_to &&
-            !association.polymorphic? &&
-            !model_config.excluded_fields.include?(association.name)
-        end
-      end
+      @belongs_to_fields ||= association_fields.select { |f| f.type == :belongs_to_association }
     end
 
     def many_fields
-      @many_fields ||= begin
-        abstract_model.associations.select do |association|
-          [:has_and_belongs_to_many, :has_many].include?(association.type) &&
-            !model_config.excluded_fields.include?(association.name)
-        end
+      @many_fields ||= association_fields.select do |f|
+        [:has_and_belongs_to_many_association, :has_many_association].include?(f.type)
       end
     end
 
-    def association_class(field)
-      abstract_model.associations[field].klass
+    def associated_config(field)
+      field.associated_model_config.import
+    end
+
+    def associated_model_fields(field)
+      model_fields(field.associated_model_config)
     end
 
     HEADER_CONVERTER = lambda do |header|

@@ -5,25 +5,12 @@ module RailsAdmin
     module Sections
       # Configuration of the navigation view
       class Import < RailsAdmin::Config::Sections::Base
-        register_instance_option(:label) do
-          :name
-        end
-
         register_instance_option(:mapping_key) do
           :name
         end
 
-        register_instance_option(:excluded_fields) do
-          # Don't import PaperTrail versions
-          [:versions]
-        end
-
-        register_instance_option(:extra_fields) do
-          []
-        end
-
-        register_instance_option(:included_fields) do
-          []
+        register_instance_option(:default_excluded_fields) do
+          [:id, :_id, :created_at, :updated_at]
         end
       end
     end

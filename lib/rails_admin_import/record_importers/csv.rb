@@ -3,7 +3,7 @@ require 'csv'
 module RailsAdminImport
   module RecordImporters
     class CSV
-      RecordImporter.add_importer(:csv, self)
+      RecordImporter.register(:csv, self)
 
       def initialize(filename)
         @csv = CSV.open(filename, headers: true, header_converters: HEADER_CONVERTER)

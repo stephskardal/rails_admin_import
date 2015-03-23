@@ -1,9 +1,5 @@
 = render "results"
 
-- visible_fields = @model_config.import.with(view: self, object: @abstract_model.model.new, controller: self.controller).visible_fields
-- model_fields = visible_fields.select{ |f| !f.association? || f.association.polymorphic? }
-- association_fields = visible_fields.select{ |f| f.association? && !f.association.polymorphic? }
-
 = form_tag import_path(@abstract_model), :multipart => true, class: 'form-horizontal denser' do
 
   %input{name: "send_data", type: "hidden", value: "true"}/
@@ -12,8 +8,8 @@
       %i.icon-chevron-down
       = t('admin.import.legend.fields')
 
-    = render "section", section: "model_fields", fields: model_fields
-    = render "section", section: "association_fields", fields: association_fields
+    = render "section", section: "model_fields", fields: @importer.model_fields
+    = render "section", section: "association_fields", fields: @importer.association_fields
 
   %fieldset
     %legend
@@ -27,7 +23,7 @@
     .form-group.control-group
       %label.col-sm-2.control-label{for: "encoding"}= t("admin.import.encoding")
       .col-sm-10.controls
-        = select_tag 'encoding', options_for_select(RailsAdmin::CSVConverter::TARGET_ENCODINGS), include_blank: true
+        = select_tag 'encoding', options_for_select(RailsAdmin::CSVConverter::TARGET_ENCODINGS), include_blank: true, data: { enumeration: true }
         %p.help-block= t('admin.import.help.encoding', name: RailsAdminImport.config.default_encoding)
     -# TODO: switch to rollback transaction if import of one record fails
     .form-group.control-group
@@ -37,24 +33,22 @@
     .form-group.control-group
       %label.col-sm-2.control-label{for: "update-lookup"}= t("admin.import.update_lookup")
       .col-sm-10.controls
-        -# TODO: model pollution, config key
-        = select_tag 'update_lookup', options_for_select(model_fields.map(&:name), RailsAdminImport.config(@abstract_model.model).mapping_key.to_s), data: { enumeration: true }
+        -# TODO: config key
+        = select_tag 'update_lookup', options_for_select(@importer.model_fields.map(&:name), RailsAdminImport.config(@abstract_model.model).mapping_key.to_s), data: { enumeration: true }
 
-  - association_fields = [*@importer.belongs_to_fields, *@importer.many_fields]
-  - unless association_fields.empty?
+  - unless @importer.association_fields.empty?
     %fieldset
       %legend
         %i.icon-chevron-down
         = t('admin.import.legend.mapping')
 
-      - association_fields.each do |field|
+      - @importer.association_fields.each do |field|
         .form-group.control-group
           %label.col-sm-2.control-label
-            = field.pretty_name
+            = capitalize_first_letter(field.label)
             = t("admin.import.mapping")
           .col-sm-10.controls
-            -# TODO: model pollution, config key
-            = select_tag field.name, options_for_select(field.klass.new.attributes.keys, RailsAdminImport.config(field.klass).mapping_key.to_s), data: { enumeration: true }
+            = select_tag field.name, options_for_select(@importer.associated_model_fields(field).map(&:name), @importer.associated_config(field).mapping_key.to_s), data: { enumeration: true }
 
   %br
   .form-actions
