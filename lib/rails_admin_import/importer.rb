@@ -2,9 +2,9 @@ require "rails_admin_import/import_logger"
 
 module RailsAdminImport
   class Importer
-    def initialize(abstract_model, model_config)
+    def initialize(abstract_model, bindings = {})
       @abstract_model = abstract_model
-      @model_config = model_config
+      @model_config = @abstract_model.config
       @model = abstract_model.model
     end
 
@@ -12,18 +12,17 @@ module RailsAdminImport
 
     def import_fields
       @import_fields ||= begin
+        fields = abstract_model.properties
+
         if model_config.included_fields.any?
-          fields = model_config.included_fields.map(&:to_s)
-        else
-          fields = model.new.attributes.keys.dup
+          fields = fields.find_all { |field| model_config.included_fields.include? field.name }
         end
 
-        belongs_to_fields.each do |key|
-          fields.delete(model.reflections[key].foreign_key)
-        end
+        foreign_keys = belongs_to_fields.map(&:foreign_key)
+        excluded_fields = [:id, :created_at, :updated_at, *model_config.excluded_fields]
 
-        [:id, :created_at, :updated_at, *model_config.excluded_fields].each do |key|
-          fields.delete(key.to_s)
+        fields = fields.reject do |field|
+          foreign_keys.include?(field.name) || excluded_fields.include?(field.name)
         end
 
         fields
@@ -32,75 +31,38 @@ module RailsAdminImport
 
     def belongs_to_fields
       @belongs_to_fields ||= begin
-        attrs = model.reflections.select { |field, reflection|
-          reflection.macro == :belongs_to && !reflection.options.has_key?(:polymorphic)
-        }.keys
-        attrs - model_config.excluded_fields 
+        abstract_model.associations.select do |association|
+          association.type == :belongs_to &&
+            !association.polymorphic? &&
+            !model_config.excluded_fields.include?(association.name)
+        end
       end
     end
 
     def many_fields
       @many_fields ||= begin
-        attrs = model.reflections.select { |field, reflection|
-          [:has_and_belongs_to_many, :has_many].include? reflection.macro
-        }.keys
-        attrs - model_config.excluded_fields 
+        abstract_model.associations.select do |association|
+          [:has_and_belongs_to_many, :has_many].include?(association.type) &&
+            !model_config.excluded_fields.include?(association.name)
+        end
       end
     end
 
     def association_class(field)
-      model.reflections[field].klass
+      abstract_model.associations[field].klass
     end
 
     HEADER_CONVERTER = lambda do |header|
       header.parameterize.underscore
     end
 
-    class CSVRecordImporter
-      extend Forwardable
-
-      def initialize(filename)
-        @csv = CSV.open(filename, headers: true, header_converters: HEADER_CONVERTER)
-
-        # TODO: set up encoding conversion
-        # csv_string = csv_string.encode(@encoding_to, @encoding_from, invalid: :replace, undef: :replace, replace: '?')
-      end
-
-      attr_reader :csv
-
-      def each_record
-        return enum_for(:each_record) unless block_given?
-        
-        csv.each do |row|
-          yield convert_to_hash(row)
-        end
-      end
-
-      private
-
-      def convert_to_hash(row)
-        row.each_with_object({}) do |(header, value), record|
-          # When multiple columns with the same name exist, wrap the values in an array
-          if record.has_key?(header)
-            record[header] = [*record[header], value]
-          else
-            record[header] = value
-          end
-        end
-      end
-    end
-
     class RecordError < StandardError
     end
 
     def run_import(params)
-      # binding.pry
+      binding.pry
       logger     = ImportLogger.new
       begin
-        if !params.has_key?(:file)
-          return results = { :success => [], :error => ["You must select a file."] }
-        end
-
         if RailsAdminImport.config.logging
           FileUtils.copy(params[:file].tempfile, "#{Rails.root}/log/import/#{Time.now.strftime("%Y-%m-%d-%H-%M-%S")}-import.csv")
         end
@@ -108,7 +70,7 @@ module RailsAdminImport
         update = params[:update_if_exists] == "1" ? params[:update_lookup] : nil
         label_method = model_config.label
 
-        record_importer = CSVRecordImporter.new(params[:file].tempfile)
+        record_importer = params[:record_importer]
         
         # TODO: re-implement file size check
         # if file_check.readlines.size > RailsAdminImport.config.line_item_limit

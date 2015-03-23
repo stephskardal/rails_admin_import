@@ -11,11 +11,15 @@ en:
         done: "Imported"
     import:
       model_fields: "Model Fields"
+      association_fields: "Association Fields"
+      # TODO: remove
       belongs_to_fields: "Belongs To Fields"
       has_many_fields: "Has Many Fields"
       file_fields: "File Fields"
       extra_fields: "Extra Fields"
+
       file: "File"
+      missing_file: "You must select a file"
       update_if_exists: "Update if exists"
       update_lookup: "Update lookup field"
       mapping: "mapping"
@@ -26,9 +30,13 @@ en:
         mapping: "Related fields mapping"
       help:
         model_fields: "The fields above may be included in the import file."
+        association_fields: "These fields map to other columns in the database, lookup via attribute selected below. For plural associations, there may be multiple columns with this header in the spreadsheet."
+
+        # TODO: remove
         belongs_to_fields: "These fields map to other items in the database, lookup via attribute selected above."
         has_many_fields: "These fields map to other columns in the database, lookup via attribute selected below. There may be multiple columns with this header in the spreadsheet."
         extra_fields: "Additional application specific fields."
+
         file_limit: "Please limit upload file to %{limit} line items."
         encoding: "Choose file encoding. Leave empty to use the default encoding: (%{name})"
 

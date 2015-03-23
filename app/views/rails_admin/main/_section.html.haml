@@ -5,6 +5,6 @@
       %ul.list-unstyled
         - fields.each do |field|
           %li
-            %label= capitalize_first_letter field
+            %label= capitalize_first_letter(field.label)
       %p.help-block= t("admin.import.help.#{section}")
 
