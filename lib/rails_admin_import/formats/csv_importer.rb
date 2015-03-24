@@ -1,9 +1,9 @@
 require 'csv'
 
 module RailsAdminImport
-  module RecordImporters
+  module Formats
     class CSVImporter
-      RecordImporter.register(:csv, self)
+      Formats.register(:csv, self)
 
       # Default is to downcase headers and add underscores to convert into attribute names
       HEADER_CONVERTER = lambda do |header|
@@ -15,7 +15,7 @@ module RailsAdminImport
           @filename = params[:file].tempfile
         end
         @import_model = import_model
-        @header_converter = import_model.config.import.header_converter || HEADER_CONVERTER
+        @header_converter = import_model.config.header_converter || HEADER_CONVERTER
       end
 
       attr_reader :filename, :error

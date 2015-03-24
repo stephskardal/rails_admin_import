@@ -4,11 +4,10 @@ module RailsAdminImport
   class Importer
     def initialize(import_model, params)
       @import_model = import_model
-      @model = import_model.model
       @params = params
     end
 
-    attr_reader :import_model, :model, :params
+    attr_reader :import_model, :params
 
     class RecordError < StandardError
     end
@@ -17,7 +16,8 @@ module RailsAdminImport
       binding.pry
       logger     = ImportLogger.new
       begin
-        if RailsAdminImport.config.logging
+        # TODO: Reimplement base config
+        if false # RailsAdminImport.config.logging
           FileUtils.copy(params[:file].tempfile, "#{Rails.root}/log/import/#{Time.now.strftime("%Y-%m-%d-%H-%M-%S")}-import.csv")
         end
 
@@ -88,6 +88,7 @@ module RailsAdminImport
         field_names.include?(field_name) && !value.blank?
       end
 
+      model = import_model.model
       object = if update.present?
                model.find_by(update => record[update])
              end 
@@ -105,9 +106,11 @@ module RailsAdminImport
 
     def import_belongs_to_data(object, record)
       import_model.belongs_to_fields.each do |field|
-        value = record[field.name]
+        mapping_key = params[field.name]
+        value = extract_mapping(record[field.name], mapping_key)
+
         if !value.blank?
-          object.send "#{field.name}=", import_model.associated_object(field, params[field.name], value)
+          object.send "#{field.name}=", import_model.associated_objects(field, mapping_key, value).first
         end
       end
     end
@@ -115,12 +118,23 @@ module RailsAdminImport
     def import_has_many_data(object, record)
       import_model.many_fields.each do |field|
         if record.has_key? field.name
-          values = record[field.name].reject { |value| value.blank? }
+          mapping_key = params[field.name]
+          values = record[field.name].reject { |value| value.blank? }.map { |value|
+            extract_mapping(value, mapping_key)
+          }
+
           if !values.empty?
-            associated_objects = values.map { |value| import_model.associated_object(field, params[field.name], value) }
-            object.send "#{field.name}=", associated_objects
+            object.send "#{field.name}=", import_model.associated_objects(field, mapping_key, values)
           end
         end
+      end
+    end
+
+    def extract_mapping(value, mapping_key)
+      if value.is_a? Hash
+        value[mapping_key]
+      else
+        value
       end
     end
   end

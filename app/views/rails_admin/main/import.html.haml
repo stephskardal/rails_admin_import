@@ -19,12 +19,16 @@
       %label.col-sm-2.control-label{for: "file"}= t("admin.import.file")
       .col-sm-10.controls
         = file_field_tag :file, :class => "form-control"
-        %p.help-block= t('admin.import.help.file_limit', limit: RailsAdminImport.config.line_item_limit)
+        %p.help-block= t('admin.import.help.file_limit', limit: 1000) # FIXME: RailsAdminImport.config.line_item_limit
+    .form-group.control-group
+      %label.col-sm-2.control-label{for: "format"}= t("admin.import.format")
+      .col-sm-10.controls
+        = select_tag 'format', options_for_select(RailsAdminImport::Formats.all), data: { enumeration: true }
     .form-group.control-group
       %label.col-sm-2.control-label{for: "encoding"}= t("admin.import.encoding")
       .col-sm-10.controls
         = select_tag 'encoding', options_for_select(RailsAdmin::CSVConverter::TARGET_ENCODINGS), include_blank: true, data: { enumeration: true }
-        %p.help-block= t('admin.import.help.encoding', name: RailsAdminImport.config.default_encoding)
+        %p.help-block= t('admin.import.help.encoding', name: 'UTF-8') # FIXME: RailsAdminImport.config.default_encoding
     -# TODO: switch to rollback transaction if import of one record fails
     .form-group.control-group
       %label.col-sm-2.control-label= t("admin.import.update_if_exists")
@@ -33,8 +37,7 @@
     .form-group.control-group
       %label.col-sm-2.control-label{for: "update-lookup"}= t("admin.import.update_lookup")
       .col-sm-10.controls
-        -# TODO: config key
-        = select_tag 'update_lookup', options_for_select(@import_model.model_fields.map(&:name), RailsAdminImport.config(@abstract_model.model).mapping_key.to_s), data: { enumeration: true }
+        = select_tag 'update_lookup', options_for_select(@import_model.model_fields.map(&:name), @import_model.config.mapping_key.to_s), data: { enumeration: true }
 
   - unless @import_model.association_fields.empty?
     %fieldset

@@ -12,16 +12,14 @@ en:
     import:
       model_fields: "Model Fields"
       association_fields: "Association Fields"
-      # TODO: remove
-      belongs_to_fields: "Belongs To Fields"
-      has_many_fields: "Has Many Fields"
-      file_fields: "File Fields"
       extra_fields: "Extra Fields"
 
-      file: "File"
+      file: "Data file"
       missing_file: "You must select a file"
+      format: "File format"
       invalid_format: "Invalid import format."
       missing_update_lookup: "Your file must contain a column for the 'Update lookup field' you selected."
+      data_not_array: "The data should be an array of records"
       update_if_exists: "Update if exists"
       update_lookup: "Update lookup field"
       mapping: "mapping"
