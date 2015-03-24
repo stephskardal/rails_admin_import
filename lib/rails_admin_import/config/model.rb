@@ -1,6 +1,7 @@
 require 'rails_admin_import/config'
 require 'rails_admin_import/config/base'
 
+# TODO: remove
 module RailsAdminImport
   module Config
     class Model < RailsAdminImport::Config::Base

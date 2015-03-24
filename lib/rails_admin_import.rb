@@ -1,6 +1,7 @@
 require "rails_admin"
 
 require "rails_admin_import/engine"
+require "rails_admin_import/import_model"
 require "rails_admin_import/record_importer"
 require "rails_admin_import/import"
 require "rails_admin_import/importer"

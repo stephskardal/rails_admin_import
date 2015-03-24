@@ -20,6 +20,8 @@ en:
 
       file: "File"
       missing_file: "You must select a file"
+      invalid_format: "Invalid import format."
+      missing_update_lookup: "Your file must contain a column for the 'Update lookup field' you selected."
       update_if_exists: "Update if exists"
       update_lookup: "Update lookup field"
       mapping: "mapping"

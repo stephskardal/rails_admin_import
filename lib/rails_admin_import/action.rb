@@ -24,22 +24,21 @@ module RailsAdmin
         end
 
         register_instance_option :controller do
-          Proc.new do
-            @importer = RailsAdminImport::Importer.new(@abstract_model)
+          proc do
+            @import_model = RailsAdminImport::ImportModel.new(@abstract_model)
 
             if request.post?
-              begin
-                raise ArgumentError if !params.has_key?(:file)
-                record_importer = RailsAdminImport::RecordImporter.for(:csv, params[:file].tempfile)
-
-                @results = @importer.run_import(params.merge(record_importer: record_importer))
+              record_importer = RailsAdminImport::RecordImporter.for(:csv, @import_model, params)
+              if record_importer.valid?
+                importer = RailsAdminImport::Importer.new(@import_model, params)
+                @results = importer.import(record_importer.each_record)
 
                 imported = @results[:success]
                 not_imported = @results[:error]
                 @results[:success_message] = t('admin.flash.successful', name: pluralize(imported.count, @model_config.label), action: t('admin.actions.import.done')) unless imported.empty?
                 @results[:error_message] = t('admin.flash.error', name: pluralize(not_imported.count, @model_config.label), action: t('admin.actions.import.done')) unless not_imported.empty?
-              rescue ArgumentException
-                flash[:error] = t('admin.import.missing_file')
+              else
+                flash[:error] = record_importer.error
               end
             end
 

@@ -2,56 +2,18 @@ require "rails_admin_import/import_logger"
 
 module RailsAdminImport
   class Importer
-    def initialize(abstract_model)
-      @abstract_model = abstract_model
-      @model_config = abstract_model.config
-      @model = abstract_model.model
+    def initialize(import_model, params)
+      @import_model = import_model
+      @model = import_model.model
+      @params = params
     end
 
-    attr_reader :abstract_model, :model, :model_config
-
-    def visible_fields(config = model_config)
-      @visible_fields ||= {}
-      @visible_fields[config] ||= config.import.visible_fields.reject do |f|
-        # Exclude id, created_at and updated_at
-        model_config.import.default_excluded_fields.include? f.name
-      end
-    end
-
-    def model_fields(config = model_config)
-      @model_fields ||= visible_fields(config).select { |f| !f.association? || f.association.polymorphic? }
-    end
-
-    def association_fields
-      @association_fields ||= visible_fields.select { |f| f.association? && !f.association.polymorphic? }
-    end
-
-    def belongs_to_fields
-      @belongs_to_fields ||= association_fields.select { |f| f.type == :belongs_to_association }
-    end
-
-    def many_fields
-      @many_fields ||= association_fields.select do |f|
-        [:has_and_belongs_to_many_association, :has_many_association].include?(f.type)
-      end
-    end
-
-    def associated_config(field)
-      field.associated_model_config.import
-    end
-
-    def associated_model_fields(field)
-      model_fields(field.associated_model_config)
-    end
-
-    HEADER_CONVERTER = lambda do |header|
-      header.parameterize.underscore
-    end
+    attr_reader :import_model, :model, :params
 
     class RecordError < StandardError
     end
 
-    def run_import(params)
+    def import(records)
       binding.pry
       logger     = ImportLogger.new
       begin
@@ -60,10 +22,8 @@ module RailsAdminImport
         end
 
         update = params[:update_if_exists] == "1" ? params[:update_lookup] : nil
-        label_method = model_config.label
+        label_method = import_model.config.object_label_method
 
-        record_importer = params[:record_importer]
-        
         # TODO: re-implement file size check
         # if file_check.readlines.size > RailsAdminImport.config.line_item_limit
         #   return results = { :success => [], :error => ["Please limit upload file to #{RailsAdminImport.config.line_item_limit} line items."] }
@@ -71,16 +31,16 @@ module RailsAdminImport
 
         results = { :success => [], :error => [] }
 
-        record_importer.each_record do |record|
-          # binding.pry
+        records.each do |record|
+          binding.pry
           if update && !record.has_key?(update)
-            fail RecordError, "Your file must contain a column for the 'Update lookup field' you selected."
+            fail RecordError, I18n.t('rails_admin.import.missing_update_lookup')
           end 
 
           # FIXME: row used to be an array. Now record is a hash
           object = find_or_create_object(record, update)
           import_belongs_to_data(object, record)
-          import_many_data(object, record)
+          import_has_many_data(object, record)
 
           perform_model_callback(object, :before_import_save, record)
 
@@ -103,20 +63,6 @@ module RailsAdminImport
           end
         end
 
-        # file = CSV.new(clean)
-        # file.readline.each_with_index do |key, i|
-        #   key = key.parameterize.underscore
-        #   if many_fields.include?(key)
-        #     # TODO: Why the array here?
-        #     # Answer: Because many fields can occur multiple times in the CSV file (multiple columns)
-        #     map[key] ||= []
-        #     map[key] << i
-        #   else
-        #     map[key] = i 
-        #   end
-        # end
-
-
         results
       rescue RecordError => e
         logger.info "#{Time.now.to_s}: Error importing record: #{e.inspect}"
@@ -137,59 +83,41 @@ module RailsAdminImport
     end
 
     def find_or_create_object(record, update)
-      new_attrs = {}
-      import_fields.each do |key|
-        value = record[key]
-        if !value.blank?
-          new_attrs[key] = value
-        end
+      field_names = import_model.model_fields.map(&:name)
+      new_attrs = record.select do |field_name, value|
+        field_names.include?(field_name) && !value.blank?
       end
 
-      item = nil
-      if update.present?
-        item = model.find_by(update => record[update])
-      end 
+      object = if update.present?
+               model.find_by(update => record[update])
+             end 
 
-      if item.nil?
-        item = model.new(new_attrs)
+      if object.nil?
+        object = model.new(new_attrs)
       else
-        item.attributes = new_attrs.except(update.to_sym)
+        object.attributes = new_attrs.except(update.to_sym)
         # FIXME: why is save called here, before the Before save callback??
         # Remove for now
-        # item.save
+        # object.save
       end
-      item
-    end
-
-    # TODO: move this to the model config
-    def import_display
-      self.id
-    end
-
-    def associated_object(field, mapping_field, value)
-      association_class(field).find_by(mapping_field => value)
+      object
     end
 
     def import_belongs_to_data(object, record)
-      belongs_to_fields.each do |field|
-        value = record[field]
+      import_model.belongs_to_fields.each do |field|
+        value = record[field.name]
         if !value.blank?
-          object.send "#{field}=", associated_object(field, params[field], value)
+          object.send "#{field.name}=", import_model.associated_object(field, params[field], value)
         end
       end
     end
 
-    def import_many_data(object, record)
-      many_fields.each do |field|
-        values = []
-        index = record.index(field)
-        until index.nil?
-          values << associated_object(field, params[field], record.field(index))
-          index = record.index(field, index)
-        end
-
-        if values.any?
-          object.send "#{field}=", values
+    def import_has_many_data(object, record)
+      import_model.many_fields.each do |field|
+        values = record[field.name].select { |value| !value.blank? }
+        if !values.empty?
+          associated_objects = values.map { |value| import_model.associated_object(field, params[field], value) }
+          object.send "#{field.name}=", associated_objects
         end
       end
     end
