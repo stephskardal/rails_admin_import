@@ -107,17 +107,19 @@ module RailsAdminImport
       import_model.belongs_to_fields.each do |field|
         value = record[field.name]
         if !value.blank?
-          object.send "#{field.name}=", import_model.associated_object(field, params[field], value)
+          object.send "#{field.name}=", import_model.associated_object(field, params[field.name], value)
         end
       end
     end
 
     def import_has_many_data(object, record)
       import_model.many_fields.each do |field|
-        values = record[field.name].select { |value| !value.blank? }
-        if !values.empty?
-          associated_objects = values.map { |value| import_model.associated_object(field, params[field], value) }
-          object.send "#{field.name}=", associated_objects
+        if record.has_key? field.name
+          values = record[field.name].reject { |value| value.blank? }
+          if !values.empty?
+            associated_objects = values.map { |value| import_model.associated_object(field, params[field.name], value) }
+            object.send "#{field.name}=", associated_objects
+          end
         end
       end
     end
