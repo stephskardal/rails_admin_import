@@ -16,8 +16,7 @@ module RailsAdminImport
       binding.pry
       logger     = ImportLogger.new
       begin
-        # TODO: Reimplement base config
-        if false # RailsAdminImport.config.logging
+        if RailsAdminImport.config.logging
           FileUtils.copy(params[:file].tempfile, "#{Rails.root}/log/import/#{Time.now.strftime("%Y-%m-%d-%H-%M-%S")}-import.csv")
         end
 
