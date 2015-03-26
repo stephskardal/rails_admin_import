@@ -33,7 +33,7 @@ module RailsAdminImport
       @many_fields ||= association_fields.select { |f| f.multiple? }
     end
 
-    def associated_objects(field, mapping_field, value)
+    def associated_object(field, mapping_field, value)
       association_class(field).find_by(mapping_field => value)
     end
 

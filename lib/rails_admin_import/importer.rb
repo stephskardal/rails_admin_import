@@ -13,7 +13,7 @@ module RailsAdminImport
     end
 
     def import(records)
-      binding.pry
+      # binding.pry
       logger     = ImportLogger.new
       begin
         if RailsAdminImport.config.logging
@@ -21,7 +21,7 @@ module RailsAdminImport
         end
 
         update = params[:update_if_exists] == "1" ? params[:update_lookup] : nil
-        label_method = import_model.config.object_label_method
+        label_method = import_model.abstract_model.config.object_label_method
 
         # TODO: re-implement file size check
         # if file_check.readlines.size > RailsAdminImport.config.line_item_limit
@@ -31,7 +31,7 @@ module RailsAdminImport
         results = { :success => [], :error => [] }
 
         records.each do |record|
-          binding.pry
+          # binding.pry
           if update && !record.has_key?(update)
             fail RecordError, I18n.t('rails_admin.import.missing_update_lookup')
           end 
@@ -46,7 +46,7 @@ module RailsAdminImport
           object_label = object.send(label_method)
 
           verb = object.new_record? ? "Create" : "Update"
-          if object.errors.empty?
+          if object.valid?
             if object.save
               logger.info "#{Time.now.to_s}: #{verb}d: #{object_label}"
               results[:success] << "#{verb}d: #{object_label}"
@@ -109,7 +109,7 @@ module RailsAdminImport
         value = extract_mapping(record[field.name], mapping_key)
 
         if !value.blank?
-          object.send "#{field.name}=", import_model.associated_objects(field, mapping_key, value).first
+          object.send "#{field.name}=", import_model.associated_object(field, mapping_key, value)
         end
       end
     end
@@ -123,7 +123,8 @@ module RailsAdminImport
           }
 
           if !values.empty?
-            object.send "#{field.name}=", import_model.associated_objects(field, mapping_key, values)
+            associated = values.map { |value| import_model.associated_object(field, mapping_key, value) }
+            object.send "#{field.name}=", associated
           end
         end
       end

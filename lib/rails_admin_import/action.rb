@@ -28,7 +28,7 @@ module RailsAdmin
             @import_model = RailsAdminImport::ImportModel.new(@abstract_model)
 
             if request.post?
-              record_importer = RailsAdminImport::Formats.for(params[:format],
+              record_importer = RailsAdminImport::Formats.for(params[:import_format],
                                                               @import_model,
                                                               params)
               if record_importer.valid?
@@ -44,10 +44,10 @@ module RailsAdmin
                       action: t("admin.actions.import.done"))
                 end
                 unless imported.empty?
-                  @results[:success_message] = message("successful", imported)
+                  @results[:success_message] = message.call("successful", imported)
                 end
                 unless not_imported.empty?
-                  @results[:error_message] = message("error", not_imported)
+                  @results[:error_message] = message.call("error", not_imported)
                 end
               else
                 flash[:error] = record_importer.error
