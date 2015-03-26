@@ -22,6 +22,6 @@ module RailsAdminImport
   end
 end
 
-require 'rails_admin_import/formats/dummy_importer'
-require 'rails_admin_import/formats/csv_importer'
-require 'rails_admin_import/formats/json_importer'
+require "rails_admin_import/formats/dummy_importer"
+require "rails_admin_import/formats/csv_importer"
+require "rails_admin_import/formats/json_importer"

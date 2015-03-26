@@ -1,11 +1,11 @@
-require 'rails_admin/config/actions'
+require "rails_admin/config/actions"
 
 module RailsAdmin
   module Config
     module Actions
       class Import < Base
         RailsAdmin::Config::Actions.register(self)
-        
+
         register_instance_option :collection do
           true
         end
@@ -28,29 +28,40 @@ module RailsAdmin
             @import_model = RailsAdminImport::ImportModel.new(@abstract_model)
 
             if request.post?
-              record_importer = RailsAdminImport::Formats.for(params[:format], @import_model, params)
+              record_importer = RailsAdminImport::Formats.for(params[:format],
+                                                              @import_model,
+                                                              params)
               if record_importer.valid?
-                importer = RailsAdminImport::Importer.new(@import_model, params)
+                importer = RailsAdminImport::Importer.new(@import_model,
+                                                          params)
                 @results = importer.import(record_importer.each_record)
 
                 imported = @results[:success]
                 not_imported = @results[:error]
-                @results[:success_message] = t('admin.flash.successful', name: pluralize(imported.count, @model_config.label), action: t('admin.actions.import.done')) unless imported.empty?
-                @results[:error_message] = t('admin.flash.error', name: pluralize(not_imported.count, @model_config.label), action: t('admin.actions.import.done')) unless not_imported.empty?
+                message = lambda do |type, array|
+                    t("admin.flash.#{type}",
+                      name: pluralize(array.count, @model_config.label),
+                      action: t("admin.actions.import.done"))
+                end
+                unless imported.empty?
+                  @results[:success_message] = message("successful", imported)
+                end
+                unless not_imported.empty?
+                  @results[:error_message] = message("error", not_imported)
+                end
               else
                 flash[:error] = record_importer.error
               end
             end
 
-            render :action => @action.template_name
+            render action: @action.template_name
           end
         end
 
         register_instance_option :link_icon do
-          'icon-folder-open'
+          "icon-folder-open"
         end
       end
     end
   end
 end
-
