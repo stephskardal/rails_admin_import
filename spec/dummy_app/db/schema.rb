@@ -19,6 +19,33 @@ ActiveRecord::Schema.define(version: 20150326192158) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "blog_authors", force: :cascade do |t|
+    t.string   "name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "blog_authors_posts", force: :cascade do |t|
+    t.integer "blog_author_id"
+    t.integer "blog_post_id"
+  end
+
+  create_table "blog_comments", force: :cascade do |t|
+    t.string   "author"
+    t.string   "text"
+    t.integer  "blog_post_id"
+    t.datetime "created_at",   null: false
+    t.datetime "updated_at",   null: false
+  end
+
+  create_table "blog_posts", force: :cascade do |t|
+    t.string   "title"
+    t.text     "body"
+    t.datetime "published_at"
+    t.datetime "created_at",   null: false
+    t.datetime "updated_at",   null: false
+  end
+
   create_table "companies", force: :cascade do |t|
     t.string   "name"
     t.datetime "created_at", null: false

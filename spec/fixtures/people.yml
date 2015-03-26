@@ -8,3 +8,8 @@ person_two:
   last_name: Two
   email: two@example.com
 
+person_three:
+  first_name: Person
+  last_name: Three
+  email: three@example.com
+
