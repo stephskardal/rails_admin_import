@@ -1,4 +1,4 @@
-require 'csv'
+require "csv"
 
 module RailsAdminImport
   module Formats
@@ -22,7 +22,7 @@ module RailsAdminImport
 
       def valid?
         if filename.nil?
-          @error = I18n.t('admin.import.missing_file')
+          @error = I18n.t("admin.import.missing_file")
           false
         else
           true
@@ -32,7 +32,7 @@ module RailsAdminImport
       # A method that yields a hash of attributes for each record to import
       def each_record
         return enum_for(:each_record) unless block_given?
-        
+
         # TODO: set up encoding conversion using the :encoding parameter
         CSV.foreach(filename, headers: true, header_converters: @header_converter) do |row|
           yield convert_to_attributes(row)

@@ -1,7 +1,7 @@
 module RailsAdminImport
   module Formats
     class DummyImporter
-      def initialize(*args)
+      def initialize(*)
       end
 
       def valid?
