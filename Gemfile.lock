@@ -5,6 +5,7 @@ PATH
       haml (~> 4.0)
       rails (>= 3.2)
       rails_admin (>= 0.6.6)
+      rchardet (~> 1.6)
 
 GEM
   remote: http://rubygems.org/
@@ -143,6 +144,7 @@ GEM
       rake (>= 0.8.7)
       thor (>= 0.18.1, < 2.0)
     rake (10.4.2)
+    rchardet (1.6.0)
     remotipart (1.2.1)
     rspec (3.2.0)
       rspec-core (~> 3.2.0)

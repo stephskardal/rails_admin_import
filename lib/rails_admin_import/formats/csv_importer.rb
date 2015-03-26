@@ -1,4 +1,5 @@
 require "csv"
+require "rchardet"
 
 module RailsAdminImport
   module Formats
@@ -14,6 +15,7 @@ module RailsAdminImport
         if params.has_key?(:file)
           @filename = params[:file].tempfile
         end
+        @encoding = params[:encoding]
         @import_model = import_model
         @header_converter = import_model.config.header_converter || HEADER_CONVERTER
       end
@@ -33,16 +35,50 @@ module RailsAdminImport
       def each_record
         return enum_for(:each_record) unless block_given?
 
-        # TODO: set up encoding conversion using the :encoding parameter
-        CSV.foreach(filename, headers: true, header_converters: @header_converter) do |row|
+        CSV.foreach(filename, csv_options) do |row|
           yield convert_to_attributes(row)
         end
       end
 
       private
 
+      attr_reader :import_model
+
+      def csv_options
+        {
+          headers: true,
+          header_converters: @header_converter
+        }.tap do |options|
+          add_encoding!(options)
+        end
+      end
+
+      def add_encoding!(options)
+        from_encoding = 
+          if !@encoding.blank?
+            @encoding
+          else
+            detect_encoding
+          end
+
+        to_encoding = import_model.abstract_model.encoding
+        if from_encoding && from_encoding != to_encoding
+          options[:encoding] = "#{from_encoding}:#{to_encoding}"
+        end
+      end
+
+      def detect_encoding
+        charset = CharDet.detect File.read(filename)
+        if charset['confidence'] > 0.6
+          from_encoding = charset['encoding']
+          from_encoding = 'UTF-8' if from_encoding == 'ascii'
+        end
+        from_encoding
+      end
+
       def convert_to_attributes(row)
         row.each_with_object({}) do |(field, value), record|
+          break if field.nil?
           field = field.to_sym
           if @import_model.has_multiple_values?(field)
             (record[field] ||= []) << value

@@ -38,5 +38,5 @@ en:
         extra_fields: "Additional application specific fields."
 
         file_limit: "Please limit upload file to %{limit} line items."
-        encoding: "Choose file encoding. Leave empty to use the default encoding: (%{name})"
+        encoding: "Choose file encoding. Leave empty to auto-detect."
 
