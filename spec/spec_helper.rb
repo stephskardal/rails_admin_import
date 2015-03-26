@@ -5,17 +5,10 @@ CI_ORM = (ENV['CI_ORM'] || :active_record).to_sym
 require File.expand_path('../dummy_app/config/environment', __FILE__)
 
 require 'rspec/rails'
-require 'database_cleaner'
 
-if CI_ORM == :active_record
-  ActiveRecord::Base.connection.tables.each do |table|
-    ActiveRecord::Base.connection.drop_table(table)
-  end
-
-  silence_stream(STDOUT) do
-    ActiveRecord::Migrator.migrate File.expand_path('../../dummy_app/db/migrate/', __FILE__)
-  end
-end
+# Requires supporting ruby files with custom matchers and macros, etc,
+# in spec/support/ and its subdirectories.
+Dir[File.expand_path("../support/**/*.rb", __FILE__)].each { |f| require f }
 
 RSpec.configure do |config|
   config.expect_with :rspec do |c|
@@ -23,13 +16,18 @@ RSpec.configure do |config|
   end
 
   config.include RSpec::Matchers
+  
+  config.include ActionDispatch::TestProcess
+  config.fixture_path = File.expand_path "../fixtures", __FILE__
 
+  DatabaseCleaner.strategy = :truncation
   config.before do |example|
-    DatabaseCleaner.strategy = (CI_ORM == :mongoid || example.metadata[:js]) ? :truncation : :transaction
-
+    
     DatabaseCleaner.start
-    RailsAdmin::Config.reset
-    RailsAdmin::AbstractModel.reset
+    if example.metadata[:reset_config]
+      RailsAdmin::Config.reset
+      RailsAdmin::AbstractModel.reset
+    end
     RailsAdmin::Config.yell_for_non_accessible_fields = false
   end
 

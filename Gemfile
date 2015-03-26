@@ -20,6 +20,11 @@ end
 group :test do
   gem 'rspec', '~> 3.0'
   gem 'rspec-rails', '~> 3.0'
+  gem 'database_cleaner'
+  
+
+  gem 'pry'
+  gem 'pry-byebug'
 end
 
 # Declare your gem's dependencies in rails_admin_import.gemspec.

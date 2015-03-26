@@ -35,7 +35,7 @@
       .col-sm-10.controls
         = check_box_tag :update_if_exists, '1', false, :class => "form-control"
     .form-group.control-group
-      %label.col-sm-2.control-label{for: "update-lookup"}= t("admin.import.update_lookup")
+      %label.col-sm-2.control-label{for: "update_lookup"}= t("admin.import.update_lookup")
       .col-sm-10.controls
         = select_tag 'update_lookup', options_for_select(@import_model.model_fields.map(&:name), @import_model.config.mapping_key.to_s), data: { enumeration: true }
 
