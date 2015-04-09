@@ -20,7 +20,7 @@ module RailsAdminImport
           FileUtils.copy(params[:file].tempfile, "#{Rails.root}/log/import/#{Time.now.strftime("%Y-%m-%d-%H-%M-%S")}-import.csv")
         end
 
-        update = params[:update_if_exists] == "1" ? params[:update_lookup] : nil
+        update = params[:update_if_exists] == "1" ? params[:update_lookup].to_sym : nil
         label_method = import_model.abstract_model.config.object_label_method
 
         # TODO: re-implement file size check
@@ -33,7 +33,7 @@ module RailsAdminImport
         records.each do |record|
           # binding.pry
           if update && !record.has_key?(update)
-            fail RecordError, I18n.t('rails_admin.import.missing_update_lookup')
+            fail RecordError, I18n.t('admin.import.missing_update_lookup')
           end 
 
           # FIXME: row used to be an array. Now record is a hash
@@ -65,7 +65,7 @@ module RailsAdminImport
         results
       rescue RecordError => e
         logger.info "#{Time.now.to_s}: Error importing record: #{e.inspect}"
-        return { success: [], error: e.message }
+        return { success: [], error: [e.message] }
 
       rescue Exception => e
         logger.info "#{Time.now.to_s}: Unknown exception in import: #{e.inspect}"

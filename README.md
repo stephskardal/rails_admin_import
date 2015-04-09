@@ -1,7 +1,7 @@
-Gem Reboot
-========
-
-I took over development on this gem. Please report new issues and I'll address them. Julien Vanier
+> Gem Reboot
+> ========
+>
+> I took over development on this gem. Please report new issues and I'll address them. Julien Vanier
 
 
 Rails Admin Import functionality

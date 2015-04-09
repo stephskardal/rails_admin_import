@@ -40,7 +40,7 @@ module RailsAdmin
                 not_imported = @results[:error]
                 message = lambda do |type, array|
                     t("admin.flash.#{type}",
-                      name: pluralize(array.count, @model_config.label),
+                      name: pluralize(array.size, @model_config.label),
                       action: t("admin.actions.import.done"))
                 end
                 unless imported.empty?
