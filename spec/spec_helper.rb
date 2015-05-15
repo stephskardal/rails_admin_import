@@ -21,16 +21,16 @@ RSpec.configure do |config|
   config.fixture_path = File.expand_path "../fixtures", __FILE__
 
   DatabaseCleaner.strategy = :truncation
-  config.before do |example|
+  config.before do
     
     DatabaseCleaner.start
-    if example.metadata[:reset_config]
-      RailsAdminImport.reset
-    end
     RailsAdmin::Config.yell_for_non_accessible_fields = false
   end
 
-  config.after(:each) do
+  config.after(:each) do |example|
     DatabaseCleaner.clean
+    if example.metadata[:reset_config]
+      RailsAdminImport.reset
+    end
   end
 end
