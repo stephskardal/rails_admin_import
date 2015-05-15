@@ -1,9 +1,3 @@
-> Gem Reboot
-> ========
->
-> I took over development on this gem. Please report new issues and I'll address them. Julien Vanier
-
-
 Rails Admin Import functionality
 ========
 
@@ -15,10 +9,6 @@ Installation
 * First, add to Gemfile:
     
         gem "rails_admin_import"
-
-* Next, mount in your application by adding following line to your config/routes.rb:
-
-        mount RailsAdminImport::Engine => '/rails_admin_import', :as => 'rails_admin_import'
 
 * If you are using cancan, add to ability.rb to specify which models can be imported:
 
@@ -67,12 +57,27 @@ You could also download a file based on a URL from the import file and set a Pap
 * TODO: Right now, import doesn't work for fields ending in s, because inflector fails in models ending in s singularly. Belongs_to and many
   mapping needs to be updated to use klasses instead of symbols
 
-TODO
-========
 
-* Testing
+Run tests
+=========
+
+1. Clone the repository to your machine
+
+    git clone https://github.com/stephskardal/rails_admin_import
+    
+2. Run `bundle install`
+3. Run `rspec`
+
+
+Authors
+=======
+
+Original author: [Steph Skardal](https://github.com/stephskardal)
+
+Maintainer (since May 2015): [Julien Vanier](https://github.com/monkbroc)
+
 
 Copyright
 ========
 
-Copyright (c) 2014 End Point & Steph Skardal. See LICENSE.txt for further details.
+Copyright (c) 2015 End Point, Steph Skardal and contributors. See LICENSE.txt for further details.
