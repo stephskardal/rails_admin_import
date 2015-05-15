@@ -1,7 +1,7 @@
-Request for Contributors / Core Contributors
-========
-
-I apologize for my extreme lack of attention to this repository since it was created. I see that several users have forked this gem and applied updates. I'd be interested in giving access to this main repository for any interested in maintaining it and/or adding features. Please contact me if you are interested at steph at endpoint dot com. 
+> Gem Reboot
+> ========
+>
+> I took over development on this gem. Please report new issues and I'll address them. Julien Vanier
 
 
 Rails Admin Import functionality
@@ -48,6 +48,10 @@ Installation
         def after_import_save(row, map)
           # Your custom special sauce          
         end
+
+You could for example set an attribute on a Devise User model to skip checking for a password when importing a new model.
+
+You could also download a file based on a URL from the import file and set a Paperclip file attribute on the model.
 
 * "import" action must be added inside config.actions block in main application RailsAdmin configuration: config/initializers/rails_admin.rb.
 
