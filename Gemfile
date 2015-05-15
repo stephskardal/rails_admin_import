@@ -2,6 +2,7 @@ source "http://rubygems.org"
 
 # CI dependencies
 gem 'rails', '~> 4.2.0'
+gem 'rails_admin', '~> 0.6'
 
 case ENV['CI_ORM']
 when 'mongoid'
@@ -21,10 +22,6 @@ group :test do
   gem 'rspec', '~> 3.0'
   gem 'rspec-rails', '~> 3.0'
   gem 'database_cleaner'
-  
-
-  gem 'pry'
-  gem 'pry-byebug'
 end
 
 # Declare your gem's dependencies in rails_admin_import.gemspec.
