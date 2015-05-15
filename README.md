@@ -57,6 +57,19 @@ You could also download a file based on a URL from the import file and set a Pap
 * TODO: Right now, import doesn't work for fields ending in s, because inflector fails in models ending in s singularly. Belongs_to and many
   mapping needs to be updated to use klasses instead of symbols
 
+* TODO: Verify that this works. To change a model configuration for all models, do
+
+```
+RailsAdmin.config do |config|
+  ActiveRecord::Base.descendants.each do |imodel|
+    config.model "#{imodel}" do
+      import do
+        exclude_fields :versions
+      end
+    end
+  end
+end
+```
 
 Run tests
 =========
