@@ -2,6 +2,7 @@ source "http://rubygems.org"
 
 # CI dependencies
 gem 'rails', '~> 4.2.0'
+gem 'rails_admin', '~> 0.6'
 
 case ENV['CI_ORM']
 when 'mongoid'
@@ -22,7 +23,7 @@ group :test do
   gem 'rspec-rails', '~> 3.0'
   gem 'database_cleaner'
   
-
+  # TODO: remove
   gem 'pry'
   gem 'pry-byebug'
 end

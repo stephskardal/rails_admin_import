@@ -1,7 +1,7 @@
 PATH
   remote: ../../
   specs:
-    rails_admin_import (1.0.0.pre)
+    rails_admin_import (0.1.9)
       haml (~> 4.0)
       rails (>= 3.2)
       rails_admin (>= 0.6.6)
