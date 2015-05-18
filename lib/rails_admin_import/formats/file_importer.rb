@@ -12,7 +12,7 @@ module RailsAdminImport
 
       def valid?
         if filename.nil?
-          @error = I18n.t('admin.import.missing_file')
+          @error = I18n.t("admin.import.missing_file")
           false
         else
           true

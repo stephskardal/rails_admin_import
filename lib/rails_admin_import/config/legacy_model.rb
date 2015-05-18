@@ -6,7 +6,7 @@ module RailsAdminImport
         @model_name = model_name
       end
 
-      def label(value)
+      def label(_value)
         # Ignored now
         # RailsAdmin object_label_method will be used
       end

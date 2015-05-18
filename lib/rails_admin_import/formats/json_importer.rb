@@ -8,7 +8,7 @@ module RailsAdminImport
         File.open(filename) do |file|
           data = JSON.load(file)
           if !data.is_a? Array
-            raise ArgumentError, I18n.t('admin.import.data_not_array')
+            raise ArgumentError, I18n.t("admin.import.data_not_array")
           end
           data.each do |record|
             yield record.symbolize_keys

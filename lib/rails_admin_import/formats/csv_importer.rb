@@ -36,7 +36,7 @@ module RailsAdminImport
       end
 
       def add_encoding!(options)
-        from_encoding = 
+        from_encoding =
           if !@encoding.blank?
             @encoding
           else
@@ -51,9 +51,9 @@ module RailsAdminImport
 
       def detect_encoding
         charset = CharDet.detect File.read(filename)
-        if charset['confidence'] > 0.6
-          from_encoding = charset['encoding']
-          from_encoding = 'UTF-8' if from_encoding == 'ascii'
+        if charset["confidence"] > 0.6
+          from_encoding = charset["encoding"]
+          from_encoding = "UTF-8" if from_encoding == "ascii"
         end
         from_encoding
       end

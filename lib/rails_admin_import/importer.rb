@@ -50,7 +50,7 @@ module RailsAdminImport
 
     def import_record(record)
       if update_lookup && !record.has_key?(update_lookup)
-        raise RecordError, I18n.t('admin.import.missing_update_lookup')
+        raise RecordError, I18n.t("admin.import.missing_update_lookup")
       end 
 
       object = find_or_create_object(record, update_lookup)
@@ -60,7 +60,7 @@ module RailsAdminImport
         import_belongs_to_data(object, record)
         import_has_many_data(object, record)
       rescue AssociationNotFound => e
-        report_error(object, action, I18n.t('admin.import.association_not_found', :error => e.to_s))
+        report_error(object, action, I18n.t("admin.import.association_not_found", :error => e.to_s))
         return
       end
 
@@ -72,7 +72,7 @@ module RailsAdminImport
         report_success(object, action)
         perform_model_callback(object, :after_import_save, record)
       else
-        report_error(object, action, object.errors.full_messages.join(', '))
+        report_error(object, action, object.errors.full_messages.join(", "))
       end
     end
 
@@ -96,7 +96,7 @@ module RailsAdminImport
 
     def report_success(object, action)
       object_label = object.send(label_method)
-      message_key = action == :create ? 'admin.import.import_success.create' : 'admin.import.import_success.update'
+      message_key = action == :create ? "admin.import.import_success.create" : "admin.import.import_success.update"
       message = I18n.t(message_key, :name => object_label)
       logger.info "#{Time.now.to_s}: #{message}"
       results[:success] << message
@@ -104,7 +104,7 @@ module RailsAdminImport
 
     def report_error(object, action, error)
       object_label = object.send(label_method)
-      message_key = action == :create ? 'admin.import.import_error.create' : 'admin.import.import_error.update'
+      message_key = action == :create ? "admin.import.import_error.create" : "admin.import.import_error.update"
       message = I18n.t(message_key, :name => object_label, :error => error)
       logger.info "#{Time.now.to_s}: #{message}"
       results[:error] << message

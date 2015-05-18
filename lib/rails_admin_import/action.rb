@@ -28,7 +28,7 @@ module RailsAdmin
             @import_model = RailsAdminImport::ImportModel.new(@abstract_model)
 
             if request.post?
-              record_importer = RailsAdminImport::Formats.for(params[:import_format] || 'csv',
+              record_importer = RailsAdminImport::Formats.for(params[:import_format] || "csv",
                                                               @import_model,
                                                               params)
               if record_importer.valid?

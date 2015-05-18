@@ -9,7 +9,7 @@ module RailsAdminImport
       end
 
       def error
-        I18n.t('admin.import.invalid_format')
+        I18n.t("admin.import.invalid_format")
       end
     end
   end

@@ -1,4 +1,4 @@
-require 'rails_admin/config/sections/base'
+require "rails_admin/config/sections/base"
 
 module RailsAdmin
   module Config
