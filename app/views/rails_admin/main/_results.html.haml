@@ -1,18 +1,18 @@
 - if @results && @results[:success].any?
-  .alert.alert-success
-    %a{data: { toggle: "collapse"}, href: "#resultsSuccess"}
-      %h4
+  .alert.alert-success.form-horizontal.denser
+    %fieldset
+      %legend
+        %i.icon-chevron-right
         = @results[:success_message]
-    #resultsSuccess.collapse
-      %ul
+      %ul.control-group{style: 'display: none'}
         - @results[:success].each do |message|
           %li= message
 - if @results && @results[:error].any?
-  .alert.alert-danger
-    %a{data: { toggle: "collapse"}, href: "#resultsError"}
-      %h4
+  .alert.alert-danger.form-horizontal.denser
+    %fieldset
+      %legend
+        %i.icon-chevron-down
         = @results[:error_message]
-    #resultsError.collapse.in
-      %ul
+      %ul.control-group
         - @results[:error].each do |message|
           %li= message

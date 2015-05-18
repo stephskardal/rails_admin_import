@@ -34,7 +34,7 @@ module RailsAdminImport
     end
 
     def associated_object(field, mapping_field, value)
-      association_class(field).find_by(mapping_field => value)
+      association_class(field).find_by!(mapping_field => value)
     end
 
     def association_class(field)

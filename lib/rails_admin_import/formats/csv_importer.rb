@@ -3,6 +3,8 @@ require "rchardet"
 
 module RailsAdminImport
   module Formats
+    class CSVImportError < StandarError; end
+
     class CSVImporter
       Formats.register(:csv, self)
 
@@ -35,8 +37,14 @@ module RailsAdminImport
       def each_record
         return enum_for(:each_record) unless block_given?
 
-        CSV.foreach(filename, csv_options) do |row|
-          yield convert_to_attributes(row)
+        CSV.open(filename, csv_options) do |csv|
+          csv.each do |row|
+            begin
+              yield convert_to_attributes(row)
+            rescue StandardError => e
+              raise CSVImportError, "Error importing line #{csv.lineno}: #{e.to_s}"
+            end
+          end
         end
       end
 

@@ -71,6 +71,9 @@ RailsAdmin.config do |config|
 end
 ```
 
+* TODO: should have_many relations use the singular or plural version of the column header?
+
+
 Run tests
 =========
 

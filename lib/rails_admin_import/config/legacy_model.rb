@@ -20,17 +20,21 @@ module RailsAdminImport
         config = RailsAdmin.config(model_name)
 
         # Call appropriate Rails Admin field list methods
-        config.include_all_fields
-        config.exclude_fields *values
+        config.import do
+          include_all_fields
+          exclude_fields *values
+        end
       end
 
       def extra_fields(values)
         config = RailsAdmin.config(model_name)
 
         # Call appropriate Rails Admin field list methods
-        config.include_all_fields
-        values.each do |value|
-          config.field value
+        config.import do
+          include_all_fields
+          values.each do |value|
+            field value
+          end
         end
       end
     end

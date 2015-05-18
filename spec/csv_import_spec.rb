@@ -18,7 +18,7 @@ describe "CSV import", :type => :request do
 
       it "import the associations" do
         file = fixture_file_upload("parents.csv", "text/plain")
-        post "/admin/parent/import", file: file, child: 'name'
+        post "/admin/parent/import", file: file, children: 'name'
         expect(response.body).not_to include "Error"
         expect(Parent.count).to eq 2
 
@@ -79,7 +79,7 @@ describe "CSV import", :type => :request do
 
     it "decodes encoding when specified" do
       file = fixture_file_upload("latin1.csv", "text/plain")
-      post "/admin/ball/import", file: file, import_format: 'csv', encoding: 'ISO-8859-1'
+      post "/admin/ball/import", file: file, encoding: 'ISO-8859-1'
 
       expect(response.body).not_to include "Error"
       expected = %w(

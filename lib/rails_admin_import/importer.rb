@@ -13,7 +13,6 @@ module RailsAdminImport
     end
 
     def import(records)
-      # binding.pry
       logger     = ImportLogger.new
       begin
         if RailsAdminImport.config.logging
@@ -31,7 +30,6 @@ module RailsAdminImport
         results = { :success => [], :error => [] }
 
         records.each do |record|
-          # binding.pry
           if update && !record.has_key?(update)
             fail RecordError, I18n.t('admin.import.missing_update_lookup')
           end 

@@ -25,6 +25,8 @@ end
 section = RailsAdmin::Config::Sections::Import
 name = :import
 
+# Manually add to Rails Admin as a model configuration section until
+# there is a better API to do this
 RailsAdmin::Config::Model.send(:define_method, name) do |&block|
   @sections = {} unless @sections
   @sections[name] = section.new(self) unless @sections[name]
