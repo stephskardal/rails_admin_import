@@ -23,14 +23,22 @@ module RailsAdminImport
         return enum_for(:each) unless block_given?
 
         if RailsAdminImport.config.logging && filename
-          FileUtils.copy(filename, File.join(Rails.root, "log", "import", "#{Time.now.strftime("%Y-%m-%d-%H-%M-%S")}-import.csv"))
+          copy_uploaded_file_to_log_dir
         end
 
         each_record(&block)
       end
 
+      private
+
       def each_record
         raise "Implement each_record in subclasses"
+      end
+
+      def copy_uploaded_file_to_log_dir
+        copy_filename = "#{Time.now.strftime("%Y-%m-%d-%H-%M-%S")}-import.csv"
+        copy_path = File.join(Rails.root, "log", "import", copy_filename)
+        FileUtils.copy(filename, copy_path)
       end
     end
   end

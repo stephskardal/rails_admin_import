@@ -24,13 +24,11 @@ RSpec.configure do |config|
   config.before do
     
     DatabaseCleaner.start
+    RailsAdminImport.reset
     RailsAdmin::Config.yell_for_non_accessible_fields = false
   end
 
   config.after(:each) do |example|
     DatabaseCleaner.clean
-    if example.metadata[:reset_config]
-      RailsAdminImport.reset
-    end
   end
 end

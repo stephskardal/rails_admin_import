@@ -26,7 +26,7 @@ module RailsAdminImport
             import_record(record)
           end
 
-          results
+          rollback_if_error
         end
       rescue RecordError => e
         logger.info "#{Time.now.to_s}: Error importing record: #{e.inspect}"
@@ -36,15 +36,33 @@ module RailsAdminImport
         logger.info "#{Time.now.to_s}: Unknown exception in import: #{e.inspect}"
         return { :success => [], :error => ["Could not upload. Unexpected error: #{e.to_s}"] }
       end
+
+      results
     end
 
     private
 
+    def init_results
+      @results = { :success => [], :error => [] }
+    end
+
     def with_transaction(&block)
-      if RailsAdminImport.config.rollback_on_error && defined?(ActiveRecord)
+      if RailsAdminImport.config.rollback_on_error &&
+        defined?(ActiveRecord)
+
         ActiveRecord::Base.transaction &block
       else
         block.call
+      end
+    end
+
+    def rollback_if_error
+      if RailsAdminImport.config.rollback_on_error &&
+        defined?(ActiveRecord) &&
+        !results[:error].empty?
+
+        results[:success] = []
+        raise ActiveRecord::Rollback
       end
     end
 
@@ -85,10 +103,6 @@ module RailsAdminImport
     end
 
     attr_reader :results
-
-    def init_results
-      @results = { :success => [], :error => [] }
-    end
 
     def logger
       @logger ||= ImportLogger.new
