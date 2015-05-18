@@ -34,7 +34,7 @@ module RailsAdmin
               if record_importer.valid?
                 importer = RailsAdminImport::Importer.new(@import_model,
                                                           params)
-                @results = importer.import(record_importer.each_record)
+                @results = importer.import(record_importer.each)
 
                 imported = @results[:success]
                 not_imported = @results[:error]

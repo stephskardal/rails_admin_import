@@ -3,7 +3,7 @@ module RailsAdminImport
     attr_reader :logger
 
     def initialize(log_file_name = "rails_admin_import.log")
-      @logger = Logger.new("#{Rails.root}/log/#{log_file_name}") if RailsAdminImport.config.logging
+      @logger = Logger.new(File.join(Rails.root, "log", log_file_name)) if RailsAdminImport.config.logging
     end
     
     def info(message)

@@ -5,6 +5,7 @@ module RailsAdminImport
     class << self
       attr_accessor :logging
       attr_accessor :line_item_limit
+      attr_accessor :rollback_on_error
 
       def model(model_name, &block)
         warn "RailsAdminImport::Config#model is deprecated. Add a import section for your model inside the rails_admin config block. See the Readme.md for more details"
@@ -17,6 +18,7 @@ module RailsAdminImport
       def reset
         @logging = false
         @line_item_limit = 1000
+        @rollback_on_error = false
       end
     end
 

@@ -28,6 +28,13 @@ en:
         fields: "Fields to import"
         upload: "Upload file"
         mapping: "Related fields mapping"
+      import_success:
+        create: "Created %{name}"
+        update: "Updated %{name}"
+      import_error:
+        create: "Failed to create %{name}: %{error}"
+        update: "Failed to update %{name}: %{error}"
+      association_not_found: "Association not found. %{error}"
       help:
         model_fields: "The fields above may be included in the import file."
         association_fields: "These fields map to other columns in the database, lookup via attribute selected below. For \"many\" associations, there may be multiple columns with this header in the spreadsheet."
