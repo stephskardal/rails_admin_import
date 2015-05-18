@@ -1,0 +1,10 @@
+[
+  {
+    "name": "Parent 1",
+    "children": ["One"]
+  },
+  {
+    "name": "Parent 2",
+    "children": ["Two", "Three"]
+  }
+]

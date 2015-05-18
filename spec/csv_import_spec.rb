@@ -18,7 +18,7 @@ describe "CSV import", :type => :request do
 
       it "import the associations" do
         file = fixture_file_upload("parents.csv", "text/plain")
-        post "/admin/parent/import", file: file, children: 'name'
+        post "/admin/parent/import", file: file, "associations[children]": 'name'
         expect(response.body).not_to include "failed"
         expect(Parent.count).to eq 2
 
@@ -35,7 +35,7 @@ describe "CSV import", :type => :request do
 
       it "reports which assocations failed to be found" do
         file = fixture_file_upload("parents.csv", "text/plain")
-        post "/admin/parent/import", file: file, children: 'name'
+        post "/admin/parent/import", file: file, "associations[children]": 'name'
         expect(response.body).to include "failed"
         expect(Parent.count).to eq 0
 
@@ -52,7 +52,7 @@ describe "CSV import", :type => :request do
 
       it "import the associations" do
         file = fixture_file_upload("company.csv", "text/plain")
-        post "/admin/company/import", file: file, employees: 'email'
+        post "/admin/company/import", file: file, "associations[employees]": 'email'
         expect(response.body).not_to include "failed"
         expect(Company.count).to eq 2
 
@@ -71,7 +71,7 @@ describe "CSV import", :type => :request do
 
     it "import the data" do
       file = fixture_file_upload("blog/posts.csv", "text/plain")
-      post "/admin/blog~post/import", file: file, authors: 'name'
+      post "/admin/blog~post/import", file: file, "associations[authors]": 'name'
       expect(response.body).not_to include "failed"
       expect(Blog::Post.count).to eq 2
 

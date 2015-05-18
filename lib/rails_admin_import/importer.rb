@@ -110,7 +110,7 @@ module RailsAdminImport
 
     def import_belongs_to_data(object, record)
       import_model.belongs_to_fields.each do |field|
-        mapping_key = params[field.name]
+        mapping_key = params["associations"][field.name]
         value = extract_mapping(record[field.name], mapping_key)
 
         if !value.blank?
@@ -122,7 +122,7 @@ module RailsAdminImport
     def import_has_many_data(object, record)
       import_model.many_fields.each do |field|
         if record.has_key? field.name
-          mapping_key = params[field.name]
+          mapping_key = params["associations"][field.name]
           values = record[field.name].reject { |value| value.blank? }.map { |value|
             extract_mapping(value, mapping_key)
           }

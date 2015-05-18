@@ -19,7 +19,7 @@
       %label.col-sm-2.control-label{for: "file"}= t("admin.import.file")
       .col-sm-10.controls
         = file_field_tag :file, :class => "form-control"
-        %p.help-block= t('admin.import.help.file_limit', limit: 1000) # FIXME: RailsAdminImport.config.line_item_limit
+        %p.help-block= t('admin.import.help.file_limit', limit: RailsAdminImport.config.line_item_limit)
     .form-group.control-group
       %label.col-sm-2.control-label{for: "import_format"}= t("admin.import.format")
       .col-sm-10.controls
@@ -28,7 +28,7 @@
       %label.col-sm-2.control-label{for: "encoding"}= t("admin.import.encoding")
       .col-sm-10.controls
         = select_tag 'encoding', options_for_select(RailsAdmin::CSVConverter::TARGET_ENCODINGS), include_blank: true, data: { enumeration: true }
-        %p.help-block= t('admin.import.help.encoding', name: 'UTF-8') # FIXME: RailsAdminImport.config.default_encoding
+        %p.help-block= t('admin.import.help.encoding', name: 'UTF-8')
     -# TODO: switch to rollback transaction if import of one record fails
     .form-group.control-group
       %label.col-sm-2.control-label= t("admin.import.update_if_exists")
@@ -51,7 +51,7 @@
             = capitalize_first_letter(field.label)
             = t("admin.import.mapping")
           .col-sm-10.controls
-            = select_tag field.name, options_for_select(@import_model.associated_model_fields(field).map(&:name), @import_model.associated_config(field).mapping_key.to_s), data: { enumeration: true }
+            = select_tag "associations[#{field.name}]", options_for_select(@import_model.associated_model_fields(field).map(&:name), @import_model.associated_config(field).mapping_key.to_s), data: { enumeration: true }
 
   %br
   .form-actions
