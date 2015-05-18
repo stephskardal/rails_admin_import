@@ -1,4 +1,7 @@
 module RailsAdminImport
+  class AssociationNotFound < StandardError
+  end
+
   class ImportModel
     def initialize(abstract_model)
       @abstract_model = abstract_model
@@ -34,7 +37,8 @@ module RailsAdminImport
     end
 
     def associated_object(field, mapping_field, value)
-      association_class(field).find_by!(mapping_field => value)
+      klass = association_class(field)
+      klass.find_by(mapping_field => value) or raise AssociationNotFound, "#{klass}.#{mapping_field} = #{value}"
     end
 
     def association_class(field)

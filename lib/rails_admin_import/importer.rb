@@ -16,7 +16,7 @@ module RailsAdminImport
       logger     = ImportLogger.new
       begin
         if RailsAdminImport.config.logging
-          FileUtils.copy(params[:file].tempfile, "#{Rails.root}/log/import/#{Time.now.strftime("%Y-%m-%d-%H-%M-%S")}-import.csv")
+          FileUtils.copy(params[:file].tempfile, File.join(Rails.root, "log", "import", "#{Time.now.strftime("%Y-%m-%d-%H-%M-%S")}-import.csv"))
         end
 
         update = params[:update_if_exists] == "1" ? params[:update_lookup].to_sym : nil
@@ -34,16 +34,23 @@ module RailsAdminImport
             fail RecordError, I18n.t('admin.import.missing_update_lookup')
           end 
 
-          # FIXME: row used to be an array. Now record is a hash
           object = find_or_create_object(record, update)
-          import_belongs_to_data(object, record)
-          import_has_many_data(object, record)
+          verb = object.new_record? ? "Create" : "Update"
+
+          begin
+            import_belongs_to_data(object, record)
+            import_has_many_data(object, record)
+          rescue AssociationNotFound => e
+            object_label = object.send(label_method)
+            logger.info "#{Time.now.to_s}: Failed to #{verb} #{object_label}. Association not found. #{e.to_s}"
+            results[:error] << "Failed to #{verb} #{object_label}. Association not found. #{e.to_s}"
+            next
+          end
 
           perform_model_callback(object, :before_import_save, record)
 
           object_label = object.send(label_method)
 
-          verb = object.new_record? ? "Create" : "Update"
           if object.valid?
             if object.save
               logger.info "#{Time.now.to_s}: #{verb}d: #{object_label}"
