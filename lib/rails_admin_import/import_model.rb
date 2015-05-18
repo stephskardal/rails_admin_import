@@ -50,7 +50,8 @@ module RailsAdminImport
     end
 
     def associated_model_fields(field)
-      model_fields(associated_config(field))
+      @associated_fields ||= {}
+      @associated_fields[field] ||= associated_config(field).visible_fields.select { |f| !f.association? }
     end
 
     def has_multiple_values?(field_name)
