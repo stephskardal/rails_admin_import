@@ -33,7 +33,8 @@ describe "Rails Admin Config" do
   describe "rollback_on_error" do
     it_behaves_like "a global config option", "rollback_on_error", true
 
-    it "imports not record when one record fails to import", :type => :request do
+    it "imports not record when one record fails to import", :type => :request,
+      :if => (CI_ORM == :active_record) do
       RailsAdmin.config do |config|
         config.configure_with :import do |config|
           config.rollback_on_error = true

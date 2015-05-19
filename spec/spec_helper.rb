@@ -26,9 +26,21 @@ RSpec.configure do |config|
     DatabaseCleaner.start
     RailsAdminImport.reset
     RailsAdmin::Config.yell_for_non_accessible_fields = false
+
+    # Add fixture_path to examples when running with Mongoid because
+    # ActiveRecord::TestFixtures is not included
+    # This is necessary for fixture_file_upload to find files
+    unless self.class.respond_to?(:fixture_path)
+      self.class.instance_eval do
+        def fixture_path
+          RSpec.configuration.fixture_path
+        end
+      end
+    end
   end
 
   config.after(:each) do |example|
     DatabaseCleaner.clean
   end
 end
+

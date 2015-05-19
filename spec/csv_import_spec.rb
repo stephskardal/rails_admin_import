@@ -13,27 +13,28 @@ describe "CSV import", :type => :request do
 
   describe "for a model with has_many" do
     describe "for simple associations" do
-      # Add fixtures/children.yml to database
-      fixtures :children
-
       it "import the associations" do
+        # Add children from support/associations.rb to the database
+        children = create_children
+
         file = fixture_file_upload("parents.csv", "text/plain")
-        post "/admin/parent/import", file: file, "associations[children]": 'name'
+        post "/admin/parent/import", file: file,
+          "associations[children]": 'name'
         expect(response.body).not_to include "failed"
         expect(Parent.count).to eq 2
 
-        children = children(:child_one)
-        expect(Parent.first.children).to match_array children
+        expected = children.slice(:child_one).values
+        expect(Parent.first.children).to match_array expected
 
-        children = children(:child_two, :child_three)
-        expect(Parent.second.children).to match_array children
+        expected = children.slice(:child_two, :child_three).values
+        expect(Parent.offset(1).first.children).to match_array expected
       end
     end
 
     describe "for associations not found" do
-      # Don't import fixtures/children.yml to the database
-
       it "reports which assocations failed to be found" do
+        # Don't add children from support/associations.rb to the database
+
         file = fixture_file_upload("parents.csv", "text/plain")
         post "/admin/parent/import", file: file, "associations[children]": 'name'
         expect(response.body).to include "failed"
@@ -47,36 +48,36 @@ describe "CSV import", :type => :request do
     end
 
     describe "for associations with a different class name" do
-      # Add fixtures/people.yml to database
-      fixtures :people
-
       it "import the associations" do
+        # Add people from support/associations.rb to the database
+        people = create_people
+
         file = fixture_file_upload("company.csv", "text/plain")
         post "/admin/company/import", file: file, "associations[employees]": 'email'
         expect(response.body).not_to include "failed"
         expect(Company.count).to eq 2
 
-        employees = people(:person_one, :person_two)
-        expect(Company.first.employees).to match_array employees
+        expected = people.slice(:person_one, :person_two).values
+        expect(Company.first.employees).to match_array expected
 
-        employees = people(:person_three)
-        expect(Company.second.employees).to match_array employees
+        employees = people.slice(:person_three).values
+        expect(Company.offset(1).first.employees).to match_array employees
       end
     end
   end
 
   describe "for a namespaced model" do
-    # Add fixtures/blog_authors.yml to database
-    fixtures 'blog/authors'
-
     it "import the data" do
+      # Add authors from support/associations.rb to the database
+      authors = create_blog_authors
+
       file = fixture_file_upload("blog/posts.csv", "text/plain")
       post "/admin/blog~post/import", file: file, "associations[authors]": 'name'
       expect(response.body).not_to include "failed"
       expect(Blog::Post.count).to eq 2
 
-      author = blog_authors(:author_one)
-      expect(Blog::Post.first.authors).to contain_exactly author
+      expected = authors.slice(:author_one).values
+      expect(Blog::Post.first.authors).to match_array expected
     end
   end
 

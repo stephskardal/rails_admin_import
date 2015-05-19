@@ -85,7 +85,7 @@ RailsAdmin.config do |config|
 end
 ```
 
-* TODO: should have_many relations use the singular or plural version of the column header?
+* TODO: test before_import/after_import hooks
 
 
 Run tests

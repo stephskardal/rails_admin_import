@@ -25,20 +25,20 @@ describe "JSON import", :type => :request do
 
   describe "for a model with has_many" do
     describe "for simple associations" do
-      # Add fixtures/children.yml to database
-      fixtures :children
-
       it "import the associations" do
+        # Add children from support/associations.rb to the database
+        children = create_children
+
         file = fixture_file_upload("parents.json", "text/plain")
         post "/admin/parent/import", import_format: 'json', file: file, "associations[children]": 'name'
         expect(response.body).not_to include "failed"
         expect(Parent.count).to eq 2
 
-        children = children(:child_one)
-        expect(Parent.first.children).to match_array children
+        expected = children.slice(:child_one).values
+        expect(Parent.first.children).to match_array expected
 
-        children = children(:child_two, :child_three)
-        expect(Parent.second.children).to match_array children
+        expected = children.slice(:child_two, :child_three).values
+        expect(Parent.offset(1).first.children).to match_array expected
       end
     end
   end
