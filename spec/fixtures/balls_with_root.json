@@ -1,0 +1,6 @@
+{
+  "balls": [
+    { "color": "red" },
+    { "color": "blue" }
+  ]
+}

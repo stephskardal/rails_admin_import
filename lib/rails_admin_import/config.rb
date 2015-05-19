@@ -8,9 +8,12 @@ module RailsAdminImport
       attr_accessor :rollback_on_error
 
       def model(model_name, &block)
-        warn "RailsAdminImport::Config#model is deprecated. " \
-          "Add a import section for your model inside the rails_admin " \
-          "config block. See the Readme.md for more details"
+        unless @deprecation_shown
+          warn "RailsAdminImport::Config#model is deprecated. " \
+            "Add a import section for your model inside the rails_admin " \
+            "config block. See the Readme.md for more details"
+          @deprecation_shown = true
+        end
         legacy_config = RailsAdminImport::Config::LegacyModel.new(model_name)
         legacy_config.instance_eval(&block) if block
         legacy_config

@@ -2,12 +2,24 @@ require "spec_helper"
 
 describe "JSON import", :type => :request do
   describe "for a simple model" do
-    it "imports the data" do
-      file = fixture_file_upload("balls.json", "text/plain")
-      post "/admin/ball/import", import_format: 'json', file: file
-      expect(response.body).not_to include "failed"
-      expect(Ball.count).to eq 2
-      expect(Ball.first.color).to eq "red"
+    context "with the data in an array" do
+      it "imports the data" do
+        file = fixture_file_upload("balls.json", "text/plain")
+        post "/admin/ball/import", import_format: 'json', file: file
+        expect(response.body).not_to include "failed"
+        expect(Ball.count).to eq 2
+        expect(Ball.first.color).to eq "red"
+      end
+    end
+
+    context "with the data in an object with a root key" do
+      it "imports the data" do
+        file = fixture_file_upload("balls_with_root.json", "text/plain")
+        post "/admin/ball/import", import_format: 'json', file: file
+        expect(response.body).not_to include "failed"
+        expect(Ball.count).to eq 2
+        expect(Ball.first.color).to eq "red"
+      end
     end
   end
 

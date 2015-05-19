@@ -16,17 +16,31 @@ Installation
 
 * Define configuration in config/initializers/rails_admin_import.rb:
 
-        RailsAdminImport.config do |config| 
-          config.model User do
-            excluded_fields do
-              [:field1, :field2, :field3]
-            end
-            label :name
-            extra_fields do
-              [:field3, :field4, :field5]
+        RailsAdmin.config do |config|
+          # REQUIRED:
+          # Include the import action
+          config.actions do
+            all
+            import
+          end
+        
+          # Optional:
+          # Configure global RailsAdminImport options
+          config.configure_with(:import) do |config|
+            config.logging = true
+          end
+        
+          # Optional:
+          # Configure model-specific options using standard RailsAdmin DSL
+          # See https://github.com/sferik/rails_admin/wiki/Railsadmin-DSL
+          config.model 'User' do
+            import do
+              include_all_fields
+              exclude_fields :secret_token
             end
           end
         end
+
 
 * (Optional) Define instance methods to be hooked into the import process, if special/additional processing is required on the data:
 

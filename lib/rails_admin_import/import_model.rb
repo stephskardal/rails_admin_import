@@ -55,7 +55,15 @@ module RailsAdminImport
     end
 
     def has_multiple_values?(field_name)
-      many_fields.any? { |field| field.name == field_name }
+      plural_name = pluralize_field(field_name)
+      many_fields.any? { |field| field.name == field_name || field.name == plural_name }
+    end
+
+    def pluralize_field(field_name)
+      @plural_fields ||= many_fields.map(&:name).each_with_object({}) { |name, h|
+        h[name.to_s.singularize.to_sym] = name
+      }
+      @plural_fields[field_name] || field_name
     end
   end
 end

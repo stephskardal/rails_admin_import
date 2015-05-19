@@ -63,6 +63,7 @@ module RailsAdminImport
           break if field.nil?
           field = field.to_sym
           if import_model.has_multiple_values?(field)
+            field = import_model.pluralize_field(field)
             (record[field] ||= []) << value
           else
             record[field] = value
