@@ -38,7 +38,7 @@ module RailsAdminImport
 
     def associated_object(field, mapping_field, value)
       klass = association_class(field)
-      klass.find_by(mapping_field => value) or raise AssociationNotFound, "#{klass}.#{mapping_field} = #{value}"
+      klass.where(mapping_field => value).first or raise AssociationNotFound, "#{klass}.#{mapping_field} = #{value}"
     end
 
     def association_class(field)

@@ -1,3 +1,4 @@
+Gemfile.lock
 *.swp
 .bundle/
 log/*.log
