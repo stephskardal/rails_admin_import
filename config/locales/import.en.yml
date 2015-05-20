@@ -10,9 +10,8 @@ en:
         bulk_link: "Import"
         done: "Imported"
     import:
-      model_fields: "Model Fields"
-      association_fields: "Association Fields"
-      extra_fields: "Extra Fields"
+      model_fields: "Model fields"
+      association_fields: "Association fields"
 
       file: "Data file"
       missing_file: "You must select a file"
@@ -34,16 +33,14 @@ en:
       import_error:
         create: "Failed to create %{name}: %{error}"
         update: "Failed to update %{name}: %{error}"
+        general: "Error during import: %{error}"
       association_not_found: "Association not found. %{error}"
       help:
         model_fields: "The fields above may be included in the import file."
-        association_fields: "These fields map to other columns in the database, lookup via attribute selected below. For \"many\" associations, there may be multiple columns with this header in the spreadsheet."
-
-        # TODO: remove
-        belongs_to_fields: "These fields map to other items in the database, lookup via attribute selected above."
-        has_many_fields: "These fields map to other columns in the database, lookup via attribute selected below. There may be multiple columns with this header in the spreadsheet."
-        extra_fields: "Additional application specific fields."
-
+        association_fields: >
+          These fields map to other tables in the database, lookup via attribute selected below.
+          For "many" associations, you may include multiple columns with the same header in the CSV file.
+        update_if_exists: "Update records found with the lookup field below instead of creating new records"
         file_limit: "Please limit upload file to %{limit} line items."
-        encoding: "Choose file encoding. Leave empty to auto-detect."
+        encoding: "Choose file encoding. Leave empty to auto-detect. Ignored for JSON."
 

@@ -23,21 +23,27 @@
     .form-group.control-group
       %label.col-sm-2.control-label{for: "import_format"}= t("admin.import.format")
       .col-sm-10.controls
-        = select_tag 'import_format', options_for_select(RailsAdminImport::Formats.all), data: { enumeration: true }
+        = select_tag 'import_format',
+          options_for_select(RailsAdminImport::Formats.all),
+          data: { enumeration: true }
     .form-group.control-group
       %label.col-sm-2.control-label{for: "encoding"}= t("admin.import.encoding")
       .col-sm-10.controls
-        = select_tag 'encoding', options_for_select(RailsAdmin::CSVConverter::TARGET_ENCODINGS), include_blank: true, data: { enumeration: true }
+        = select_tag 'encoding',
+          options_for_select(RailsAdmin::CSVConverter::TARGET_ENCODINGS),
+          include_blank: true, data: { enumeration: true }
         %p.help-block= t('admin.import.help.encoding', name: 'UTF-8')
-    -# TODO: switch to rollback transaction if import of one record fails
     .form-group.control-group
       %label.col-sm-2.control-label= t("admin.import.update_if_exists")
       .col-sm-10.controls
         = check_box_tag :update_if_exists, '1', false, :class => "form-control"
+        %p.help-block= t('admin.import.help.update_if_exists')
     .form-group.control-group
       %label.col-sm-2.control-label{for: "update_lookup"}= t("admin.import.update_lookup")
       .col-sm-10.controls
-        = select_tag 'update_lookup', options_for_select(@import_model.model_fields.map(&:name), @import_model.config.mapping_key.to_s), data: { enumeration: true }
+        = select_tag 'update_lookup',
+          options_for_select(@import_model.model_fields.map(&:name),
+          @import_model.config.mapping_key.to_s), data: { enumeration: true }
 
   - unless @import_model.association_fields.empty?
     %fieldset
@@ -51,7 +57,9 @@
             = capitalize_first_letter(field.label)
             = t("admin.import.mapping")
           .col-sm-10.controls
-            = select_tag "associations[#{field.name}]", options_for_select(@import_model.associated_model_fields(field).map(&:name), @import_model.associated_config(field).mapping_key.to_s), data: { enumeration: true }
+            = select_tag "associations[#{field.name}]",
+              options_for_select(@import_model.associated_model_fields(field).map(&:name),
+              @import_model.associated_config(field).mapping_key.to_s), data: { enumeration: true }
 
   %br
   .form-actions

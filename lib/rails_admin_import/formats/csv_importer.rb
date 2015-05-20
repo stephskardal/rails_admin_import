@@ -14,7 +14,7 @@ module RailsAdminImport
       def initialize(import_model, params)
         super
         @encoding = params[:encoding]
-        @header_converter = import_model.config.header_converter || HEADER_CONVERTER
+        @header_converter = RailsAdminImport.config.header_converter || HEADER_CONVERTER
       end
 
       # A method that yields a hash of attributes for each record to import

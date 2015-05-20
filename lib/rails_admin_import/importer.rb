@@ -9,7 +9,7 @@ module RailsAdminImport
 
     attr_reader :import_model, :params
 
-    class RecordError < StandardError
+    class UpdateLookupError < StandardError
     end
 
     def import(records)
@@ -28,16 +28,11 @@ module RailsAdminImport
 
           rollback_if_error
         end
-      rescue RecordError => e
-        logger.info "#{Time.now.to_s}: Error importing record: #{e.inspect}"
-        return { success: [], error: [e.message] }
-
       rescue Exception => e
-        logger.info "#{Time.now.to_s}: Unknown exception in import: #{e.inspect}"
-        return { :success => [], :error => ["Could not upload. Unexpected error: #{e.to_s}"] }
+        report_general_error(e.to_s)
       end
 
-      results
+      format_results
     end
 
     private
@@ -68,7 +63,7 @@ module RailsAdminImport
 
     def import_record(record)
       if update_lookup && !record.has_key?(update_lookup)
-        raise RecordError, I18n.t("admin.import.missing_update_lookup")
+        raise UpdateLookupError, I18n.t("admin.import.missing_update_lookup")
       end 
 
       object = find_or_create_object(record, update_lookup)
@@ -78,13 +73,12 @@ module RailsAdminImport
         import_belongs_to_data(object, record)
         import_has_many_data(object, record)
       rescue AssociationNotFound => e
-        report_error(object, action, I18n.t("admin.import.association_not_found", :error => e.to_s))
+        error = I18n.t("admin.import.association_not_found", :error => e.to_s)
+        report_error(object, action, error)
         return
       end
 
       perform_model_callback(object, :before_import_save, record)
-
-      object_label = object.send(label_method)
 
       if object.save
         report_success(object, action)
@@ -95,11 +89,9 @@ module RailsAdminImport
     end
 
     def update_lookup
-      @update_lookup ||= params[:update_if_exists] == "1" ? params[:update_lookup].to_sym : nil
-    end
-
-    def label_method
-      @label_method ||= import_model.abstract_model.config.object_label_method
+      @update_lookup ||= if params[:update_if_exists] == "1"
+                           params[:update_lookup].to_sym
+                         end
     end
 
     attr_reader :results
@@ -109,19 +101,46 @@ module RailsAdminImport
     end
 
     def report_success(object, action)
-      object_label = object.send(label_method)
-      message_key = action == :create ? "admin.import.import_success.create" : "admin.import.import_success.update"
-      message = I18n.t(message_key, :name => object_label)
+      object_label = import_model.label_for_model(object)
+      message = I18n.t("admin.import.import_success.#{action}",
+                       :name => object_label)
       logger.info "#{Time.now.to_s}: #{message}"
       results[:success] << message
     end
 
     def report_error(object, action, error)
-      object_label = object.send(label_method)
-      message_key = action == :create ? "admin.import.import_error.create" : "admin.import.import_error.update"
-      message = I18n.t(message_key, :name => object_label, :error => error)
+      object_label = import_model.label_for_model(object)
+      message = I18n.t("admin.import.import_error.#{action}",
+                       :name => object_label,
+                       :error => error)
       logger.info "#{Time.now.to_s}: #{message}"
       results[:error] << message
+    end
+
+    def report_general_error(error)
+      message = I18n.t("admin.import.import_error.general", :error => error)
+      logger.info "#{Time.now.to_s}: #{message}"
+      results[:error] << message
+    end
+
+    def format_results
+      imported = results[:success]
+      not_imported = results[:error]
+      unless imported.empty?
+        results[:success_message] = format_result_message("successful", imported)
+      end
+      unless not_imported.empty?
+        results[:error_message] = format_result_message("error", not_imported)
+      end
+
+      results
+    end
+
+    def format_result_message(type, array)
+      result_count = "#{array.size} #{import_model.display_name.pluralize(array.size)}"
+      I18n.t("admin.flash.#{type}",
+             name: result_count,
+               action: I18n.t("admin.actions.import.done"))
     end
     
     def perform_model_callback(object, method, record)

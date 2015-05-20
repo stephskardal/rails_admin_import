@@ -1,75 +1,89 @@
-Rails Admin Import functionality
-========
+# Rails Admin Import
 
-Plugin functionality to add generic import to Rails Admin interface
+Plugin functionality to add generic import to Rails Admin in CSV and JSON format
 
-Installation
-========
+*This Readme is for version 1.0. If you are still using version 0.1.x, see [this branch](https://github.com/stephskardal/rails_admin_import/tree/legacy)*
+
+## Installation
 
 * First, add to Gemfile:
-    
-        gem "rails_admin_import"
 
-* If you are using cancan, add to ability.rb to specify which models can be imported:
+```
+gem "rails_admin_import", "~> 1.0.0"
+```
 
-        can :import, [User, Model1, Model2]
+* Define configuration in `config/initializers/rails_admin_import.rb`:
 
-* Define configuration in config/initializers/rails_admin_import.rb:
+```ruby
+RailsAdmin.config do |config|
+  # REQUIRED:
+  # Include the import action
+  # See https://github.com/sferik/rails_admin/wiki/Actions
+  config.actions do
+    all
+    import
+  end
 
-        RailsAdmin.config do |config|
-          # REQUIRED:
-          # Include the import action
-          config.actions do
-            all
-            import
-          end
-        
-          # Optional:
-          # Configure global RailsAdminImport options
-          config.configure_with(:import) do |config|
-            config.logging = true
-          end
-        
-          # Optional:
-          # Configure model-specific options using standard RailsAdmin DSL
-          # See https://github.com/sferik/rails_admin/wiki/Railsadmin-DSL
-          config.model 'User' do
-            import do
-              include_all_fields
-              exclude_fields :secret_token
-            end
-          end
-        end
+  # Optional:
+  # Configure global RailsAdminImport options
+  config.configure_with(:import) do |config|
+    config.logging = true
+  end
+
+  # Optional:
+  # Configure model-specific options using standard RailsAdmin DSL
+  # See https://github.com/sferik/rails_admin/wiki/Railsadmin-DSL
+  config.model 'User' do
+    import do
+      include_all_fields
+      exclude_fields :secret_token
+    end
+  end
+end
+```
+
+* If you are using CanCanCan for authorization, add to ability.rb to specify which models can be imported:
+
+```ruby
+can :import, [User, Model1, Model2]
+```
+
+## File format
+
+### CSV
+
+The first line must contain attribute names. They will be converted to lowercase and underscored (First Name ==> first_name).
+
+For "many" associations, you may include multiple columns with the same header in the CSV file.
+
+The repeated header may be singular or plural. For example, for a "children" association, you may have multiple "child" columns or multiple "children" column, each containing one lookup value for an associated record. Blank values are ignored.
+
+Example
+
+```
+First name,Last name,Team,Team
+Peter,Gibbons,IT,Management
+Michael,Bolton,IT,
+```
+
+### JSON
+
+The file must be an array or an object with a root key the same name as the plural model name, i.e. the default Rails JSON output format with include_root_in_json on or off.
 
 
-* (Optional) Define instance methods to be hooked into the import process, if special/additional processing is required on the data:
+## Configuration
 
-        # some model
-        def before_import_save(row, map)
-          # Your custom special sauce          
-        end
+* __logging__ (default `false`): Save a copy of each imported file to log/import and a detailed import log to log/rails_admin_import.log
 
-        def after_import_save(row, map)
-          # Your custom special sauce          
-        end
+* __line_item_limit__ (default `1000`): max number of items that can be imported at one time. TODO: Currently this is suggested but not enforced.
 
-You could for example set an attribute on a Devise User model to skip checking for a password when importing a new model.
+* __rollback_on_error__ (default `false`): import records in a transaction and rollback if there is one error. Only for ActiveRecord, not Mongoid.
 
-You could also download a file based on a URL from the import file and set a Paperclip file attribute on the model.
-
-* "import" action must be added inside config.actions block in main application RailsAdmin configuration: config/initializers/rails_admin.rb.
-
-        config.actions do
-          ...
-          import
-          ...
-        end
-
-  Refer to [RailAdmin documentation on custom actions](https://github.com/sferik/rails_admin/wiki/Actions) that must be present in this block.
+* __header_converter__ (default `nil`): a lambda to convert each CSV header text string to a model attribute name. The default header converter converts to lowercase and replaces spaces with underscores.
 
 
-* TODO: Right now, import doesn't work for fields ending in s, because inflector fails in models ending in s singularly. Belongs_to and many
-  mapping needs to be updated to use klasses instead of symbols
+* TODO: Document excluding fields, or adding import-specific fields
+
 
 * TODO: Verify that this works. To change a model configuration for all models, do
 
@@ -85,11 +99,50 @@ RailsAdmin.config do |config|
 end
 ```
 
-* TODO: test before_import/after_import hooks
+## Import hooks
 
 
-Run tests
-=========
+Define instance methods on your models to be hooked into the import process, if special/additional processing is required on the data:
+
+        # some model
+        def before_import_save(row, map)
+          # Your custom special sauce          
+        end
+
+        def after_import_save(row, map)
+          # Your custom special sauce          
+        end
+        
+You could for example set an attribute on a Devise User model to skip checking for a password when importing a new model.
+
+You could also download a file based on a URL from the import file and set a Paperclip file attribute on the model.
+
+
+TODO: Write tests for import hooks.
+
+TODO: Write mapper from new syntax to old syntax
+
+TODO: test before_import/after_import hooks
+
+
+## ORM: ActiveRecord and Mongoid
+
+The gem is tested to work with ActiveRecord and Mongoid.
+
+Support for Mongoid is early, so if you can suggest improvements (especially around importing embedded models), open an issue.
+
+
+## Upgrading
+
+* Move global config to `config.configure_with(:import)` in `config/initializers/rails_admin_import.rb`.
+
+* Move the field definitions to `config.model 'User' do; import do; // ...` in `config/initializers/rails_admin_import.rb`.
+
+* No need to mount RailsAdminImport in `config/routes.rb` (RailsAdmin must still be mounted).
+
+* Update model import hooks to take 1 hash argument instead of 2 arrays with values and headers.
+
+## Run tests
 
 1. Clone the repository to your machine
 
@@ -97,17 +150,25 @@ Run tests
     
 2. Run `bundle install`
 3. Run `rspec`
+  
+The structure of the tests is taken from the Rails Admin gem.
 
-
-Authors
-=======
+## Authors
 
 Original author: [Steph Skardal](https://github.com/stephskardal)
 
 Maintainer (since May 2015): [Julien Vanier](https://github.com/monkbroc)
 
 
-Copyright
-========
+## Contributing
+
+Everyone is encouraged to help improve this project. Here are a few ways you can help:
+
+- [Report bugs](https://github.com/ankane/blazer/issues)
+- Fix bugs and [submit pull requests](https://github.com/ankane/blazer/pulls)
+- Write, clarify, or fix documentation
+- Suggest or add new features
+
+## Copyright
 
 Copyright (c) 2015 End Point, Steph Skardal and contributors. See LICENSE.txt for further details.

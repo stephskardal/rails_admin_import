@@ -9,11 +9,6 @@ module RailsAdmin
           :name
         end
 
-        # Defaults to converting header to lowercase with underscore
-        register_instance_option(:header_converter) do
-          nil
-        end
-
         register_instance_option(:default_excluded_fields) do
           [:id, :_id, :created_at, :updated_at]
         end

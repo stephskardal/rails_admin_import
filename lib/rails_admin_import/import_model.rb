@@ -11,6 +11,18 @@ module RailsAdminImport
 
     attr_reader :abstract_model, :model, :config
 
+    def display_name
+      abstract_model.config.label
+    end
+
+    def label_for_model(object)
+      object.public_send(label_method)
+    end
+
+    def label_method
+      @label_method ||= abstract_model.config.object_label_method
+    end
+
     def importable_fields(model_config = config)
       @importable_fields ||= {}
       @importable_fields[model_config] ||= model_config.visible_fields.reject do |f|
