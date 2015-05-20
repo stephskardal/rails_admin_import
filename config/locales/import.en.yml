@@ -34,6 +34,10 @@ en:
         create: "Failed to create %{name}: %{error}"
         update: "Failed to update %{name}: %{error}"
         general: "Error during import: %{error}"
+        old_import_hook: >
+          The import hook %{model}.%{method} should take only 1 argument.
+          Data may not imported correctly.
+          See Upgrading section readme in Rails Admin Import.
       association_not_found: "Association not found. %{error}"
       help:
         model_fields: "The fields above may be included in the import file."

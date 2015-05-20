@@ -1,6 +1,6 @@
 # Rails Admin Import
 
-Plugin functionality to add generic import to Rails Admin in CSV and JSON format
+Plugin functionality to add generic import to Rails Admin from CSV and JSON files
 
 *This Readme is for version 1.0. If you are still using version 0.1.x, see [this branch](https://github.com/stephskardal/rails_admin_import/tree/legacy)*
 
@@ -73,6 +73,8 @@ The file must be an array or an object with a root key the same name as the plur
 
 ## Configuration
 
+### Global configuration options
+
 * __logging__ (default `false`): Save a copy of each imported file to log/import and a detailed import log to log/rails_admin_import.log
 
 * __line_item_limit__ (default `1000`): max number of items that can be imported at one time. TODO: Currently this is suggested but not enforced.
@@ -81,19 +83,57 @@ The file must be an array or an object with a root key the same name as the plur
 
 * __header_converter__ (default `nil`): a lambda to convert each CSV header text string to a model attribute name. The default header converter converts to lowercase and replaces spaces with underscores.
 
+### Model-specific configuration
 
-* TODO: Document excluding fields, or adding import-specific fields
+Use [standard RailsAdmin DSL](https://github.com/sferik/rails_admin/wiki/Railsadmin-DSL) to add or remove fields.
 
+* To change the default attribute that will be used to find associations on import, set `mapping_key` (default attribute is `name`)
 
-* TODO: Verify that this works. To change a model configuration for all models, do
-
-```
+```ruby
 RailsAdmin.config do |config|
-  ActiveRecord::Base.descendants.each do |imodel|
-    config.model "#{imodel}" do
-      import do
-        exclude_fields :versions
-      end
+  config.model 'Ball' do
+    import do
+      mapping_key :color
+    end
+  end
+end
+```
+
+* To include a specific list of fields:
+
+```ruby
+RailsAdmin.config do |config|
+  config.model 'User' do
+    import do
+      field :first_name
+      field :last_name
+      field :email
+    end
+  end
+end
+```
+
+* To exclude specific fields:
+
+```ruby
+RailsAdmin.config do |config|
+  config.model 'User' do
+    import do
+      include_all_fields
+      exclude_fields :secret_token
+    end
+  end
+end
+```
+
+* To add extra fields that will be set as attributes on the model and that will be passed to the import hook methods:
+
+```ruby
+RailsAdmin.config do |config|
+  config.model 'User' do
+    import do
+      include_all_fields
+      fields :special_import_token
     end
   end
 end
@@ -104,25 +144,25 @@ end
 
 Define instance methods on your models to be hooked into the import process, if special/additional processing is required on the data:
 
-        # some model
-        def before_import_save(row, map)
-          # Your custom special sauce          
-        end
+```ruby
+# some model
+class User < ActiveRecord::Base
+  def before_import_save(record)
+    # Your custom special sauce          
+  end
 
-        def after_import_save(row, map)
-          # Your custom special sauce          
-        end
-        
+  def after_import_save(record)
+    # Your custom special sauce          
+  end
+end
+```
+
 You could for example set an attribute on a Devise User model to skip checking for a password when importing a new model.
 
 You could also download a file based on a URL from the import file and set a Paperclip file attribute on the model.
 
 
 TODO: Write tests for import hooks.
-
-TODO: Write mapper from new syntax to old syntax
-
-TODO: test before_import/after_import hooks
 
 
 ## ORM: ActiveRecord and Mongoid
@@ -141,6 +181,8 @@ Support for Mongoid is early, so if you can suggest improvements (especially aro
 * No need to mount RailsAdminImport in `config/routes.rb` (RailsAdmin must still be mounted).
 
 * Update model import hooks to take 1 hash argument instead of 2 arrays with values and headers.
+
+* Support for importing file attributes was removed since I couldn't understand how it works. It should be possible to reimplement it yourself using post import hooks. Open an issue to discuss how to put back support for importing files into the gem.
 
 ## Run tests
 

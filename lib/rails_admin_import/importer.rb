@@ -143,11 +143,26 @@ module RailsAdminImport
                action: I18n.t("admin.actions.import.done"))
     end
     
-    def perform_model_callback(object, method, record)
-      # TODO: if arity is 2, split record into headers and data to be
-      # compatible with the old version and set a deprecation warning
-      if object.respond_to?(method)
-        object.send(method, record)
+    def perform_model_callback(object, method_name, record)
+      if object.respond_to?(method_name)
+        # Compatibility: Old import hook took 2 arguments.
+        # Warn and call with a blank hash as 2nd argument.
+        if object.method(method_name).arity == 2
+          report_old_import_hook(method_name)
+          object.send(method_name, record, {})
+        else
+          object.send(method_name, record)
+        end
+      end
+    end
+
+    def report_old_import_hook(method_name)
+      unless @old_import_hook_reported
+        error = I18n.t("admin.import.import_error.old_import_hook",
+                       model: import_model.display_name,
+                       method: method_name)
+        report_general_error(error)
+        @old_import_hook_reported = true
       end
     end
 
