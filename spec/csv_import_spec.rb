@@ -53,7 +53,8 @@ describe "CSV import", :type => :request do
         people = create_people
 
         file = fixture_file_upload("company.csv", "text/plain")
-        post "/admin/company/import", file: file, "associations[employees]": 'email'
+        post "/admin/company/import", file: file,
+          "associations[employees]": 'email'
         expect(response.body).not_to include "failed"
         expect(Company.count).to eq 2
 

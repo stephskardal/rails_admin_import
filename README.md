@@ -157,12 +157,11 @@ class User < ActiveRecord::Base
 end
 ```
 
-You could for example set an attribute on a Devise User model to skip checking for a password when importing a new model.
+For example, you could
 
-You could also download a file based on a URL from the import file and set a Paperclip file attribute on the model.
+* Set an attribute on a Devise User model to skip checking for a password when importing a new model.
 
-
-TODO: Write tests for import hooks.
+* Download a file based on a URL from the import file and set a Paperclip file attribute on the model.
 
 
 ## ORM: ActiveRecord and Mongoid

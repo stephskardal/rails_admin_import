@@ -33,24 +33,33 @@ module RailsAdminImport
 
     def model_fields(model_config = config)
       @model_fields ||= {}
-      @model_fields[model_config] ||= importable_fields(model_config).select { |f| !f.association? || f.association.polymorphic? }
+      @model_fields[model_config] ||= importable_fields(model_config).select { |f|
+        !f.association? || f.association.polymorphic?
+      }
     end
 
     def association_fields
-      @association_fields ||= importable_fields.select { |f| f.association? && !f.association.polymorphic? }
+      @association_fields ||= importable_fields.select { |f|
+        f.association? && !f.association.polymorphic?
+      }
     end
 
     def belongs_to_fields
-      @belongs_to_fields ||= association_fields.select { |f| !f.multiple? }
+      @belongs_to_fields ||= association_fields.select { |f|
+        !f.multiple?
+      }
     end
 
     def many_fields
-      @many_fields ||= association_fields.select { |f| f.multiple? }
+      @many_fields ||= association_fields.select {
+        |f| f.multiple?
+      }
     end
 
     def associated_object(field, mapping_field, value)
       klass = association_class(field)
-      klass.where(mapping_field => value).first or raise AssociationNotFound, "#{klass}.#{mapping_field} = #{value}"
+      klass.where(mapping_field => value).first or
+        raise AssociationNotFound, "#{klass}.#{mapping_field} = #{value}"
     end
 
     def association_class(field)
@@ -63,7 +72,9 @@ module RailsAdminImport
 
     def associated_model_fields(field)
       @associated_fields ||= {}
-      @associated_fields[field] ||= associated_config(field).visible_fields.select { |f| !f.association? }
+      @associated_fields[field] ||= associated_config(field).visible_fields.select { |f|
+        !f.association?
+      }
     end
 
     def has_multiple_values?(field_name)
