@@ -29,7 +29,7 @@ module RailsAdminImport
           rollback_if_error
         end
       rescue Exception => e
-        report_general_error(e.to_s)
+        report_general_error("#{e} (#{e.backtrace.first})")
       end
 
       format_results
@@ -104,7 +104,7 @@ module RailsAdminImport
       object_label = import_model.label_for_model(object)
       message = I18n.t("admin.import.import_success.#{action}",
                        :name => object_label)
-      logger.info "#{Time.now.to_s}: #{message}"
+      logger.info "#{Time.now}: #{message}"
       results[:success] << message
     end
 
@@ -113,13 +113,13 @@ module RailsAdminImport
       message = I18n.t("admin.import.import_error.#{action}",
                        :name => object_label,
                        :error => error)
-      logger.info "#{Time.now.to_s}: #{message}"
+      logger.info "#{Time.now}: #{message}"
       results[:error] << message
     end
 
     def report_general_error(error)
       message = I18n.t("admin.import.import_error.general", :error => error)
-      logger.info "#{Time.now.to_s}: #{message}"
+      logger.info "#{Time.now}: #{message}"
       results[:error] << message
     end
 
