@@ -1,5 +1,7 @@
 # Rails Admin Import
 
+[![Build Status](https://travis-ci.org/monkbroc/rails_admin_import.svg?branch=master)](https://travis-ci.org/monkbroc/rails_admin_import)
+
 Plugin functionality to add generic import to Rails Admin from CSV and JSON files
 
 *This Readme is for version 1.0. If you are still using version 0.1.x, see [this branch](https://github.com/stephskardal/rails_admin_import/tree/legacy)*
