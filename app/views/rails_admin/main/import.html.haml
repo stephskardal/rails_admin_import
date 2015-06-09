@@ -1,0 +1,72 @@
+= render "results"
+
+= form_tag import_path(@abstract_model), :multipart => true, class: 'form-horizontal denser' do
+
+  %input{name: "send_data", type: "hidden", value: "true"}/
+  %fieldset
+    %legend
+      %i.icon-chevron-down
+      = t('admin.import.legend.fields')
+
+    = render "section", section: "model_fields", fields: @import_model.model_fields
+    = render "section", section: "association_fields", fields: @import_model.association_fields
+
+  %fieldset
+    %legend
+      %i.icon-chevron-down
+      = t('admin.import.legend.upload')
+    .form-group.control-group
+      %label.col-sm-2.control-label{for: "file"}= t("admin.import.file")
+      .col-sm-10.controls
+        = file_field_tag :file, :class => "form-control"
+        %p.help-block= t('admin.import.help.file_limit', limit: RailsAdminImport.config.line_item_limit)
+    .form-group.control-group
+      %label.col-sm-2.control-label{for: "import_format"}= t("admin.import.format")
+      .col-sm-10.controls
+        = select_tag 'import_format',
+          options_for_select(RailsAdminImport::Formats.all),
+          data: { enumeration: true }
+    .form-group.control-group
+      %label.col-sm-2.control-label{for: "encoding"}= t("admin.import.encoding")
+      .col-sm-10.controls
+        = select_tag 'encoding',
+          options_for_select(RailsAdmin::CSVConverter::TARGET_ENCODINGS),
+          include_blank: true, data: { enumeration: true }
+        %p.help-block= t('admin.import.help.encoding', name: 'UTF-8')
+    .form-group.control-group
+      %label.col-sm-2.control-label= t("admin.import.update_if_exists")
+      .col-sm-10.controls
+        = check_box_tag :update_if_exists, '1', false, :class => "form-control"
+        %p.help-block= t('admin.import.help.update_if_exists')
+    .form-group.control-group
+      %label.col-sm-2.control-label{for: "update_lookup"}= t("admin.import.update_lookup")
+      .col-sm-10.controls
+        = select_tag 'update_lookup',
+          options_for_select(@import_model.model_fields.map(&:name),
+          @import_model.config.mapping_key.to_s), data: { enumeration: true }
+
+  - unless @import_model.association_fields.empty?
+    %fieldset
+      %legend
+        %i.icon-chevron-down
+        = t('admin.import.legend.mapping')
+
+      - @import_model.association_fields.each do |field|
+        .form-group.control-group
+          %label.col-sm-2.control-label
+            = capitalize_first_letter(field.label)
+            = t("admin.import.mapping")
+          .col-sm-10.controls
+            = select_tag "associations[#{field.name}]",
+              options_for_select(@import_model.associated_model_fields(field).map(&:name),
+              @import_model.associated_config(field).mapping_key.to_s), data: { enumeration: true }
+
+  %br
+  .form-actions
+    %input{type: :hidden, name: 'return_to', value: (request.params[:return_to].presence || request.referer)}
+    %button.btn.btn-primary{type: "submit", name: "commit", data: {disable_with: "Uploading..."} }
+      %i.icon-white.icon-ok
+      = t("admin.form.save")
+    %button.btn{type: "submit", name: "_continue"}
+      %i.icon-remove
+      = t("admin.form.cancel")

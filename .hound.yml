@@ -1,0 +1,4 @@
+LineLength:
+  Description: 'Limit lines to 100 characters.'
+  Enabled: true
+  Max: 100

@@ -1,0 +1,10 @@
+- if fields.any?
+  .form-group.control-group
+    %label.col-sm-2.control-label= t("admin.import.#{section}")
+    .col-sm-10.controls
+      %ul.list-unstyled
+        - fields.each do |field|
+          %li
+            %label= capitalize_first_letter(field.label)
+      %p.help-block= t("admin.import.help.#{section}")
+
