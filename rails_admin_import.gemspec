@@ -11,7 +11,7 @@ Gem::Specification.new do |s|
   s.license = 'MIT'
   s.homepage = 'https://github.com/stephskardal/rails_admin_import'
 
-  s.files = Dir["{app,config,lib}/**/*"] + ["MIT-LICENSE", "Rakefile", "README.md", "RELEASE_NOTES"]
+  s.files = Dir["{app,config,lib}/**/*"] + ["MIT-LICENSE", "Rakefile", "README.md", "CHANGELOG.md"]
 
   s.add_dependency 'rails', '>= 3.2'
   s.add_dependency 'rails_admin', '>= 0.6.6'
