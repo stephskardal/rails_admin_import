@@ -85,6 +85,8 @@ The file must be an array or an object with a root key the same name as the plur
 
 * __header_converter__ (default `nil`): a lambda to convert each CSV header text string to a model attribute name. The default header converter converts to lowercase and replaces spaces with underscores.
 
+* __csv_options__ (default `{}`): a hash of options that will be passed to a new [CSV](http://ruby-doc.org/stdlib-2.0.0/libdoc/csv/rdoc/CSV.html) instance
+
 ### Model-specific configuration
 
 Use [standard RailsAdmin DSL](https://github.com/sferik/rails_admin/wiki/Railsadmin-DSL) to add or remove fields.
@@ -150,11 +152,11 @@ Define instance methods on your models to be hooked into the import process, if 
 # some model
 class User < ActiveRecord::Base
   def before_import_save(record)
-    # Your custom special sauce          
+    # Your custom special sauce
   end
 
   def after_import_save(record)
-    # Your custom special sauce          
+    # Your custom special sauce
   end
 end
 ```
@@ -190,10 +192,10 @@ Support for Mongoid is early, so if you can suggest improvements (especially aro
 1. Clone the repository to your machine
 
     git clone https://github.com/stephskardal/rails_admin_import
-    
+
 2. Run `bundle install`
 3. Run `rspec`
-  
+
 The structure of the tests is taken from the Rails Admin gem.
 
 ## Authors

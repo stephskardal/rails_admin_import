@@ -7,6 +7,7 @@ module RailsAdminImport
       attr_accessor :line_item_limit
       attr_accessor :rollback_on_error
       attr_accessor :header_converter
+      attr_accessor :csv_options
 
       def model(model_name, &block)
         unless @deprecation_shown
@@ -26,6 +27,7 @@ module RailsAdminImport
         @line_item_limit = 1000
         @rollback_on_error = false
         @header_converter = nil
+        @csv_options = {}
       end
     end
 
