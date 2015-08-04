@@ -27,15 +27,17 @@ module RailsAdminImport
       private
 
       def csv_options
-        {
+        defaults = RailsAdminImport.config.csv_options
+        options = {
           headers: true,
-          header_converters: @header_converter
-        }.tap do |options|
-          add_encoding!(options)
-        end
+          header_converters: @header_converter,
+          encoding: encoding,
+        }
+
+        defaults.merge(options)
       end
 
-      def add_encoding!(options)
+      def encoding
         from_encoding =
           if !@encoding.blank?
             @encoding
@@ -44,8 +46,11 @@ module RailsAdminImport
           end
 
         to_encoding = import_model.abstract_model.encoding
+
         if from_encoding && from_encoding != to_encoding
-          options[:encoding] = "#{from_encoding}:#{to_encoding}"
+          "#{from_encoding}:#{to_encoding}"
+        else
+          nil
         end
       end
 
