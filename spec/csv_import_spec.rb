@@ -11,6 +11,22 @@ describe "CSV import", :type => :request do
     end
   end
 
+  describe "for a model with belongs_to" do
+    describe "for simple associations" do
+      it "import the associations" do
+        # Add parents from support/associations.rb to the database
+        parents = create_parents
+
+        file = fixture_file_upload("children.csv", "text/plain")
+        post "/admin/child/import", file: file,
+          "associations[parent]": 'name'
+        expect(response.body).not_to include "failed"
+        expect(Child.count).to eq 1
+        expect(Child.first.parent_id).to match parents[:parent_one].id
+      end
+    end
+  end
+
   describe "for a model with has_many" do
     describe "for simple associations" do
       it "import the associations" do

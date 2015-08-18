@@ -167,7 +167,7 @@ module RailsAdminImport
     end
 
     def find_or_create_object(record, update)
-      field_names = import_model.model_fields.map(&:name)
+      field_names = import_model.model_columns_names
       new_attrs = record.select do |field_name, value|
         field_names.include?(field_name) && !value.blank?
       end

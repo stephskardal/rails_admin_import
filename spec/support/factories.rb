@@ -13,6 +13,16 @@ FactoryGirl.define do
     end
   end
 
+  factory :parent do
+    factory :parent_one do
+      name "One"
+    end
+
+    factory :parent_two do
+      name "Two"
+    end
+  end
+
   factory :person do
     factory :person_one do
       first_name "Person"
