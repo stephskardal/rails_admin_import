@@ -6,6 +6,13 @@ def create_children
   }
 end
 
+def create_parents
+  {
+    :parent_one => FactoryGirl.create(:parent_one),
+    :parent_two => FactoryGirl.create(:parent_two)
+  }
+end
+
 def create_people
   {
     :person_one => FactoryGirl.create(:person_one),

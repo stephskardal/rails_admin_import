@@ -33,9 +33,15 @@ module RailsAdminImport
 
     def model_fields(model_config = config)
       @model_fields ||= {}
-      @model_fields[model_config] ||= importable_fields(model_config).select { |f|
-        !f.association? || f.association.polymorphic?
+      @model_fields[model_config] ||= importable_fields(model_config).reject { |f|
+        f.association? && !(f.association.polymorphic? || f.is_a?(RailsAdmin::Config::Fields::Types::BelongsToAssociation))
       }
+    end
+
+    def model_columns_names(model_config = config)
+      model_fields.map do |field|
+        field.is_a?(RailsAdmin::Config::Fields::Types::BelongsToAssociation) ? field.foreign_key : field.name
+      end
     end
 
     def association_fields

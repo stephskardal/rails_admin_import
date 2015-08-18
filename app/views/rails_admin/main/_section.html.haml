@@ -5,6 +5,11 @@
       %ul.list-unstyled
         - fields.each do |field|
           %li
-            %label= capitalize_first_letter(field.label)
+            %label
+              - if section == "model_fields" && field.is_a?(RailsAdmin::Config::Fields::Types::BelongsToAssociation)
+                = field.foreign_key.to_s.capitalize.gsub("_", " ")
+              - else
+                = capitalize_first_letter(field.label)
+
       %p.help-block= t("admin.import.help.#{section}")
 

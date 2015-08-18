@@ -42,7 +42,7 @@
       %label.col-sm-2.control-label{for: "update_lookup"}= t("admin.import.update_lookup")
       .col-sm-10.controls
         = select_tag 'update_lookup',
-          options_for_select(@import_model.model_fields.map(&:name),
+          options_for_select(@import_model.model_columns_names,
           @import_model.config.mapping_key.to_s), data: { enumeration: true }
 
   - unless @import_model.association_fields.empty?
