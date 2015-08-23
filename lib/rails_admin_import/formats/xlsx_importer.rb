@@ -1,10 +1,11 @@
 require "csv"
-require "simple_xlsx_reader"
 
 module RailsAdminImport
   module Formats
     class XLSXImporter < FileImporter
       Formats.register(:xlsx, self)
+
+      autoload :SimpleXlsxReader, "simple_xlsx_reader"
 
       def initialize(import_model, params)
         super

@@ -182,6 +182,16 @@ The gem is tested to work with ActiveRecord and Mongoid.
 Support for Mongoid is early, so if you can suggest improvements (especially around importing embedded models), open an issue.
 
 
+## Eager loading
+
+Since the import functionality is rarely used in many applications, some gems are autoloaded when first used during an import in order to save memory at boot.
+
+If you prefer to eager load all dependecies at boot, use this line in your `Gemfile`.
+
+```
+gem "rails_admin_import", "~> 1.2.0", require: "rails_admin_import/eager_load"
+```
+
 ## Upgrading
 
 * Move global config to `config.configure_with(:import)` in `config/initializers/rails_admin_import.rb`.
@@ -201,7 +211,7 @@ Support for Mongoid is early, so if you can suggest improvements (especially aro
     git clone https://github.com/stephskardal/rails_admin_import
 
 2. Run `bundle install`
-3. Run `rspec`
+3. Run `bundle exec rspec`
 
 The structure of the tests is taken from the Rails Admin gem.
 
@@ -216,8 +226,8 @@ Maintainer (since May 2015): [Julien Vanier](https://github.com/monkbroc)
 
 Everyone is encouraged to help improve this project. Here are a few ways you can help:
 
-- [Report bugs](https://github.com/ankane/blazer/issues)
-- Fix bugs and [submit pull requests](https://github.com/ankane/blazer/pulls)
+- [Report bugs](https://github.com/stephskardal/rails_admin_import/issues)
+- Fix bugs and [submit pull requests](https://github.com/stephskardal/rails_admin_import/pulls)
 - Write, clarify, or fix documentation
 - Suggest or add new features
 

@@ -6,4 +6,8 @@ class Person
   field :last_name, type: String
   field :email, type: String
   belongs_to :employer, class_name: "Company"
+
+  def full_name
+    [first_name, last_name].compact.join ' '
+  end
 end

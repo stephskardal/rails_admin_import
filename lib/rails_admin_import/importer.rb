@@ -70,8 +70,8 @@ module RailsAdminImport
       action = object.new_record? ? :create : :update
 
       begin
-        import_belongs_to_data(object, record)
-        import_has_many_data(object, record)
+        import_single_association_data(object, record)
+        import_many_association_data(object, record)
       rescue AssociationNotFound => e
         error = I18n.t("admin.import.association_not_found", :error => e.to_s)
         report_error(object, action, error)
@@ -185,8 +185,8 @@ module RailsAdminImport
       object
     end
 
-    def import_belongs_to_data(object, record)
-      import_model.belongs_to_fields.each do |field|
+    def import_single_association_data(object, record)
+      import_model.single_association_fields.each do |field|
         mapping_key = params[:associations][field.name]
         value = extract_mapping(record[field.name], mapping_key)
 
@@ -196,8 +196,8 @@ module RailsAdminImport
       end
     end
 
-    def import_has_many_data(object, record)
-      import_model.many_fields.each do |field|
+    def import_many_association_data(object, record)
+      import_model.many_association_fields.each do |field|
         if record.has_key? field.name
           mapping_key = params[:associations][field.name]
           values = record[field.name].reject { |value| value.blank? }.map { |value|

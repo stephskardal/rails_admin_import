@@ -1,10 +1,11 @@
 require "csv"
-require "rchardet"
 
 module RailsAdminImport
   module Formats
     class CSVImporter < FileImporter
       Formats.register(:csv, self)
+
+      autoload :CharDet, "rchardet"
 
       def initialize(import_model, params)
         super

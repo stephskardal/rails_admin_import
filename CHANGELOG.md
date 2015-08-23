@@ -4,6 +4,7 @@
 ### Changed
 - Existing records can now be updated based on a belongs_to foreign key
 - Add Excel file format support
+- Autoload the Excel import and encoding detection gems
 
 ## [1.1.0] - 2015-08-04
 ### Changed
