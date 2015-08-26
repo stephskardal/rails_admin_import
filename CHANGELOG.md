@@ -2,7 +2,9 @@
 
 ## [1.2.0] - unreleased
 ### Changed
-- Existing records can now be updated based on a belongs_to foreign key
+- Existing records can now be updated based on a belongs_to foreign key. Thanks Diego Carrion!
+- Add Excel file format support
+- Autoload the Excel import and encoding detection gems
 
 ## [1.1.0] - 2015-08-04
 ### Changed

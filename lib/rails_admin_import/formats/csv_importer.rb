@@ -1,20 +1,16 @@
 require "csv"
-require "rchardet"
 
 module RailsAdminImport
   module Formats
     class CSVImporter < FileImporter
       Formats.register(:csv, self)
 
-      # Default is to downcase headers and add underscores to convert into attribute names
-      HEADER_CONVERTER = lambda do |header|
-        header.parameterize.underscore
-      end
+      autoload :CharDet, "rchardet"
 
       def initialize(import_model, params)
         super
         @encoding = params[:encoding]
-        @header_converter = RailsAdminImport.config.header_converter || HEADER_CONVERTER
+        @header_converter = RailsAdminImport.config.header_converter
       end
 
       # A method that yields a hash of attributes for each record to import

@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/monkbroc/rails_admin_import.svg?branch=master)](https://travis-ci.org/monkbroc/rails_admin_import)
 
-Plugin functionality to add generic import to Rails Admin from CSV and JSON files
+Plugin functionality to add generic import to Rails Admin from CSV, JSON and XLSX files
 
 *This Readme is for version 1.0. If you are still using version 0.1.x, see [this branch](https://github.com/stephskardal/rails_admin_import/tree/legacy)*
 
@@ -11,7 +11,7 @@ Plugin functionality to add generic import to Rails Admin from CSV and JSON file
 * First, add to Gemfile:
 
 ```
-gem "rails_admin_import", "~> 1.0.0"
+gem "rails_admin_import", "~> 1.2.0"
 ```
 
 * Define configuration in `config/initializers/rails_admin_import.rb`:
@@ -72,10 +72,17 @@ Michael,Bolton,IT,
 
 The file must be an array or an object with a root key the same name as the plural model name, i.e. the default Rails JSON output format with include_root_in_json on or off.
 
+### XLSX
+
+The Microsoft Excel XLM format (XLSX) is supported, but not the old binary Microsoft Excel format (XLS).
+
+The expected rows and columns are the same as for the CSV format (first line contains headers, multiple columns for "many" associations).
 
 ## Configuration
 
 ### Global configuration options
+
+* __default_format__ (default `csv`): Which import format will be pre-selected in the view.
 
 * __logging__ (default `false`): Save a copy of each imported file to log/import and a detailed import log to log/rails_admin_import.log
 
@@ -83,7 +90,7 @@ The file must be an array or an object with a root key the same name as the plur
 
 * __rollback_on_error__ (default `false`): import records in a transaction and rollback if there is one error. Only for ActiveRecord, not Mongoid.
 
-* __header_converter__ (default `nil`): a lambda to convert each CSV header text string to a model attribute name. The default header converter converts to lowercase and replaces spaces with underscores.
+* __header_converter__ (default `lambda { ... }`): a lambda to convert each CSV header text string to a model attribute name. The default header converter converts to lowercase and replaces spaces with underscores.
 
 * __csv_options__ (default `{}`): a hash of options that will be passed to a new [CSV](http://ruby-doc.org/stdlib-2.0.0/libdoc/csv/rdoc/CSV.html) instance
 
@@ -174,6 +181,16 @@ The gem is tested to work with ActiveRecord and Mongoid.
 
 Support for Mongoid is early, so if you can suggest improvements (especially around importing embedded models), open an issue.
 
+
+## Eager loading
+
+Since the import functionality is rarely used in many applications, some gems are autoloaded when first used during an import in order to save memory at boot.
+
+If you prefer to eager load all dependecies at boot, use this line in your `Gemfile`.
+
+```
+gem "rails_admin_import", "~> 1.2.0", require: "rails_admin_import/eager_load"
+```
 
 ## Upgrading
 

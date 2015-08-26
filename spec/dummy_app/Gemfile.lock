@@ -6,6 +6,7 @@ PATH
       rails (>= 3.2)
       rails_admin (>= 0.6.6)
       rchardet (~> 1.6)
+      simple_xlsx_reader (~> 1.0)
 
 GEM
   remote: https://rubygems.org/
@@ -157,6 +158,7 @@ GEM
     rake (10.4.2)
     rchardet (1.6.1)
     remotipart (1.2.1)
+    rubyzip (1.1.7)
     safe_yaml (1.0.4)
     sass (3.2.19)
     sass-rails (4.0.5)
@@ -164,6 +166,9 @@ GEM
       sass (~> 3.2.2)
       sprockets (~> 2.8, < 3.0)
       sprockets-rails (~> 2.0)
+    simple_xlsx_reader (1.0.2)
+      nokogiri
+      rubyzip
     slop (3.6.0)
     sprockets (2.12.3)
       hike (~> 1.2)
