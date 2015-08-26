@@ -20,6 +20,8 @@ describe "CSV import", :type => :request do
         "associations[employee]": "name"
 
       expect(response.body).not_to include "failed"
+      # Give time for transaction to commit. Ugly...
+      sleep 0.1
       expect(Person.first.full_name).to match "John Snow"
       expect(Person.count).to eq 1
     end
