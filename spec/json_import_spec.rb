@@ -5,7 +5,7 @@ describe "JSON import", :type => :request do
     context "with the data in an array" do
       it "imports the data" do
         file = fixture_file_upload("balls.json", "text/plain")
-        post "/admin/ball/import", import_format: 'json', file: file
+        post "/admin/ball/import", file: file
         expect(response.body).not_to include "failed"
         expect(Ball.count).to eq 2
         expect(Ball.first.color).to eq "red"
@@ -15,7 +15,7 @@ describe "JSON import", :type => :request do
     context "with the data in an object with a root key" do
       it "imports the data" do
         file = fixture_file_upload("balls_with_root.json", "text/plain")
-        post "/admin/ball/import", import_format: 'json', file: file
+        post "/admin/ball/import", file: file
         expect(response.body).not_to include "failed"
         expect(Ball.count).to eq 2
         expect(Ball.first.color).to eq "red"
@@ -30,7 +30,7 @@ describe "JSON import", :type => :request do
         children = create_children
 
         file = fixture_file_upload("parents.json", "text/plain")
-        post "/admin/parent/import", import_format: 'json', file: file, "associations[children]": 'name'
+        post "/admin/parent/import", file: file, "associations[children]": 'name'
         expect(response.body).not_to include "failed"
         expect(Parent.count).to eq 2
 

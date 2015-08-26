@@ -52,6 +52,8 @@ can :import, [User, Model1, Model2]
 
 ## File format
 
+The format is inferred by the extension (.csv, .json or .xlsx).
+
 ### CSV
 
 The first line must contain attribute names. They will be converted to lowercase and underscored (First Name ==> first_name).
@@ -81,8 +83,6 @@ The expected rows and columns are the same as for the CSV format (first line con
 ## Configuration
 
 ### Global configuration options
-
-* __default_format__ (default `csv`): Which import format will be pre-selected in the view.
 
 * __logging__ (default `false`): Save a copy of each imported file to log/import and a detailed import log to log/rails_admin_import.log
 

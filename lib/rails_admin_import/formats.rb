@@ -5,6 +5,11 @@ module RailsAdminImport
         @registry[format.to_s] = klass
       end
 
+      def from_file(file)
+        return unless file
+        File.extname(file.original_filename).sub(/^\./, '')
+      end
+
       def for(format, *args)
         @registry.fetch(format.to_s, DummyImporter).new(*args)
       end

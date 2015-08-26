@@ -21,12 +21,6 @@
         = file_field_tag :file, :class => "form-control"
         %p.help-block= t('admin.import.help.file_limit', limit: RailsAdminImport.config.line_item_limit)
     .form-group.control-group
-      %label.col-sm-2.control-label{for: "import_format"}= t("admin.import.format")
-      .col-sm-10.controls
-        = select_tag 'import_format',
-          options_for_select(RailsAdminImport::Formats.all, RailsAdminImport.config.default_format),
-          data: { enumeration: true }
-    .form-group.control-group
       %label.col-sm-2.control-label{for: "encoding"}= t("admin.import.encoding")
       .col-sm-10.controls
         = select_tag 'encoding',

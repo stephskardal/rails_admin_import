@@ -3,7 +3,6 @@ require "rails_admin_import/config/legacy_model"
 module RailsAdminImport
   module Config
     class << self
-      attr_accessor :default_format
       attr_accessor :logging
       attr_accessor :line_item_limit
       attr_accessor :rollback_on_error
@@ -29,7 +28,6 @@ module RailsAdminImport
 
       # Reset all configurations to defaults.
       def reset
-        @default_format = "csv"
         @logging = false
         @line_item_limit = 1000
         @rollback_on_error = false
