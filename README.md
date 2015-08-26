@@ -194,7 +194,7 @@ Support for Mongoid is early, so if you can suggest improvements (especially aro
     git clone https://github.com/stephskardal/rails_admin_import
 
 2. Run `bundle install`
-3. Run `rspec`
+3. Run `bundle exec rspec`
 
 The structure of the tests is taken from the Rails Admin gem.
 
@@ -209,8 +209,8 @@ Maintainer (since May 2015): [Julien Vanier](https://github.com/monkbroc)
 
 Everyone is encouraged to help improve this project. Here are a few ways you can help:
 
-- [Report bugs](https://github.com/ankane/blazer/issues)
-- Fix bugs and [submit pull requests](https://github.com/ankane/blazer/pulls)
+- [Report bugs](https://github.com/stephskardal/rails_admin_import/issues)
+- Fix bugs and [submit pull requests](https://github.com/stephskardal/rails_admin_import/pulls)
 - Write, clarify, or fix documentation
 - Suggest or add new features
 

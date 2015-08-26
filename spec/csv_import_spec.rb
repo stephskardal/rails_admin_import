@@ -9,6 +9,37 @@ describe "CSV import", :type => :request do
       expect(Ball.count).to eq 2
       expect(Ball.first.color).to eq "red"
     end
+
+    it "updates the records if they exist" do
+      person = FactoryGirl.create(:person_one)
+
+      file = fixture_file_upload("person_update.csv", "text/plain")
+      post "/admin/person/import", file: file,
+        "update_if_exists": "1",
+        "update_lookup": "email",
+        "associations[employee]": "name"
+
+      expect(response.body).not_to include "failed"
+      expect(Person.first.full_name).to match "John Snow"
+      expect(Person.count).to eq 1
+    end
+  end
+
+  describe "for a model with belongs_to" do
+    it "updates the record based on a association" do
+      parent = FactoryGirl.create(:parent_one, id: "1")
+      child = FactoryGirl.create(:child_one, parent: parent)
+
+      file = fixture_file_upload("child_update.csv", "text/plain")
+      post "/admin/child/import", file: file,
+        "update_if_exists": "1",
+        "update_lookup": "parent_id",
+        "associations[parent]": "name"
+
+      expect(response.body).not_to include "failed"
+      expect(Child.first.name).to match "Tall One"
+      expect(Child.count).to eq 1
+    end
   end
 
   describe "for a model with has_many" do

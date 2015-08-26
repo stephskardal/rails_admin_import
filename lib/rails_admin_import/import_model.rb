@@ -44,16 +44,26 @@ module RailsAdminImport
       }
     end
 
-    def belongs_to_fields
-      @belongs_to_fields ||= association_fields.select { |f|
+    def single_association_fields
+      @single_association_fields ||= association_fields.select { |f|
         !f.multiple?
       }
     end
 
-    def many_fields
-      @many_fields ||= association_fields.select {
-        |f| f.multiple?
+    def belongs_to_fields
+      @belongs_to_fields ||= single_association_fields.select { |f|
+        f.type == :belongs_to_association
       }
+    end
+
+    def many_association_fields
+      @many_association_fields ||= association_fields.select { |f|
+        f.multiple?
+      }
+    end
+
+    def update_lookup_field_names
+      @update_lookup_field_names ||= model_fields.map(&:name) + belongs_to_fields.map(&:foreign_key)
     end
 
     def associated_object(field, mapping_field, value)
@@ -79,11 +89,11 @@ module RailsAdminImport
 
     def has_multiple_values?(field_name)
       plural_name = pluralize_field(field_name)
-      many_fields.any? { |field| field.name == field_name || field.name == plural_name }
+      many_association_fields.any? { |field| field.name == field_name || field.name == plural_name }
     end
 
     def pluralize_field(field_name)
-      @plural_fields ||= many_fields.map(&:name).each_with_object({}) { |name, h|
+      @plural_fields ||= many_association_fields.map(&:name).each_with_object({}) { |name, h|
         h[name.to_s.singularize.to_sym] = name
       }
       @plural_fields[field_name] || field_name

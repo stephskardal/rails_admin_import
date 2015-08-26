@@ -1,5 +1,9 @@
 # Change Log
 
+## [1.2.0] - unreleased
+### Changed
+- Existing records can now be updated based on a belongs_to foreign key
+
 ## [1.1.0] - 2015-08-04
 ### Changed
 - `csv_options` config added. Thanks Maksim Burnin!
