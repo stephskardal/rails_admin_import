@@ -24,8 +24,17 @@ RSpec.configure do |config|
   config.before do
     
     DatabaseCleaner.start
-    RailsAdminImport.reset
+    RailsAdmin::Config.reset
+    RailsAdmin::AbstractModel.reset
     RailsAdmin::Config.yell_for_non_accessible_fields = false
+    RailsAdminImport.reset
+
+    RailsAdmin.config do |config|
+      config.actions do
+        all
+        import
+      end
+    end
 
     # Add fixture_path to examples when running with Mongoid because
     # ActiveRecord::TestFixtures is not included

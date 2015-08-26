@@ -26,7 +26,7 @@ module RailsAdminImport
 
       def convert_headers(headers)
         headers.map do |h|
-          @header_converter.call(h)
+          @header_converter.call(h || "")
         end
       end
 
