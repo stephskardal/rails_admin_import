@@ -18,4 +18,6 @@ Gem::Specification.new do |s|
   s.add_dependency 'haml', '~> 4.0'
   s.add_dependency 'rchardet', '~> 1.6'
   s.add_dependency 'simple_xlsx_reader', '~> 1.0'
+
+  s.add_development_dependency 'rubygems-tasks'
 end

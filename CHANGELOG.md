@@ -1,6 +1,6 @@
 # Change Log
 
-## [1.2.0] - unreleased
+## [1.2.0] - 2015-08-27
 ### Changed
 - Existing records can now be updated based on a belongs_to foreign key. Thanks Diego Carrion!
 - Add Excel file format support
