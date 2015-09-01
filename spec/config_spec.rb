@@ -79,6 +79,10 @@ describe "Rails Admin Config" do
     end
 
     context "with the old API" do
+      around do |example|
+        silence_warnings { example.run }
+      end
+
       describe "label" do
         it "can be set" do
           expect {
