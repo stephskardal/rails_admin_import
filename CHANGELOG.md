@@ -1,17 +1,16 @@
 # Change Log
 
-## [1.2.0] - 2015-08-27
-### Changed
+## 1.2.0 / 2015-08-27
+
 - Existing records can now be updated based on a belongs_to foreign key. Thanks Diego Carrion!
 - Add Excel file format support
 - Autoload the Excel import and encoding detection gems
 
-## [1.1.0] - 2015-08-04
-### Changed
+## 1.1.0 / 2015-08-04
+
 - `csv_options` config added. Thanks Maksim Burnin!
 
-## [1.0.0] - 2015-06-09
-### Changed
+## 1.0.0 / 2015-06-09
 
 Major rework of the gem by new maintainer.
 
@@ -23,8 +22,7 @@ Major rework of the gem by new maintainer.
 - Added tests
 
 
-## [0.1.9] - 2014-05-22
-### Changed
+## 0.1.9 / 2014-05-22
 
 - Updated/corrected README
 - Merged ImportLogger work

@@ -23,6 +23,22 @@ describe "CSV import", :type => :request do
       expect(Person.first.full_name).to match "John Snow"
       expect(Person.count).to eq 1
     end
+
+    it "uses the configured object_label_method" do
+      RailsAdmin.config do |config|
+        config.model "Person" do
+          object_label_method :full_name
+        end
+      end
+
+      file = fixture_file_upload("person_update.csv", "text/plain")
+      post "/admin/person/import", file: file,
+        "update_if_exists": "1",
+        "update_lookup": "email",
+        "associations[employee]": "name"
+
+      expect(response.body).to include "John Snow"
+    end
   end
 
   describe "for a model with belongs_to" do
