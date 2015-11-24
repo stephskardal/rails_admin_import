@@ -174,7 +174,7 @@ module RailsAdminImport
 
       model = import_model.model
       object = if update.present?
-                 model.find_by(update => record[update])
+                 model.where(update => record[update]).first
                end 
 
       if object.nil?

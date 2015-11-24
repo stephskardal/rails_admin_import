@@ -10,18 +10,32 @@ describe "CSV import", :type => :request do
       expect(Ball.first.color).to eq "red"
     end
 
-    it "updates the records if they exist" do
-      person = FactoryGirl.create(:person_one)
+    describe "update_if_exists" do
+      it "updates the records if they exist" do
+        person = FactoryGirl.create(:person_one)
 
-      file = fixture_file_upload("person_update.csv", "text/plain")
-      post "/admin/person/import", file: file,
-        "update_if_exists": "1",
-        "update_lookup": "email",
-        "associations[employee]": "name"
+        file = fixture_file_upload("person_update.csv", "text/plain")
+        post "/admin/person/import", file: file,
+          "update_if_exists": "1",
+          "update_lookup": "email",
+          "associations[employee]": "name"
 
-      expect(response.body).not_to include "failed"
-      expect(Person.first.full_name).to match "John Snow"
-      expect(Person.count).to eq 1
+        expect(response.body).not_to include "failed"
+        expect(Person.first.full_name).to match "John Snow"
+        expect(Person.count).to eq 1
+      end
+
+      it "creates the records if they don't exist" do
+        file = fixture_file_upload("person_update.csv", "text/plain")
+        post "/admin/person/import", file: file,
+          "update_if_exists": "1",
+          "update_lookup": "email",
+          "associations[employee]": "name"
+
+        expect(response.body).not_to include "failed"
+        expect(Person.first.full_name).to match "John Snow"
+        expect(Person.count).to eq 1
+      end
     end
 
     it "uses the configured object_label_method" do
@@ -33,8 +47,6 @@ describe "CSV import", :type => :request do
 
       file = fixture_file_upload("person_update.csv", "text/plain")
       post "/admin/person/import", file: file,
-        "update_if_exists": "1",
-        "update_lookup": "email",
         "associations[employee]": "name"
 
       expect(response.body).to include "John Snow"

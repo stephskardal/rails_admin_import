@@ -1,5 +1,9 @@
 # Change Log
 
+# 1.3.0 / unreleased
+
+- Use `where.first` instead of `find_by` so update works for Mongoid
+
 ## 1.2.0 / 2015-08-27
 
 - Existing records can now be updated based on a belongs_to foreign key. Thanks Diego Carrion!
