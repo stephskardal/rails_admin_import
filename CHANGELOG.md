@@ -1,6 +1,6 @@
 # Change Log
 
-# 1.3.0 / unreleased
+# 1.3.0 / 2015-11-24
 
 - Use `where.first` instead of `find_by` so update works for Mongoid
 
