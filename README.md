@@ -150,6 +150,18 @@ RailsAdmin.config do |config|
 end
 ```
 
+* To overwrite the [default excluded fields](https://github.com/stephskardal/rails_admin_import/blob/master/lib/rails_admin_import/config/sections/import.rb#L13) and allow matching to `:id` on import
+
+```ruby
+RailsAdmin.config do |config|
+  config.model 'User' do
+    import do
+      default_excluded_fields [:created_at, :updated_at]
+    end
+  end
+end
+```
+
 ## Import hooks
 
 
