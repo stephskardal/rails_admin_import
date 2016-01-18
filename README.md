@@ -47,6 +47,7 @@ end
 * If you are using CanCanCan for authorization, add to ability.rb to specify which models can be imported:
 
 ```ruby
+cannot :import, :all
 can :import, [User, Model1, Model2]
 ```
 
