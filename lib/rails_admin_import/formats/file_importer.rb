@@ -37,7 +37,9 @@ module RailsAdminImport
 
       def copy_uploaded_file_to_log_dir
         copy_filename = "#{Time.now.strftime("%Y-%m-%d-%H-%M-%S")}-import.csv"
-        copy_path = File.join(Rails.root, "log", "import", copy_filename)
+        dir_path = File.join(Rails.root, "log", "import")
+        FileUtils.mkdir_p(dir_path)
+        copy_path = File.join(dir_path, copy_filename)
         FileUtils.copy(filename, copy_path)
       end
     end
