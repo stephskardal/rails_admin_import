@@ -216,6 +216,10 @@ gem "rails_admin_import", "~> 1.2.0", require: "rails_admin_import/eager_load"
 * Update model import hooks to take 1 hash argument instead of 2 arrays with values and headers.
 
 * Support for importing file attributes was removed since I couldn't understand how it works. It should be possible to reimplement it yourself using post import hooks. Open an issue to discuss how to put back support for importing files into the gem.
+ 
+## Community-contributed translations
+
+* [Spanish translation](https://gist.github.com/yovasx2/dc0e9512e6c6243f840c) by Giovanni Alberto
 
 ## Run tests
 
