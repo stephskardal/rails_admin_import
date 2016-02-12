@@ -1,5 +1,9 @@
 # Change Log
 
+# 1.3.1 / 2016-02-11
+
+- Bugfix: Create log/import directory when logging config option is enabled. Thanks @yovasx2!
+
 # 1.3.0 / 2015-11-24
 
 - Use `where.first` instead of `find_by` so update works for Mongoid
