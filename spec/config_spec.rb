@@ -1,4 +1,5 @@
 require "spec_helper"
+require "fileutils"
 
 describe "Rails Admin Config" do
   shared_examples_for "a global config option" do |name, value|
@@ -24,6 +25,23 @@ describe "Rails Admin Config" do
 
   describe "logging" do
     it_behaves_like "a global config option", "logging", true
+
+    it "creates a log when importing", :type => :request do
+      RailsAdmin.config do |config|
+        config.configure_with :import do |config|
+          config.logging = true
+        end
+      end
+
+      expected_path = File.expand_path('../dummy_app/log/import', __FILE__)
+      FileUtils.rm_rf expected_path
+
+      file = fixture_file_upload("balls.csv", "text/plain")
+      post "/admin/ball/import", file: file
+
+      logfile = Dir.glob(File.join(expected_path, "*-import.csv"))
+      expect(logfile).not_to be_empty
+    end
   end
 
   describe "line_item_limit" do
