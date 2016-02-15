@@ -28,6 +28,19 @@ describe "Rails Admin Config" do
 
   describe "line_item_limit" do
     it_behaves_like "a global config option", "line_item_limit", 500
+
+    it 'returns an error if the provided file exceeds the line limit', type: :request do
+      RailsAdmin.config do |config|
+        config.configure_with :import do |config|
+          config.line_item_limit = 1
+        end
+      end
+
+      file = fixture_file_upload('balls.csv', 'text/plain')
+      post '/admin/ball/import', file: file
+      expect(response.body).to include 'Please limit upload file to 1 line items.'
+      expect(Ball.count).to eq 0
+    end
   end
 
   describe "rollback_on_error" do
