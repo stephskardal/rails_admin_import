@@ -86,7 +86,7 @@ The expected rows and columns are the same as for the CSV format (first line con
 
 * __logging__ (default `false`): Save a copy of each imported file to log/import and a detailed import log to log/rails_admin_import.log
 
-* __line_item_limit__ (default `1000`): max number of items that can be imported at one time. TODO: Currently this is suggested but not enforced.
+* __line_item_limit__ (default `1000`): max number of items that can be imported at one time.
 
 * __rollback_on_error__ (default `false`): import records in a transaction and rollback if there is one error. Only for ActiveRecord, not Mongoid.
 
