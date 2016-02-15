@@ -16,10 +16,13 @@ module RailsAdminImport
       begin
         init_results
 
-        # TODO: re-implement file size check
-        # if file_check.readlines.size > RailsAdminImport.config.line_item_limit
-        #   return results = { :success => [], :error => ["Please limit upload file to #{RailsAdminImport.config.line_item_limit} line items."] }
-        # end
+
+        if records.count > RailsAdminImport.config.line_item_limit
+          return results = {
+            success: [],
+            error: ["Please limit upload file to #{RailsAdminImport.config.line_item_limit} line items."]
+          }
+        end
 
         with_transaction do
           records.each do |record|
@@ -64,7 +67,7 @@ module RailsAdminImport
     def import_record(record)
       if update_lookup && !record.has_key?(update_lookup)
         raise UpdateLookupError, I18n.t("admin.import.missing_update_lookup")
-      end 
+      end
 
       object = find_or_create_object(record, update_lookup)
       action = object.new_record? ? :create : :update
@@ -142,7 +145,7 @@ module RailsAdminImport
              name: result_count,
                action: I18n.t("admin.actions.import.done"))
     end
-    
+
     def perform_model_callback(object, method_name, record)
       if object.respond_to?(method_name)
         # Compatibility: Old import hook took 2 arguments.
@@ -175,7 +178,7 @@ module RailsAdminImport
       model = import_model.model
       object = if update.present?
                  model.where(update => record[update]).first
-               end 
+               end
 
       if object.nil?
         object = model.new(new_attrs)
@@ -221,4 +224,3 @@ module RailsAdminImport
     end
   end
 end
-
