@@ -34,6 +34,7 @@ en:
         create: "Failed to create %{name}: %{error}"
         update: "Failed to update %{name}: %{error}"
         general: "Error during import: %{error}"
+        line_item_limit: "Please limit upload file to %{limit} line items."
         old_import_hook: >
           The import hook %{model}.%{method} should take only 1 argument.
           Data may not imported correctly.

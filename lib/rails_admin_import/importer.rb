@@ -20,7 +20,7 @@ module RailsAdminImport
         if records.count > RailsAdminImport.config.line_item_limit
           return results = {
             success: [],
-            error: ["Please limit upload file to #{RailsAdminImport.config.line_item_limit} line items."]
+            error: [I18n.t('admin.import.import_error.line_item_limit', limit: RailsAdminImport.config.line_item_limit)]
           }
         end
 
