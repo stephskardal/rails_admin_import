@@ -51,11 +51,92 @@ cannot :import, :all
 can :import, [User, Model1, Model2]
 ```
 
-## File format
+## Usage
+
+Model instances can be both created and updated from import data. Any fields
+can be imported as long as they are allowed by the model's configuration.
+Associated records can be looked up for both singular and plural relationships.
+Both updating existing records and associating records requires the use of
+**mapping keys**.
+
+### Mapping Keys
+
+Every importable class has a mapping key that uniquely identifies its
+instances. The value for this field can then be provided in import data, either
+to update the existing record or to attach it through an association to another
+model. This concept exists because `id`s are often not constant when moving
+records between data stores.
+
+For example, a `User` model may have an `email` field. When uploading a set
+of users where some already exist in our database, we can select "email" as
+our mapping key and then provide that field on each record in our data,
+allowing us to update existing records with matching emails.
+
+Using a csv formatted example:
+```
+Email,First name,Last name
+peter.gibbons@initech.com,Peter,Gibbons
+michael.bolton@initech.com,Michael,Bolton
+```
+would look for existing users with those emails. If one was found, its name
+fields would be updated. Otherwise, a new one would be created.
+
+Similarly, if each user has favorite books, we could set the mapping key
+for `Book` to be `isbn` and then include the isbn for their books within each
+user record. The syntax for this is to use the name of the associated model as
+the field name, no matter what actual mapping key has been selected. So
+a user record would have one or more fields named "Book" that include each
+associated book's ISBN.
+
+Again using a csv formatted example:
+```
+Email, Book, Book, Book
+peter.gibbons@initech.com, 9781119997870, 9780671027032
+michael.bolton@initech.com, 9780446677479
+```
+would look up books with those ISBNs and attach them to those users.
+
+Mapping keys can be selected on the import page. Their defaults can also be
+globally configured in the config file:
+
+```
+RailsAdmin.config do |config|
+  config.model 'User' do
+    import do
+      mapping_key :email
+    end
+  end
+end
+```
+
+Note that a matched record must exist when attaching associated models, or the
+ imported record will fail and be skipped.
+
+Complex associations may need to be dealt with via custom logic
+called by one of the import hooks (see below for more detail on using hooks).
+If we wanted to import `Service`s and attach them to a `User`, but the user
+relationship existed through an intermediary model called `ServiceProvider`, we
+could provide a `user_email` field in our records and handle the actual
+association with an import hook:
+
+```
+class Service < ActiveRecord::Base
+  belongs_to :service_provider
+  has_one :user, through: :service_provider
+
+  def before_import_save(record)
+    if (email = record[:user_email]) and (user = User.find_by_email(email))
+      self.service_provider = user.service_provider
+    end
+  end
+end
+```
+
+### File format
 
 The format is inferred by the extension (.csv, .json or .xlsx).
 
-### CSV
+#### CSV
 
 The first line must contain attribute names. They will be converted to lowercase and underscored (First Name ==> first_name).
 
@@ -71,11 +152,11 @@ Peter,Gibbons,IT,Management
 Michael,Bolton,IT,
 ```
 
-### JSON
+#### JSON
 
 The file must be an array or an object with a root key the same name as the plural model name, i.e. the default Rails JSON output format with include_root_in_json on or off.
 
-### XLSX
+#### XLSX
 
 The Microsoft Excel XLM format (XLSX) is supported, but not the old binary Microsoft Excel format (XLS).
 
