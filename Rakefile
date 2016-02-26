@@ -12,4 +12,6 @@ RSpec::Core::RakeTask.new(:spec)
 
 task test: :spec
 
-task default: :spec
+task :default do
+  system("bundle exec rake spec")
+end

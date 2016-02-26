@@ -1,3 +1,3 @@
 module RailsAdminImport
-  VERSION = "1.3.1"
+  VERSION = "1.4.0"
 end

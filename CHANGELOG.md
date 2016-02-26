@@ -1,5 +1,11 @@
 # Change Log
 
+# 1.4.0 / 2016-02-26
+
+- Implement row limit (default maximum is 1000 rows). Thanks @codealchemy!
+- Document mapping keys. Thanks @zrisher!
+- Ignore columns with blank headers in CSV files
+
 # 1.3.1 / 2016-02-11
 
 - Bugfix: Create log/import directory when logging config option is enabled. Thanks @yovasx2!
