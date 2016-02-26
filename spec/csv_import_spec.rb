@@ -168,4 +168,14 @@ describe "CSV import", :type => :request do
       expect(Ball.all.map(&:color)).to match_array expected
     end
   end
+
+  describe "for a file with empty columns" do
+    it "ignores empty columns" do
+      file = fixture_file_upload("balls_empty.csv", "text/plain")
+      post "/admin/ball/import", file: file
+      expect(response.body).not_to include "failed"
+      expect(Ball.count).to eq 2
+      expect(Ball.first.color).to eq "red"
+    end
+  end
 end
