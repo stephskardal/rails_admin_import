@@ -9,8 +9,12 @@ module RailsAdmin
           :name
         end
 
+        register_instance_option(:mapping_key_list) do
+          []
+        end
+
         register_instance_option(:default_excluded_fields) do
-          [:id, :_id, :created_at, :updated_at]
+          [:id, :_id, :created_at, :updated_at, :c_at, :u_at]
         end
       end
     end

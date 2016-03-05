@@ -63,7 +63,11 @@ module RailsAdminImport
     end
 
     def update_lookup_field_names
-      @update_lookup_field_names ||= model_fields.map(&:name) + belongs_to_fields.map(&:foreign_key)
+      if @config.mapping_key_list.present?
+        @update_lookup_field_names = @config.mapping_key_list
+      else
+        @update_lookup_field_names ||= model_fields.map(&:name) + belongs_to_fields.map(&:foreign_key)
+      end
     end
 
     def associated_object(field, mapping_field, value)
@@ -82,9 +86,13 @@ module RailsAdminImport
 
     def associated_model_fields(field)
       @associated_fields ||= {}
-      @associated_fields[field] ||= associated_config(field).visible_fields.select { |f|
-        !f.association?
-      }
+      if associated_config(field).mapping_key_list.present?
+        @associated_fields[field] ||= associated_config(field).mapping_key_list
+      else
+        @associated_fields[field] ||= associated_config(field).visible_fields.select { |f|
+          !f.association?
+        }.map(&:name)
+      end
     end
 
     def has_multiple_values?(field_name)

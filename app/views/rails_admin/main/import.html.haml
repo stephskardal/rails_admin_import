@@ -52,7 +52,7 @@
             = t("admin.import.mapping")
           .col-sm-10.controls
             = select_tag "associations[#{field.name}]",
-              options_for_select(@import_model.associated_model_fields(field).map(&:name),
+              options_for_select(@import_model.associated_model_fields(field),
               @import_model.associated_config(field).mapping_key.to_s), data: { enumeration: true }
 
   %br
