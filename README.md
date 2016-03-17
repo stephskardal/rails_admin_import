@@ -267,8 +267,13 @@ For example, you could
 
 * Set an attribute on a Devise User model to skip checking for a password when importing a new model.
 
-* Download a file based on a URL from the import file and set a Paperclip file attribute on the model.
+* Import an image into Carrierwave via a URL provided in the CSV.
 
+```
+def before_import_save(record)
+  self.remote_image_url = record[:image] if record[:image].present?  
+end
+```
 
 ## ORM: ActiveRecord and Mongoid
 
