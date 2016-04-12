@@ -4,6 +4,7 @@ require "rails_admin_import/formats"
 require "rails_admin_import/importer"
 require "rails_admin_import/config"
 require "rails_admin_import/rails_admin_plugin"
+require 'rails_admin_import/encodings'
 
 module RailsAdminImport
   def self.config(entity = nil, &block)
