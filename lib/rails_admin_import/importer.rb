@@ -65,7 +65,7 @@ module RailsAdminImport
     end
 
     def import_record(record)
-      if update_lookup && !record.has_key?(update_lookup)
+      if update_lookup && !(update_lookup - record.keys).empty?
         raise UpdateLookupError, I18n.t("admin.import.missing_update_lookup")
       end
 
@@ -93,7 +93,7 @@ module RailsAdminImport
 
     def update_lookup
       @update_lookup ||= if params[:update_if_exists] == "1"
-                           params[:update_lookup].to_sym
+                           params[:update_lookup].map(&:to_sym)
                          end
     end
 
@@ -177,13 +177,16 @@ module RailsAdminImport
 
       model = import_model.model
       object = if update.present?
-                 model.where(update => record[update]).first
+                 # => loop through update array building query hash for all fields
+                 query = {}
+                 update.each do |field|   query[field] = record[field]    end
+                 model.where(query).first
                end
 
       if object.nil?
         object = model.new(new_attrs)
       else
-        object.attributes = new_attrs.except(update.to_sym)
+        object.attributes = new_attrs.except(update.map(&:to_sym))
       end
       object
     end
