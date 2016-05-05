@@ -1,5 +1,9 @@
 # Change Log
 
+# 2.0.0 / 2016-05-04
+
+- Pull in the encoding list from the Encoding module instead of RailsAdmin. Thanks @baldursson, @patricklewis and @lucasff
+
 # 1.4.0 / 2016-02-26
 
 - Implement row limit (default maximum is 1000 rows). Thanks @codealchemy!
