@@ -1,0 +1,246 @@
+fr:
+  admin:
+    js:
+      true: Vrai
+      false: Faux
+      is_present: Est présent
+      is_blank: Est vide
+      date: Date ...
+      between_and_: Entre le ... et le ...
+      today: "Aujourd'hui"
+      yesterday: Hier
+      this_week: Cette semaine
+      last_week: Semaine précédente
+      number: Nombre ...
+      contains: Contient
+      is_exactly: Est exactement
+      starts_with: Commence par
+      ends_with: Termine par
+    loading: "Chargement..."
+    home:
+      name: Home
+    pagination:
+      previous: "&laquo; Préc."
+      next: "Suiv. &raquo;"
+      truncate: "…"
+    misc:
+      filter_date_format: "dd/mm/yy" # a combination of 'dd', 'mm' and 'yy' with any delimiter. No other interpolation will be done!
+      search: "Rechercher"
+      filter: "Filtrer"
+      refresh: "Rafraîchir"
+      show_all: "Voir tout"
+      add_filter: "Ajouter un filtre..."
+      bulk_menu_title: "Objets sélectionnés..."
+      remove: "Enlever"
+      add_new: "Ajouter nouveau"
+      chosen: "%{name} choisis"
+      chose_all: "Prendre tout"
+      clear_all: "Tout enlever"
+      up: "Monter"
+      down: "Descendre"
+      navigation: "Navigation"
+      navigation_static_label: "Liens"
+      log_out: "Log out"
+      ago: ""
+    flash:
+      successful: "%{name} a été %{action} avec succès"
+      error: "%{name} n'a pas pu être %{action}"
+      noaction: "Aucune action !"
+      model_not_found: "Le model '%{model}' n'a pas été trouvé"
+      object_not_found: "%{model} avec id '%{id}' n'a pas été trouvé"
+    table_headers:
+      model_name: "Nom du modèle"
+      last_used: "Utilisé"
+      records: "Enregistrements"
+      username: "Utilisateur"
+      changes: "Changements"
+      created_at: "Date/Heure"
+      item: "Objet"
+      message: "Message"
+    actions:
+      dashboard:
+        title: "Administration"
+        menu: "Administration"
+        breadcrumb: "Administration"
+      import:
+        title: "Importer"
+        menu: "Importer"
+        breadcrumb: "Importer"
+        link: "Importer"
+        bulk_link: "Importer"
+        done: "Importé"
+      index:
+        title: "Listing des %{model_label_plural}"
+        menu: "Liste"
+        breadcrumb: "%{model_label_plural}"
+      show:
+        title: "Détails pour %{model_label} '%{object_label}'"
+        menu: "Voir"
+        breadcrumb: "%{object_label}"
+      show_in_app:
+        menu: "Voir dans l'application"
+      new:
+        title: "Création d'un(e) %{model_label}"
+        menu: "Nouveau"
+        breadcrumb: "Nouveau"
+        link: "Ajouter un(e) %{model_label}"
+        done: "créé(e)"
+      edit:
+        title: "Édition %{model_label} '%{object_label}'"
+        menu: "Édition"
+        breadcrumb: "Édition"
+        link: "Éditer ce(tte) %{model_label}"
+        done: "modifié(e)"
+      delete:
+        title: "Suppression %{model_label} '%{object_label}'"
+        menu: "Supprimer"
+        breadcrumb: "Suppression"
+        link: "Supprimer '%{object_label}'"
+        done: "supprimé(e)"
+      bulk_delete:
+        title: "Suppression de %{model_label_plural}"
+        menu: "Délétion multiple"
+        breadcrumb: "Délétion multiple"
+        bulk_link: "Supprimer les %{model_label_plural} sélectionné(e)s"
+      export:
+        title: "Export de %{model_label_plural}"
+        menu: "Export"
+        breadcrumb: "Export"
+        link: "Export des %{model_label_plural} trouvé(e)s"
+        bulk_link: "Exporter les %{model_label_plural} sélectionné(e)s"
+        done: "exporté(e)s"
+      history_index:
+        title: "Historique des %{model_label_plural}"
+        menu: "Historique"
+        breadcrumb: "Historique"
+      history_show:
+        title: "Historique %{model_label} '%{object_label}'"
+        menu: "Historique"
+        breadcrumb: "Historique"
+    form:
+      cancel: "Annuler"
+      basic_info: "Informations de base"
+      required: "Obligatoire"
+      optional: "Facultatif"
+      one_char: "caractère"
+      char_length_up_to: "longueur jusqu'à"
+      char_length_of: "longueur de"
+      save: "Enregistrer"
+      save_and_add_another: "Enregistrer et créer un(e) autre"
+      save_and_edit: "Enregistrer et re-modifier"
+      all_of_the_following_related_items_will_be_deleted: " ? Les objets suivants peuvent être affectés (supprimés ou orphelins) : "
+      are_you_sure_you_want_to_delete_the_object: "Êtes-vous sûr de vouloir supprimer cet(te) %{model_name}"
+      confirmation: "Oui, je suis sûr(e)"
+      bulk_delete: "Les objets suivants seront supprimés, ce qui pourrait supprimer ou rendre orpheline les dépendances affichées :"
+      new_model: "%{name} (nouveau)"
+    export:
+      confirmation: "Exporter en %{name}"
+      select: "Sélectionner les champs à exporter"
+      select_all_fields: "Selectionner Tous Les Champs"
+      fields_from: "Champs pour '%{name}'"
+      fields_from_associated: "Champs pour l'association '%{name}'"
+      display: "Afficher %{name} : %{type}"
+      options_for: "Options pour %{name}"
+      empty_value_for_associated_objects: "<vide>"
+      click_to_reverse_selection: 'Cliquer pour inverser la sélection'
+      csv:
+        header_for_root_methods: "%{name}" # 'model' is available
+        header_for_association_methods: "%{name} [%{association}]"
+        encoding_to: "Encoder en..."
+        encoding_to_help: "Choisir l'encodage de sortie. Laisser vide pour garder l'encodage d'entrée : (%{name})"
+        skip_header: "Pas d'en-tête"
+        skip_header_help: "Ne pas afficher d'en-tête (pas de champs de description)"
+        default_col_sep: ";"
+        col_sep: "Séparateur de colonnes"
+        col_sep_help: "Laisser vide pour utiliser la valeur par défaut recommandée pour votre système ('%{value}')"
+    import:
+      model_fields: "Champs du modèle"
+      association_fields: "Champs des associations"
+      file: "Archive des données"
+      missing_file: "Vous devez sélectionner un fichier"
+      format: "Format du fichier"
+      invalid_format: "Format d'importation invalide."
+      missing_update_lookup: "L'archive doit contenir una colonne pour le 'Champ de recherche Actualisation' que vous avez sélectionner."
+      invalid_json: "L'information JSON doit être un arrengement des registres ou un object avec une clé '%{root_key}' et un ensemble pour un arrangement des registres"
+      update_if_exists: "Actualiser si il existe"
+      update_lookup: "Champ de recherche actualisation"
+      mapping: "Calculant"
+      encoding: "Encodant"
+      legend:
+        fields: "Champs à importer"
+        upload: "Charger l'archive"
+        mapping: "Calculant les champs en relation"
+      import_success: 
+        create: "Créant %{name}"
+        update: "Actualisant %{name}"
+      import_error:
+        create: "Problème en créant %{name}: %{error}"
+        update: "Problème en actualisant %{name}: %{error}"
+        general: "Erreur durant l'importation: %{error}"
+        line_item_limit: "S'il vous plaît limitez l'archive à charger à %{limit} lignes."
+        old_import_hook: >
+          L' importation %{model}.%{method} doit prendre qu'un seul argument.
+          L'information no s'est pas importée correctement.
+          Voyez la section Actualisé dans l'archive readme.md de Rails Admin Import.
+      association_not_found: "Association pas trouvée. %{error}"
+      help:
+        model_fields: "Les champs d'en haut doivent être inclus dans l'archive d'importation."
+        association_fields: >
+          Ces champs s'égaliseront avec d'autres table dans la base de données, conformément aux atributs seleccionnés en bas.
+          Pour plusieurs asociations, vous devrez inclure de multiples colonnes avec la même en-tête dans l'archive CSV.
+        update_if_exists: "Actualiser les registres trouvés ave le champ de recherche en bas au lieu de créer de nouveaux registres."
+        file_limit: "S'il vous plaît, limitez l'archive à charger à %{limit} lignes."
+        encoding: "Choisissez l'archive pour l'encoder. Laissez en blanc pour une détection automatique. Ignoré par JSON."
+    datetime:
+    distance_in_words:
+      half_a_minute: "30 secondes"
+      less_than_x_seconds:
+        one: "il y a moins d'une seconde"
+        other: "il y a moins de %{count} secondes"
+      x_seconds:
+        one: "1 seconde"
+        other: "%{count} secondes"
+      less_than_x_minutes:
+        one: "il y a moins d'une minute"
+        other: "il y a moins de %{count} minutes"
+      x_minutes:
+        one: "1 minute"
+        other: "%{count} minutes"
+      about_x_hours:
+        one: "il y a une heure"
+        other: "il y a %{count} heures"
+      x_days:
+        one: "1 jour"
+        other: "%{count} jours"
+      about_x_months:
+        one: "il y a 1 mois"
+        other: "il y a %{count} mois"
+      x_months:
+        one: "1 mois"
+        other: "%{count} mois"
+      about_x_years:
+        one: "il y a un an"
+        other: "il y a %{count} ans"
+      over_x_years:
+        one: "il y a plus d'un an"
+        other: "il y a plus de %{count} ans"
+      almost_x_years:
+        one: "il y a presque un an"
+        other: "il y a presque %{count} ans"
+  date:
+    formats:
+      default: ! '%d/%m/%Y'
+      long: ! '%d %B %Y %H:%M %p'
+      short: ! '%d %b'
+      only_day: ! "%e"
+      very_long: '%A %d %B %Y %Hh %M'
+      middle: ! '%e %B %Y'
+      day_names: [lundi, mardi, mercredi, jeudi, vendredi, samedi, dimanche]
+      abbr_day_names: [lun, mar, mer, jeu, ven, sam, dim]
+      month_names: [~, janvier, février, mars, avril, mai, juin, juillet, août, septembre, octobre, novembre, décembre]
+      abbr_month_names: [~, janv, févr, mars, avr, mai, juin, juill, août, sept, oct, nov, déc]
+      order:
+        - :day
+        - :month
+        - :year
+        - :hour

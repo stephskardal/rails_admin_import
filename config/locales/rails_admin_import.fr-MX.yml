@@ -1,0 +1,48 @@
+fr-MX:
+  admin:
+    actions:
+      import:
+        title: "Importer"
+        menu: "Importer"
+        breadcrumb: "Importer"
+        link: "Importer"
+        bulk_link: "Importer"
+        done: "Importé"
+    import:
+      model_fields: "Champs du modèle"
+      association_fields: "Champs des associations"
+      file: "Archive des données"
+      missing_file: "Vous devez sélectionner un fichier"
+      format: "Format du fichier"
+      invalid_format: "Format d'importation invalide."
+      missing_update_lookup: "L'archive doit contenir una colonne pour le 'Champ de recherche Actualisation' que vous avez sélectionner."
+      invalid_json: "L'information JSON doit être un arrengement des registres ou un object avec une clé '%{root_key}' et un ensemble pour un arrangement des registres"
+      update_if_exists: "Actualiser si il existe"
+      update_lookup: "Champ de recherche actualisation"
+      mapping: "Calculant"
+      encoding: "Encodant"
+      legend:
+        fields: "Champs à importer"
+        upload: "Charger l'archive"
+        mapping: "Calculant les champs en relation"
+      import_success: 
+        create: "Créant %{name}"
+        update: "Actualisant %{name}"
+      import_error:
+        create: "Problème en créant %{name}: %{error}"
+        update: "Problème en actualisant %{name}: %{error}"
+        general: "Erreur durant l'importation: %{error}"
+        line_item_limit: "S'il vous plaît limitez l'archive à charger à %{limit} lignes."
+        old_import_hook: >
+          L' importation %{model}.%{method} doit prendre qu'un seul argument.
+          L'information no s'est pas importée correctement.
+          Voyez la section Actualisé dans l'archive readme.md de Rails Admin Import.
+      association_not_found: "Association pas trouvée. %{error}"
+      help:
+        model_fields: "Les champs d'en haut doivent être inclus dans l'archive d'importation."
+        association_fields: >
+          Ces champs s'égaliseront avec d'autres table dans la base de données, conformément aux atributs seleccionnés en bas.
+          Pour plusieurs asociations, vous devrez inclure de multiples colonnes avec la même en-tête dans l'archive CSV.
+        update_if_exists: "Actualiser les registres trouvés ave le champ de recherche en bas au lieu de créer de nouveaux registres."
+        file_limit: "S'il vous plaît, limitez l'archive à charger à %{limit} lignes."
+        encoding: "Choisissez l'archive pour l'encoder. Laissez en blanc pour une détection automatique. Ignoré par JSON."
