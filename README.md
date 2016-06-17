@@ -306,8 +306,7 @@ gem "rails_admin_import", "~> 1.2.0", require: "rails_admin_import/eager_load"
 
 * [Spanish translation](https://gist.github.com/yovasx2/dc0e9512e6c6243f840c) by Giovanni Alberto
 
-* [French translation](https://github.com/rodinux/rails_admin_import)
-by Rodolphe Robles
+* [French translation](https://github.com/rodinux/rails_admin_import) by Rodolphe Robles (with files for translate rails_admin.fr)
 
 ## Run tests
 
