@@ -48,4 +48,3 @@ en:
         update_if_exists: "Update records found with the lookup field below instead of creating new records"
         file_limit: "Please limit upload file to %{limit} line items."
         encoding: "Choose file encoding. Leave empty to auto-detect. Ignored for JSON."
-
