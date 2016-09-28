@@ -1,0 +1,1 @@
+See the [community contributed translation section of the README](https://github.com/stephskardal/rails_admin_import#community-contributed-translations) See the [community contributed translation section of the README](https://github.com/stephskardal/rails_admin_import#community-contributed-translations) for more languages.
