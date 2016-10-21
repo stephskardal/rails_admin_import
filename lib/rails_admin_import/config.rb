@@ -11,6 +11,8 @@ module RailsAdminImport
 
       # Default is to downcase headers and add underscores to convert into attribute names
       HEADER_CONVERTER = lambda do |header|
+        # check for nil/blank headers
+        next if header.blank?
         header.parameterize.underscore
       end
 
