@@ -308,6 +308,8 @@ gem "rails_admin_import", "~> 1.2.0", require: "rails_admin_import/eager_load"
 
 * [French translation](https://github.com/rodinux/rails_admin_import.fr-MX.yml) by Rodolphe Robles. (I suggest to translate also rails admin.fr and your locales.fr to resolve an issue with DatePicker)
 
+* [Italian translation](https://gist.github.com/aprofiti/ec3dc452898c8c48534b59eeb2701765) by Alessandro Profiti
+
 ## Run tests
 
 1. Clone the repository to your machine
