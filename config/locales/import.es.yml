@@ -1,0 +1,49 @@
+es:
+  admin:
+    actions:
+      import:
+        title: "Importar"
+        menu: "Importar"
+        breadcrumb: "Importar"
+        link: "Importar"
+        bulk_link: "Importar"
+        done: "Importado"
+    import:
+      model_fields: "Campos de model"
+      association_fields: "Campos de relación"
+
+      file: "Archivo de datos"
+      missing_file: "Debe elegir un archivo de datos"
+      format: "Formato del archivo"
+      invalid_format: "Formato invalido del archivo"
+      missing_update_lookup: "El archivo debe contener la columna la cual eligió en 'Actualizar por campo de referencia'"
+      invalid_json: "The JSON data should be an array of records or an object with a key '%{root_key}' set to an array of records"
+      update_if_exists: "Actualizar si existe"
+      update_lookup: "Actualizar por campo de referencia"
+      mapping: "mapeo"
+      encoding: "Encodificación"
+      legend:
+        fields: "Campos para importar"
+        upload: "Subir archivo"
+        mapping: "Mapeo de campos asociados"
+      import_success:
+        create: "Creado %{name}"
+        update: "Actualizado %{name}"
+      import_error:
+        create: "Hubo un error al crear %{name}: %{error}"
+        update: "Hubo un error al actualizar %{name}: %{error}"
+        general: "Error al importar: %{error}"
+        line_item_limit: "Limite el archivo a %{limit} líneas."
+        old_import_hook: >
+          The import hook %{model}.%{method} should take only 1 argument.
+          Data may not imported correctly.
+          See Upgrading section readme in Rails Admin Import.
+      association_not_found: "Asociación no encontrada. %{error}"
+      help:
+        model_fields: "Los campos de arriba pueden ser utilizados en el archivo"
+        association_fields: >
+          These fields map to other tables in the database, lookup via attribute selected below.
+          For "many" associations, you may include multiple columns with the same header in the CSV file.
+        update_if_exists: "Update records found with the lookup field below instead of creating new records"
+        file_limit: "Please limit upload file to %{limit} line items."
+        encoding: "Eliga la encodificación. Deje vacío para ser detectado automaticamente. Ignorado en caso de JSON."
