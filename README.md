@@ -310,6 +310,8 @@ gem "rails_admin_import", "~> 1.2.0", require: "rails_admin_import/eager_load"
 
 * [Italian translation](https://gist.github.com/aprofiti/ec3dc452898c8c48534b59eeb2701765) by Alessandro Profiti
 
+* [Japanese translation](https://gist.github.com/higumachan/c4bf669d6446ec509386229f916ba5fc) by Yuta Hinokuma
+
 ## Run tests
 
 1. Clone the repository to your machine
