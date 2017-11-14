@@ -33,7 +33,7 @@ module RailsAdminImport
       def convert_to_attributes(row)
         row_with_headers = @headers.zip(row)
         row_with_headers.each_with_object({}) do |(field, value), record|
-          break if field.nil?
+          next if field.nil?
           field = field.to_sym
           if import_model.has_multiple_values?(field)
             field = import_model.pluralize_field(field)
