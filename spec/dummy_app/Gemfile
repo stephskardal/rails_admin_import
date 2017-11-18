@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-gem 'rails', '~> 4.0'
+gem 'rails', '~> 5.1'
 
 group :active_record do
   case ENV['CI_DB_ADAPTER']
@@ -14,14 +14,13 @@ group :active_record do
 end
 
 group :mongoid do
-  gem 'mongoid', '~> 4.0'
+  gem 'mongoid', '~> 6.0'
 end
 
-gem 'rails_admin', '~> 0.6'
+gem 'rails_admin', '~> 1.2'
 gem 'rails_admin_import', path: '../../'
 
-gem 'sass-rails', '~> 4.0.0'
-gem 'coffee-rails', '~> 4.0.0'
+gem 'sass-rails', '~> 5.0'
 gem 'uglifier', '>= 1.3'
 
 gem 'pry-byebug'

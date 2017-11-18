@@ -6,7 +6,7 @@ describe "XLSX import", :type => :request do
   describe "for a simple model" do
     it "imports the data" do
       file = fixture_file_upload("balls.xlsx", MIME_TYPE)
-      post "/admin/ball/import", file: file
+      post "/admin/ball/import", params: { file: file }
       expect(response.body).not_to include "failed"
       expect(Ball.count).to eq 2
       expect(Ball.first.color).to eq "red"
@@ -15,7 +15,7 @@ describe "XLSX import", :type => :request do
   describe "when columns are blank" do
     it "skips the extra columns" do
       file = fixture_file_upload("balls_blank_columns.xlsx", MIME_TYPE)
-      post "/admin/ball/import", file: file
+      post "/admin/ball/import", params: { file: file }
       expect(response.body).not_to include "failed"
       expect(Ball.count).to eq 2
       expect(Ball.first.color).to eq "red"

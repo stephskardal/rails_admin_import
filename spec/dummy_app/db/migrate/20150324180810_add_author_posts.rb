@@ -1,4 +1,4 @@
-class AddAuthorPosts < ActiveRecord::Migration
+class AddAuthorPosts < ActiveRecord::Migration[5.0]
   def change
     create_table :blog_authors_posts do |t|
       t.integer :blog_author_id

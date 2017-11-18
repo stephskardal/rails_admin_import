@@ -9,7 +9,7 @@ Plugin functionality to add generic import to Rails Admin from CSV, JSON and XLS
 * First, add to Gemfile:
 
 ```
-gem "rails_admin_import", "~> 1.2"
+gem "rails_admin_import", "~> 2.0"
 ```
 
 * Define configuration in `config/initializers/rails_admin_import.rb`:

@@ -37,7 +37,7 @@ describe "Rails Admin Config" do
       FileUtils.rm_rf expected_path
 
       file = fixture_file_upload("balls.csv", "text/plain")
-      post "/admin/ball/import", file: file
+      post "/admin/ball/import", params: { file: file }
 
       logfile = Dir.glob(File.join(expected_path, "*-import.csv"))
       expect(logfile).not_to be_empty
@@ -55,7 +55,7 @@ describe "Rails Admin Config" do
       end
 
       file = fixture_file_upload('balls.csv', 'text/plain')
-      post '/admin/ball/import', file: file
+      post '/admin/ball/import', params: { file: file }
       expect(response.body).to include 'Please limit upload file to 1 line items.'
       expect(Ball.count).to eq 0
     end
@@ -73,7 +73,7 @@ describe "Rails Admin Config" do
       end
 
       file = fixture_file_upload("balls_error.csv", "text/plain")
-      post "/admin/ball/import", file: file
+      post "/admin/ball/import", params: { file: file }
       expect(response.body).to include "failed"
       expect(Ball.count).to eq 0
     end

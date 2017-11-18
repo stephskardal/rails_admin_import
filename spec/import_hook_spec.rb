@@ -7,8 +7,10 @@ describe "Import hook", :type => :request do
       people = create_people
 
       file = fixture_file_upload("company.csv", "text/plain")
-      post "/admin/company/import", file: file,
-        "associations[employees]": 'email'
+      post "/admin/company/import", params: {
+        file: file,
+        "associations[employees]": "email"
+      }
 
       expect(response.body).not_to include "failed"
       # Company.before_import_save sets source to "import"
@@ -22,8 +24,10 @@ describe "Import hook", :type => :request do
       people = create_people
 
       file = fixture_file_upload("company_skip.csv", "text/plain")
-      post "/admin/company/import", file: file,
-        "associations[employees]": 'email'
+      post "/admin/company/import", params: {
+        file: file,
+        "associations[employees]": "email"
+      }
 
       expect(response.body).not_to include "failed"
       expect(Company.count).to eq 1
@@ -36,8 +40,10 @@ describe "Import hook", :type => :request do
       people = create_people
 
       file = fixture_file_upload("company_attributes.csv", "text/plain")
-      post "/admin/company/import", file: file,
-        "associations[employees]": 'email'
+      post "/admin/company/import", params: {
+        file: file,
+        "associations[employees]": "email"
+      }
 
       expect(response.body).not_to include "failed"
       expect(Company.find_by_name("No employees").employees.count).to eq 0
@@ -52,8 +58,10 @@ describe "Import hook", :type => :request do
       people = create_people
 
       file = fixture_file_upload("company.csv", "text/plain")
-      post "/admin/company/import", file: file,
-        "associations[employees]": 'email'
+      post "/admin/company/import", params: {
+        file: file,
+        "associations[employees]": "email"
+      }
 
       expect(Company.callback_log).to eq [:before_import, :after_import]
     end

@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :child do
     factory :child_one do
       name "One"
