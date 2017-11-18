@@ -289,13 +289,28 @@ Define methods on your models to be hooked into the import process, if special/a
 # some model
 class User < ActiveRecord::Base
   def self.before_import_find(record)
-    # maybe modify the data that will be used to find the model
-    # return true to continue importing, false to skip importing this record
-    true
+    # maybe modify the import record that will be used to find the model
+    # throw :skip to skip importing this record
+    throw :skip unless record[:email].ends_with? "@mycompany.com"
+  end
+
+  def before_import_attributes(record)
+    # called on the blank new model or the found model before fields are imported
+    # maybe delete fields from the import record that you don't need
+    # throw :skip to skip importing this record
+  end
+
+  def before_import_associations(record)
+    # called on the model with attributes but before associations are imported
+    # do custom import of associations
+    # make sure to delete association fields from the import record to avoid double import
+    record.delete(:my_association)
+    # throw :skip to skip importing this record
   end
 
   def before_import_save(record)
     # modify the record before it is saved but after all fields and associations have been imported
+    # throw :skip to skip importing this record
   end
 
   def after_import_save(record)

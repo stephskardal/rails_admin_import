@@ -26,7 +26,9 @@ module RailsAdminImport
 
         with_transaction do
           records.each do |record|
-            import_record(record)
+            catch :skip do
+              import_record(record)
+            end
           end
 
           rollback_if_error
@@ -65,16 +67,18 @@ module RailsAdminImport
     end
 
     def import_record(record)
-      return unless perform_model_callback(import_model.model, :before_import_find, record)
+      perform_model_callback(import_model.model, :before_import_find, record)
 
       if update_lookup && !(update_lookup - record.keys).empty?
         raise UpdateLookupError, I18n.t("admin.import.missing_update_lookup")
       end
 
       object = find_or_create_object(record, update_lookup)
+      return if object.nil?
       action = object.new_record? ? :create : :update
 
       begin
+        perform_model_callback(object, :before_import_associations, record)
         import_single_association_data(object, record)
         import_many_association_data(object, record)
       rescue AssociationNotFound => e
@@ -181,15 +185,18 @@ module RailsAdminImport
 
       model = import_model.model
       object = if update.present?
-                 # => loop through update array building query hash for all fields
-                 query = {}
-                 update.each do |field|   query[field] = record[field]    end
+                 query = update.each_with_object({}) do
+                   |field, query| query[field] = record[field]
+                 end
                  model.where(query).first
                end
 
       if object.nil?
-        object = model.new(new_attrs)
+        object = model.new
+        perform_model_callback(object, :before_import_attributes, record)
+        object.attributes = new_attrs
       else
+        perform_model_callback(object, :before_import_attributes, record)
         object.attributes = new_attrs.except(update.map(&:to_sym))
       end
       object
