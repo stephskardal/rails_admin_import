@@ -30,7 +30,7 @@
     .form-group.control-group
       %label.col-sm-2.control-label= t("admin.import.update_if_exists")
       .col-sm-10.controls
-        = check_box_tag :update_if_exists, '1', false, :class => "form-control"
+        = check_box_tag :update_if_exists, '1', RailsAdminImport.config.update_if_exists, :class => "form-control"
         %p.help-block= t('admin.import.help.update_if_exists')
     .form-group.control-group
       %label.col-sm-2.control-label{for: "update_lookup"}= t("admin.import.update_lookup")

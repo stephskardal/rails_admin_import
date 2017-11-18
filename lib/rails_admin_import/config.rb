@@ -6,6 +6,7 @@ module RailsAdminImport
       attr_accessor :logging
       attr_accessor :line_item_limit
       attr_accessor :rollback_on_error
+      attr_accessor :update_if_exists
       attr_accessor :header_converter
       attr_accessor :csv_options
 
@@ -33,6 +34,7 @@ module RailsAdminImport
         @logging = false
         @line_item_limit = 1000
         @rollback_on_error = false
+        @update_if_exists = false
         @header_converter = HEADER_CONVERTER
         @csv_options = {}
       end

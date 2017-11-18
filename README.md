@@ -192,6 +192,7 @@ RailsAdmin.config do |config|
   config.configure_with(:import) do |config|
     config.logging = false
     config.line_item_limit = 1000
+    config.update_if_exists = false
     config.rollback_on_error = false
     config.header_converter = lambda do |header|
       # check for nil/blank headers
@@ -206,6 +207,8 @@ end
 * __logging__ (default `false`): Save a copy of each imported file to log/import and a detailed import log to log/rails_admin_import.log
 
 * __line_item_limit__ (default `1000`): max number of items that can be imported at one time.
+
+* __update_if_exists__ (default `false`): default value for the "Update if exists" checkbox on the import page.
 
 * __rollback_on_error__ (default `false`): import records in a transaction and rollback if there is one error. Only for ActiveRecord, not Mongoid.
 
@@ -288,7 +291,12 @@ Define methods on your models to be hooked into the import process, if special/a
 ```ruby
 # some model
 class User < ActiveRecord::Base
+  def self.before_import
+    # called on the model class once before importing any individual records
+  end
+
   def self.before_import_find(record)
+    # called on the model class before finding or creating the new record
     # maybe modify the import record that will be used to find the model
     # throw :skip to skip importing this record
     throw :skip unless record[:email].ends_with? "@mycompany.com"
@@ -309,12 +317,25 @@ class User < ActiveRecord::Base
   end
 
   def before_import_save(record)
-    # modify the record before it is saved but after all fields and associations have been imported
+    # called on the model before it is saved but after all fields and associations have been imported
+    # make final modifications to the record
     # throw :skip to skip importing this record
   end
 
   def after_import_save(record)
-    # post-process the model after it is saved
+    # called on the model after it is saved
+  end
+
+  def after_import_association_error(record)
+    # called on the model when an association cannot be found
+  end
+
+  def after_import_error(record)
+    # called on the model when save fails
+  end
+
+  def self.after_import
+    # called once on the model class after importing all individual records
   end
 end
 ```
@@ -330,6 +351,29 @@ def before_import_save(record)
   self.remote_image_url = record[:image] if record[:image].present?  
 end
 ```
+
+* Skip some validations when importing.
+
+```
+class User < ActiveRecord::Base
+  # Non-persistent attribute to allow creating a new user without a password
+  # Password will be set by the user by following a link in the invitation email
+  attr_accessor :allow_blank_password
+
+  devise :validatable
+
+  # Called by Devise to enable/disable password presence validation
+  def password_required?
+    allow_blank_password ? false : super
+  end
+
+  # Don't require a password when importing users
+  def before_import_save(record)
+    self.allow_blank_password = true
+  end
+end
+```
+
 
 ## ORM: ActiveRecord and Mongoid
 
@@ -351,6 +395,19 @@ gem "rails_admin_import", "~> 1.2.0", require: "rails_admin_import/eager_load"
 ## Import error due to Rails class reloading
 
 If you get an error like `Error during import: MyModel(#70286054976500) expected, got MyModel(#70286114743280)`, you need restart the rails server and redo the import. This is due to the fact that Rails reloads the ActiveRecord model classes in development when you make changes to them and Rails Admin is still using the old class.
+
+## Customize the UI
+
+If you want to hide all the advanced fields from the import UI, you can copy [`app/views/rails_admin/main/import.html.haml`](app/views/rails_admin/main/import.html.haml) to your project at the same path. Add `.hidden` at the end of lines you want to hide.
+
+For example:
+```
+    .form-group.control-group.hidden
+      %label.col-sm-2.control-label= t("admin.import.update_if_exists")
+      .col-sm-10.controls
+        = check_box_tag :update_if_exists, '1', true, :class => "form-control"
+        %p.help-block= t('admin.import.help.update_if_exists')
+```
 
 ## Upgrading
 

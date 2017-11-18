@@ -18,4 +18,18 @@ class Company
   def before_import_save(record)
     self.source = "import"
   end
+
+  # Global hooks
+  def self.callback_log
+    @callbacks
+  end
+  def self.reset_callback_log
+    @callbacks = []
+  end
+  def self.before_import
+    @callbacks << :before_import
+  end
+  def self.after_import
+    @callbacks << :after_import
+  end
 end

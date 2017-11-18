@@ -16,13 +16,14 @@ module RailsAdminImport
       begin
         init_results
 
-
         if records.count > RailsAdminImport.config.line_item_limit
           return results = {
             success: [],
             error: [I18n.t('admin.import.import_error.line_item_limit', limit: RailsAdminImport.config.line_item_limit)]
           }
         end
+
+        perform_global_callback(:before_import)
 
         with_transaction do
           records.each do |record|
@@ -33,6 +34,8 @@ module RailsAdminImport
 
           rollback_if_error
         end
+
+        perform_global_callback(:after_import)
       rescue Exception => e
         report_general_error("#{e} (#{e.backtrace.first})")
       end
@@ -84,6 +87,7 @@ module RailsAdminImport
       rescue AssociationNotFound => e
         error = I18n.t("admin.import.association_not_found", :error => e.to_s)
         report_error(object, action, error)
+        perform_model_callback(object, :after_import_association_error, record)
         return
       end
 
@@ -94,6 +98,7 @@ module RailsAdminImport
         perform_model_callback(object, :after_import_save, record)
       else
         report_error(object, action, object.errors.full_messages.join(", "))
+        perform_model_callback(object, :after_import_error, record)
       end
     end
 
@@ -162,8 +167,6 @@ module RailsAdminImport
         else
           object.send(method_name, record)
         end
-      else
-        true
       end
     end
 
@@ -175,6 +178,11 @@ module RailsAdminImport
         report_general_error(error)
         @old_import_hook_reported = true
       end
+    end
+
+    def perform_global_callback(method_name)
+      object = import_model.model
+      object.send(method_name) if object.respond_to?(method_name)
     end
 
     def find_or_create_object(record, update)

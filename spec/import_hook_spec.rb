@@ -43,4 +43,19 @@ describe "Import hook", :type => :request do
       expect(Company.find_by_name("No employees").employees.count).to eq 0
     end
   end
+
+  describe "global hooks" do
+    it "are called" do
+      Company.reset_callback_log
+
+      # Add people from support/associations.rb to the database
+      people = create_people
+
+      file = fixture_file_upload("company.csv", "text/plain")
+      post "/admin/company/import", file: file,
+        "associations[employees]": 'email'
+
+      expect(Company.callback_log).to eq [:before_import, :after_import]
+    end
+  end
 end
