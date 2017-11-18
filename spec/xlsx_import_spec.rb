@@ -13,7 +13,7 @@ describe "XLSX import", :type => :request do
     end
   end
   describe "when columns are blank" do
-    it "ignores the extra columns" do
+    it "skips the extra columns" do
       file = fixture_file_upload("balls_blank_columns.xlsx", MIME_TYPE)
       post "/admin/ball/import", file: file
       expect(response.body).not_to include "failed"
