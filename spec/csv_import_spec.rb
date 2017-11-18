@@ -10,6 +10,14 @@ describe "CSV import", :type => :request do
       expect(Ball.first.color).to eq "red"
     end
 
+    it "skips blank rows while importing the data" do
+      file = fixture_file_upload("balls_blank_row.csv", "text/plain")
+      post "/admin/ball/import", file: file
+      expect(response.body).not_to include "failed"
+      expect(Ball.count).to eq 2
+      expect(Ball.first.color).to eq "red"
+    end
+
     describe "update_if_exists" do
       context "single update lookup key" do
         it "updates the records if they exist" do

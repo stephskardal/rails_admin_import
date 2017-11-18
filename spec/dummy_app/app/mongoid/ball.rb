@@ -3,5 +3,5 @@ class Ball
   include Mongoid::Timestamps
 
   field :color, type: String
-  validates_presence_of :color, on: :create
+  validates :color, presence: true, exclusion: %w(forbidden)
 end

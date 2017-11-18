@@ -1,3 +1,3 @@
 class Ball < ActiveRecord::Base
-  validates_presence_of :color
+  validates :color, presence: true, exclusion: %w(forbidden)
 end

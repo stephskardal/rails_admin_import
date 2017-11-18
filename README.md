@@ -161,6 +161,8 @@ Peter,Gibbons,IT,Management
 Michael,Bolton,IT,
 ```
 
+Blank lines will be skipped.
+
 #### JSON
 
 The file must be an array or an object with a root key the same name as the plural model name, i.e. the default Rails JSON output format with include_root_in_json on or off.
@@ -170,6 +172,8 @@ The file must be an array or an object with a root key the same name as the plur
 The Microsoft Excel XLM format (XLSX) is supported, but not the old binary Microsoft Excel format (XLS).
 
 The expected rows and columns are the same as for the CSV format (first line contains headers, multiple columns for "many" associations).
+
+Blank lines will be skipped.
 
 ## Configuration
 

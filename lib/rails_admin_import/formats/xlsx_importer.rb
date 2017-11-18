@@ -19,7 +19,8 @@ module RailsAdminImport
         sheet = doc.sheets.first
         @headers = convert_headers(sheet.headers)
         sheet.data.each do |row|
-          yield convert_to_attributes(row)
+          attr = convert_to_attributes(row)
+          yield attr unless attr.all? { |field, value| value.blank? }
         end
       end
 
