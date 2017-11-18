@@ -65,6 +65,8 @@ module RailsAdminImport
     end
 
     def import_record(record)
+      return unless perform_model_callback(import_model.model, :before_import_find, record)
+
       if update_lookup && !(update_lookup - record.keys).empty?
         raise UpdateLookupError, I18n.t("admin.import.missing_update_lookup")
       end
@@ -156,6 +158,8 @@ module RailsAdminImport
         else
           object.send(method_name, record)
         end
+      else
+        true
       end
     end
 

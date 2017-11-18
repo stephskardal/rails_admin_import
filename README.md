@@ -283,18 +283,23 @@ end
 
 ## Import hooks
 
-
-Define instance methods on your models to be hooked into the import process, if special/additional processing is required on the data:
+Define methods on your models to be hooked into the import process, if special/additional processing is required on the data:
 
 ```ruby
 # some model
 class User < ActiveRecord::Base
+  def self.before_import_find(record)
+    # maybe modify the data that will be used to find the model
+    # return true to continue importing, false to skip importing this record
+    true
+  end
+
   def before_import_save(record)
-    # Your custom special sauce
+    # modify the record before it is saved but after all fields and associations have been imported
   end
 
   def after_import_save(record)
-    # Your custom special sauce
+    # post-process the model after it is saved
   end
 end
 ```
