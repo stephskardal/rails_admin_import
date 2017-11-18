@@ -181,6 +181,28 @@ Blank lines will be skipped.
 
 ### Global configuration options
 
+```ruby
+RailsAdmin.config do |config|
+  config.actions do
+    all
+    import
+  end
+
+  # Default global RailsAdminImport options
+  config.configure_with(:import) do |config|
+    config.logging = false
+    config.line_item_limit = 1000
+    config.rollback_on_error = false
+    config.header_converter = lambda do |header|
+      # check for nil/blank headers
+      next if header.blank?
+      header.parameterize.underscore
+    end
+    config.csv_options = {}
+  end
+end
+```
+
 * __logging__ (default `false`): Save a copy of each imported file to log/import and a detailed import log to log/rails_admin_import.log
 
 * __line_item_limit__ (default `1000`): max number of items that can be imported at one time.
