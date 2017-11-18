@@ -300,6 +300,10 @@ If you prefer to eager load all dependecies at boot, use this line in your `Gemf
 gem "rails_admin_import", "~> 1.2.0", require: "rails_admin_import/eager_load"
 ```
 
+## Import error due to Rails class reloading
+
+If you get an error like `Error during import: MyModel(#70286054976500) expected, got MyModel(#70286114743280)`, you need restart the rails server and redo the import. This is due to the fact that Rails reloads the ActiveRecord model classes in development when you make changes to them and Rails Admin is still using the old class.
+
 ## Upgrading
 
 * Move global config to `config.configure_with(:import)` in `config/initializers/rails_admin_import.rb`.
