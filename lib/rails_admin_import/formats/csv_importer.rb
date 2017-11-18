@@ -4,6 +4,7 @@ module RailsAdminImport
   module Formats
     class CSVImporter < FileImporter
       Formats.register(:csv, self)
+      Formats.register(:CSV, self)
 
       autoload :CharDet, "rchardet"
 

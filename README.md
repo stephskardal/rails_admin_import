@@ -60,9 +60,10 @@ Both updating existing records and associating records requires the use of
 ### Mapping Keys
 
 Every importable class has a mapping key that uniquely identifies its
-instances. The value for this field can then be provided in import data, either
-to update the existing record or to attach it through an association to another
-model. This concept exists because `id`s are often not constant when moving
+instances. The mapping key can be one or more fields. The value for
+these fields can then be provided in import data, either to update the
+existing record or to attach it through an association to another model.
+This concept exists because `id`s are often not constant when moving
 records between data stores.
 
 For example, a `User` model may have an `email` field. When uploading a set
@@ -78,6 +79,9 @@ michael.bolton@initech.com,Michael,Bolton
 ```
 would look for existing users with those emails. If one was found, its name
 fields would be updated. Otherwise, a new one would be created.
+
+For updating building owners, the mapping key could be `street_address` and
+`zip_code`.
 
 Similarly, if each user has favorite books, we could set the mapping key
 for `Book` to be `isbn` and then include the isbn for their books within each
@@ -102,13 +106,19 @@ RailsAdmin.config do |config|
   config.model 'User' do
     import do
       mapping_key :email
+      # for multiple values, use mapping_key [:first_name, :last_name]
+      mapping_key_list [:email, :some_other_id]
     end
   end
 end
 ```
 
+Since in models with large number of fields it doesn't make sense to use
+most of them as mapping values, you can add `mapping_key_list` to
+restrict which fields can be selected as mapping key in the UI during import.
+
 Note that a matched record must exist when attaching associated models, or the
- imported record will fail and be skipped.
+imported record will fail and be skipped.
 
 Complex associations (`has_one ..., :through` or polymorphic associations)
 need to be dealt with via custom logic called by one of the import hooks
@@ -237,7 +247,7 @@ end
 RailsAdmin.config do |config|
   config.model 'User' do
     import do
-      default_excluded_fields [:created_at, :updated_at]
+      default_excluded_fields [:created_at, :updated_at, :deleted_at, :c_at, :u_at]
     end
   end
 end
@@ -301,7 +311,7 @@ gem "rails_admin_import", "~> 1.2.0", require: "rails_admin_import/eager_load"
 * Update model import hooks to take 1 hash argument instead of 2 arrays with values and headers.
 
 * Support for importing file attributes was removed since I couldn't understand how it works. It should be possible to reimplement it yourself using post import hooks. Open an issue to discuss how to put back support for importing files into the gem.
- 
+
 ## Community-contributed translations
 
 * [Spanish translation](https://gist.github.com/yovasx2/dc0e9512e6c6243f840c) by Giovanni Alberto

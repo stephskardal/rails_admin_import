@@ -37,6 +37,18 @@ FactoryGirl.define do
       last_name "Three"
       email "three@example.com"
     end
+
+    factory :person_jane_doe do
+      first_name "Jane"
+      last_name "Doe"
+      email "jane.doe@example.com"
+    end
+
+    factory :person_jane_smith do
+      first_name "Jane"
+      last_name "Smith"
+      email "jane.smith@example.com"
+    end
   end
 
   factory :blog_author, :class => Blog::Author do

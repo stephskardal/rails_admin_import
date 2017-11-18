@@ -37,7 +37,9 @@
       .col-sm-10.controls
         = select_tag 'update_lookup',
           options_for_select(@import_model.update_lookup_field_names,
-          @import_model.config.mapping_key.to_s), data: { enumeration: true }
+            Array.wrap(@import_model.config.mapping_key).map(&:to_s)),
+          multiple: true,
+          data: { enumeration: true }
 
   - unless @import_model.association_fields.empty?
     %fieldset
@@ -53,7 +55,8 @@
           .col-sm-10.controls
             = select_tag "associations[#{field.name}]",
               options_for_select(@import_model.associated_model_fields(field),
-              @import_model.associated_config(field).mapping_key.to_s), data: { enumeration: true }
+                Array.wrap(@import_model.associated_config(field).mapping_key).first.to_s),
+              data: { enumeration: true }
 
   %br
   .form-actions

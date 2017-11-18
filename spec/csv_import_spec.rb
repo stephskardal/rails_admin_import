@@ -11,30 +11,63 @@ describe "CSV import", :type => :request do
     end
 
     describe "update_if_exists" do
-      it "updates the records if they exist" do
-        person = FactoryGirl.create(:person_one)
+      context "single update lookup key" do
+        it "updates the records if they exist" do
+          person = FactoryGirl.create(:person_one)
 
-        file = fixture_file_upload("person_update.csv", "text/plain")
-        post "/admin/person/import", file: file,
-          "update_if_exists": "1",
-          "update_lookup": "email",
-          "associations[employee]": "name"
+          file = fixture_file_upload("person_update.csv", "text/plain")
+          post "/admin/person/import", file: file,
+            "update_if_exists": "1",
+            "update_lookup": ["email"],
+            "associations[employee]": "name"
 
-        expect(response.body).not_to include "failed"
-        expect(Person.first.full_name).to match "John Snow"
-        expect(Person.count).to eq 1
+          expect(response.body).not_to include "failed"
+          expect(Person.first.full_name).to match "John Snow"
+          expect(Person.count).to eq 1
+        end
+
+        it "creates the records if they don't exist" do
+          file = fixture_file_upload("person_update.csv", "text/plain")
+          post "/admin/person/import", file: file,
+            "update_if_exists": "1",
+            "update_lookup": ["email"],
+            "associations[employee]": "name"
+
+          expect(response.body).not_to include "failed"
+          expect(Person.first.full_name).to match "John Snow"
+          expect(Person.count).to eq 1
+        end
       end
+      context "multiple update lookup key" do
+        it "updates the records if they exist" do
+          jane_doe = FactoryGirl.create(:person_jane_doe)
+          jane_smith = FactoryGirl.create(:person_jane_smith)
 
-      it "creates the records if they don't exist" do
-        file = fixture_file_upload("person_update.csv", "text/plain")
-        post "/admin/person/import", file: file,
-          "update_if_exists": "1",
-          "update_lookup": "email",
-          "associations[employee]": "name"
+          file = fixture_file_upload("person_jane_update.csv", "text/plain")
+          post "/admin/person/import", file: file,
+            "update_if_exists": "1",
+            "update_lookup": ["first_name", "last_name"],
+            "associations[employee]": "name"
 
-        expect(response.body).not_to include "failed"
-        expect(Person.first.full_name).to match "John Snow"
-        expect(Person.count).to eq 1
+          expect(response.body).not_to include "failed"
+          expect(Person.first.email).to match "jane.doe@gmail.com"
+          expect(Person.second.email).to match "jane.smith@example.com"
+          expect(Person.count).to eq 2
+        end
+
+        it "creates the records if they don't exist" do
+          jane_smith = FactoryGirl.create(:person_jane_smith)
+          file = fixture_file_upload("person_jane_update.csv", "text/plain")
+          post "/admin/person/import", file: file,
+            "update_if_exists": "1",
+            "update_lookup": ["first_name", "last_name"],
+            "associations[employee]": "name"
+
+          expect(response.body).not_to include "failed"
+          expect(Person.first.email).to match "jane.smith@example.com"
+          expect(Person.second.email).to match "jane.doe@gmail.com"
+          expect(Person.count).to eq 2
+        end
       end
     end
 
@@ -61,7 +94,7 @@ describe "CSV import", :type => :request do
       file = fixture_file_upload("child_update.csv", "text/plain")
       post "/admin/child/import", file: file,
         "update_if_exists": "1",
-        "update_lookup": "parent_id",
+        "update_lookup": ["parent_id"],
         "associations[parent]": "name"
 
       expect(response.body).not_to include "failed"

@@ -2,6 +2,7 @@ module RailsAdminImport
   module Formats
     class JSONImporter < FileImporter
       Formats.register(:json, self)
+      Formats.register(:JSON, self)
 
       # A method that yields a hash of attributes for each record to import
       def each_record

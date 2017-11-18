@@ -4,6 +4,7 @@ module RailsAdminImport
   module Formats
     class XLSXImporter < FileImporter
       Formats.register(:xlsx, self)
+      Formats.register(:XLSX, self)
 
       autoload :SimpleXlsxReader, "simple_xlsx_reader"
 
