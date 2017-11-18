@@ -141,6 +141,8 @@ class Service < ActiveRecord::Base
 end
 ```
 
+Importing new records by id is not recommended since it ignores the sequences of ids in database. That will lead to `ERROR: duplicate key value violates unique constraint` in future. You can work around this issue by adding an `import_id` column to your model, renaming the `id` column in your CSV to `import_id` and using `import_id` as the update lookup field.
+
 ### File format
 
 The format is inferred by the extension (.csv, .json or .xlsx).
