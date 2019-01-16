@@ -26,8 +26,10 @@ RailsAdmin.config do |config|
 
   # Optional:
   # Configure global RailsAdminImport options
+  # Configure pass filename to records hashes
   config.configure_with(:import) do |config|
     config.logging = true
+    config.pass_filename = true
   end
 
   # Optional:
@@ -193,6 +195,7 @@ RailsAdmin.config do |config|
     config.logging = false
     config.line_item_limit = 1000
     config.update_if_exists = false
+    config.pass_filename = false
     config.rollback_on_error = false
     config.header_converter = lambda do |header|
       # check for nil/blank headers
