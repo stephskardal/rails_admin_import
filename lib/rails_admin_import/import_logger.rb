@@ -7,7 +7,7 @@ module RailsAdminImport
         @logger = Logger.new(File.join(Rails.root, "log", log_file_name))
       end
     end
-    
+
     def info(message)
       if RailsAdminImport.config.logging
         @logger.info message

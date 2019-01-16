@@ -70,6 +70,10 @@ module RailsAdminImport
     end
 
     def import_record(record)
+      if params["file"] && RailsAdminImport.config.pass_filename
+        record.merge!({:filename_importer => params[:file].original_filename})
+      end
+
       perform_model_callback(import_model.model, :before_import_find, record)
 
       if update_lookup && !(update_lookup - record.keys).empty?

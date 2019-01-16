@@ -9,6 +9,7 @@ module RailsAdminImport
       attr_accessor :update_if_exists
       attr_accessor :header_converter
       attr_accessor :csv_options
+      attr_accessor :pass_filename
 
       # Default is to downcase headers and add underscores to convert into attribute names
       HEADER_CONVERTER = lambda do |header|
@@ -36,6 +37,7 @@ module RailsAdminImport
         @rollback_on_error = false
         @update_if_exists = false
         @header_converter = HEADER_CONVERTER
+        @pass_filename = false
         @csv_options = {}
       end
     end
