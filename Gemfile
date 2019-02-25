@@ -21,7 +21,7 @@ end
 group :test do
   gem 'rspec', '~> 3.0'
   gem 'rspec-rails', '~> 3.0'
-  gem 'factory_bot_rails'
+  gem 'factory_bot_rails', '~> 4.8'
   gem 'database_cleaner'
 end
 
