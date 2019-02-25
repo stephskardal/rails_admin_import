@@ -218,6 +218,7 @@ end
 * __header_converter__ (default `lambda { ... }`): a lambda to convert each CSV header text string to a model attribute name. The default header converter converts to lowercase and replaces spaces with underscores.
 
 * __csv_options__ (default `{}`): a hash of options that will be passed to a new [CSV](http://ruby-doc.org/stdlib-2.0.0/libdoc/csv/rdoc/CSV.html) instance
+* __pass_filename__ (default `false`): Access the uploaded file name in your model actions, for example if set to true, inside each record, there will be an addtional property `record[:filename_importer]` which contains the file name of the currently uploaded file.
 
 ### Model-specific configuration
 
