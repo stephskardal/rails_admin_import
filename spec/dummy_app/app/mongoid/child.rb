@@ -3,5 +3,5 @@ class Child
   include Mongoid::Timestamps
 
   field :name, type: String
-  belongs_to :parent
+  belongs_to :parent, optional: true
 end
