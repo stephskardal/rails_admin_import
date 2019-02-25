@@ -431,6 +431,8 @@ For example:
 
 * [Japanese translation](https://gist.github.com/higumachan/c4bf669d6446ec509386229f916ba5fc) by Yuta Hinokuma
 
+* [Brazilian Portuguese translation](https://gist.github.com/tteurs/5a87ff4bc5f24692dab05b3cde0ca9df) by Matheo Gracia Pegoraro
+
 ## Run tests
 
 1. Clone the repository to your machine
