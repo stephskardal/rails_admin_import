@@ -10,11 +10,11 @@ when 'mongoid'
 else
   case ENV['CI_DB_ADAPTER']
   when 'mysql2'
-    gem 'mysql2', '~> 0.3.14'
+    gem 'mysql2', '~> 0.4.4'
   when 'postgresql'
     gem 'pg', '>= 0.14'
   else
-    gem 'sqlite3', '>= 1.3'
+    gem 'sqlite3', '~> 1.3.13'
   end
 end
 
