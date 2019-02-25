@@ -9,7 +9,7 @@ Plugin functionality to add generic import to Rails Admin from CSV, JSON and XLS
 * First, add to Gemfile:
 
 ```
-gem "rails_admin_import", "~> 2.1"
+gem "rails_admin_import", "~> 2.2"
 ```
 
 * Define configuration in `config/initializers/rails_admin_import.rb`:
@@ -398,7 +398,11 @@ gem "rails_admin_import", "~> 1.2.0", require: "rails_admin_import/eager_load"
 
 ## Import error due to Rails class reloading
 
+![error due to class reloading](https://user-images.githubusercontent.com/2566348/51355874-0f83ad00-1a7e-11e9-8e58-46bc4699f2e6.jpg)
+
 If you get an error like `Error during import: MyModel(#70286054976500) expected, got MyModel(#70286114743280)`, you need restart the rails server and redo the import. This is due to the fact that Rails reloads the ActiveRecord model classes in development when you make changes to them and Rails Admin is still using the old class.
+
+Another suggestion is to set `config.cache_classes = true` to true in your `development.rb` for Rails Admin Import to work around the ActiveRecord model class reloading issue. See [this comment](https://github.com/stephskardal/rails_admin_import/issues/88#issuecomment-455374671) for more information.
 
 ## Customize the UI
 
@@ -434,6 +438,8 @@ For example:
 * [Italian translation](https://gist.github.com/aprofiti/ec3dc452898c8c48534b59eeb2701765) by Alessandro Profiti
 
 * [Japanese translation](https://gist.github.com/higumachan/c4bf669d6446ec509386229f916ba5fc) by Yuta Hinokuma
+
+* [Brazilian Portuguese translation](https://gist.github.com/tteurs/5a87ff4bc5f24692dab05b3cde0ca9df) by Matheo Gracia Pegoraro
 
 ## Run tests
 
