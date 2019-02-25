@@ -394,7 +394,11 @@ gem "rails_admin_import", "~> 1.2.0", require: "rails_admin_import/eager_load"
 
 ## Import error due to Rails class reloading
 
+![error due to class reloading](https://user-images.githubusercontent.com/2566348/51355874-0f83ad00-1a7e-11e9-8e58-46bc4699f2e6.jpg)
+
 If you get an error like `Error during import: MyModel(#70286054976500) expected, got MyModel(#70286114743280)`, you need restart the rails server and redo the import. This is due to the fact that Rails reloads the ActiveRecord model classes in development when you make changes to them and Rails Admin is still using the old class.
+
+Another suggestion is to set `config.cache_classes = true` to true in your `development.rb` for Rails Admin Import to work around the ActiveRecord model class reloading issue. See [this comment](https://github.com/stephskardal/rails_admin_import/issues/88#issuecomment-455374671) for more information.
 
 ## Customize the UI
 
