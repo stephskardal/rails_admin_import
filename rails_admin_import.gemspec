@@ -15,6 +15,6 @@ Gem::Specification.new do |s|
 
   s.add_dependency 'rails', '>= 3.2'
   s.add_dependency 'rails_admin', '>= 0.6.6'
-  s.add_dependency 'rchardet', '~> 1.6'
+  s.add_dependency 'charlock_holmes', '~> 0.6'
   s.add_dependency 'simple_xlsx_reader', '~> 1.0'
 end
