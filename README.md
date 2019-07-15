@@ -195,9 +195,7 @@ RailsAdmin.config do |config|
     config.update_if_exists = false
     config.rollback_on_error = false
     config.header_converter = lambda do |header|
-      # check for nil/blank headers
-      next if header.blank?
-      header.parameterize.underscore
+      header.parameterize.underscore if header.present?
     end
     config.csv_options = {}
   end
