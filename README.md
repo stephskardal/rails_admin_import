@@ -8,7 +8,7 @@ Plugin functionality to add generic import to Rails Admin from CSV, JSON and XLS
 
 * First, add to Gemfile:
 
-```
+```sh
 gem "rails_admin_import", "~> 2.2"
 ```
 
@@ -101,7 +101,7 @@ would look up books with those ISBNs and attach them to those users.
 Mapping keys can be selected on the import page. Their defaults can also be
 globally configured in the config file:
 
-```
+```ruby
 RailsAdmin.config do |config|
   config.model 'User' do
     import do
@@ -128,7 +128,7 @@ existed through an intermediary model called `ServiceProvider`, we could
 provide a `user_email` field in our records and handle the actual
 association with an import hook:
 
-```
+```ruby
 class Service < ActiveRecord::Base
   belongs_to :service_provider
   has_one :user, through: :service_provider
@@ -346,7 +346,7 @@ For example, you could
 
 * Import an image into Carrierwave via a URL provided in the CSV.
 
-```
+```ruby
 def before_import_save(record)
   self.remote_image_url = record[:image] if record[:image].present?  
 end
@@ -354,7 +354,7 @@ end
 
 * Skip some validations when importing.
 
-```
+```ruby
 class User < ActiveRecord::Base
   # Non-persistent attribute to allow creating a new user without a password
   # Password will be set by the user by following a link in the invitation email
@@ -388,7 +388,7 @@ Since the import functionality is rarely used in many applications, some gems ar
 
 If you prefer to eager load all dependecies at boot, use this line in your `Gemfile`.
 
-```
+```ruby
 gem "rails_admin_import", "~> 1.2.0", require: "rails_admin_import/eager_load"
 ```
 
@@ -405,7 +405,7 @@ Another suggestion is to set `config.cache_classes = true` to true in your `deve
 If you want to hide all the advanced fields from the import UI, you can copy [`app/views/rails_admin/main/import.html.haml`](app/views/rails_admin/main/import.html.haml) to your project at the same path. Add `.hidden` at the end of lines you want to hide.
 
 For example:
-```
+```haml
     .form-group.control-group.hidden
       %label.col-sm-2.control-label= t("admin.import.update_if_exists")
       .col-sm-10.controls
