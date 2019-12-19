@@ -1,5 +1,5 @@
 PATH
-  remote: ../../
+  remote: ../..
   specs:
     rails_admin_import (2.1.0)
       charlock_holmes (~> 0.6)
@@ -123,7 +123,7 @@ GEM
     pry-byebug (3.7.0)
       byebug (~> 11.0)
       pry (~> 0.10)
-    rack (2.0.6)
+    rack (2.0.8)
     rack-pjax (1.0.0)
       nokogiri (~> 1.5)
       rack (>= 1.1)
