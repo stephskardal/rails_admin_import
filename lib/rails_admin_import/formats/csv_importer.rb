@@ -44,6 +44,8 @@ module RailsAdminImport
             detect_encoding
           end
 
+        from_encoding = "bom|" + from_encoding if from_encoding.start_with?("UTF-")
+
         to_encoding = import_model.abstract_model.encoding
 
         if from_encoding && from_encoding != to_encoding
