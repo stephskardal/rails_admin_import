@@ -1,50 +1,53 @@
-
 en:
   admin:
     actions:
       import:
-        title: "Import"
-        menu: "Import"
-        breadcrumb: "Import"
-        link: "Import"
-        bulk_link: "Import"
-        done: "Imported"
+        breadcrumb: Import
+        bulk_link: Import
+        done: Imported
+        link: Import
+        menu: Import
+        title: Import
     import:
-      model_fields: "Model fields"
-      association_fields: "Association fields"
-
-      file: "Data file"
-      missing_file: "You must select a file"
-      format: "File format"
-      invalid_format: "Invalid import format."
-      missing_update_lookup: "Your file must contain a column for the 'Update lookup field' you selected."
-      invalid_json: "The JSON data should be an array of records or an object with a key '%{root_key}' set to an array of records"
-      update_if_exists: "Update if exists"
-      update_lookup: "Update lookup field(s)"
-      mapping: "mapping"
-      encoding: "Encoding"
-      legend:
-        fields: "Fields to import"
-        upload: "Upload file"
-        mapping: "Related fields mapping"
-      import_success:
-        create: "Created %{name}"
-        update: "Updated %{name}"
-      import_error:
-        create: "Failed to create %{name}: %{error}"
-        update: "Failed to update %{name}: %{error}"
-        general: "Error during import: %{error}"
-        line_item_limit: "Please limit upload file to %{limit} line items."
-        old_import_hook: >
-          The import hook %{model}.%{method} should take only 1 argument.
-          Data may not imported correctly.
-          See Upgrading section readme in Rails Admin Import.
-      association_not_found: "Association not found. %{error}"
+      association_fields: Association fields
+      association_not_found: 'Association not found. %{error}'
+      encoding: Encoding
+      enumeration:
+        add: Add new
+        choose_all: Choose all
+        clear_all: Clear all
+        down: Down
+        remove: Remove
+        search: Search
+        up: Up
+      file: Data file
+      format: File format
       help:
-        model_fields: "The fields above may be included in the import file."
-        association_fields: >
-          These fields map to other tables in the database, lookup via attribute selected below.
-          For "many" associations, you may include multiple columns with the same header in the CSV file.
-        update_if_exists: "Update records found with the lookup field below instead of creating new records"
-        file_limit: "Please limit upload file to %{limit} line items."
-        encoding: "Choose file encoding. Leave empty to auto-detect. Ignored for JSON."
+        association_fields: |
+          These fields map to other tables in the database, lookup via attribute selected below. For "many" associations, you may include multiple columns with the same header in the CSV file.
+        encoding: Choose file encoding. Leave empty to auto-detect. Ignored for JSON.
+        file_limit: 'Please limit upload file to %{limit} line items.'
+        model_fields: The fields above may be included in the import file.
+        update_if_exists: Update records found with the lookup field below instead of creating new records
+      import_error:
+        create: 'Failed to create %{name}: %{error}'
+        general: 'Error during import: %{error}'
+        line_item_limit: 'Please limit upload file to %{limit} line items.'
+        old_import_hook: |
+          The import hook %{model}.%{method} should take only 1 argument. Data may not imported correctly. See Upgrading section readme in Rails Admin Import.
+        update: 'Failed to update %{name}: %{error}'
+      import_success:
+        create: 'Created %{name}'
+        update: 'Updated %{name}'
+      invalid_format: Invalid import format.
+      invalid_json: 'The JSON data should be an array of records or an object with a key ''%{root_key}'' set to an array of records'
+      legend:
+        fields: Fields to import
+        mapping: Related fields mapping
+        upload: Upload file
+      mapping: mapping
+      missing_file: You must select a file
+      missing_update_lookup: Your file must contain a column for the 'Update lookup field' you selected.
+      model_fields: Model fields
+      update_if_exists: Update if exists
+      update_lookup: Update lookup field(s)
