@@ -17,7 +17,7 @@ group :mongoid do
   gem 'mongoid', '~> 6.0'
 end
 
-gem 'rails_admin', '~> 1.2'
+gem 'rails_admin', '~> 2.0'
 gem 'rails_admin_import', path: '../../'
 
 gem 'sass-rails', '~> 5.0'
