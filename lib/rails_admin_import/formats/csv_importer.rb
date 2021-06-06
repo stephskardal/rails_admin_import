@@ -17,7 +17,7 @@ module RailsAdminImport
 
       # A method that yields a hash of attributes for each record to import
       def each_record
-        CSV.foreach(filename, csv_options) do |row|
+        CSV.foreach(filename, **csv_options) do |row|
           attr = convert_to_attributes(row)
           yield attr unless attr.all? { |field, value| value.blank? }
         end
