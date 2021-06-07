@@ -26,7 +26,6 @@ RSpec.configure do |config|
     DatabaseCleaner.start
     RailsAdmin::Config.reset
     RailsAdmin::AbstractModel.reset
-    RailsAdmin::Config.yell_for_non_accessible_fields = false
     RailsAdminImport.reset
 
     RailsAdmin.config do |config|
