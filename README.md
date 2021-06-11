@@ -26,8 +26,10 @@ RailsAdmin.config do |config|
 
   # Optional:
   # Configure global RailsAdminImport options
+  # Configure pass filename to records hashes
   config.configure_with(:import) do |config|
     config.logging = true
+    config.pass_filename = true
   end
 
   # Optional:
@@ -197,6 +199,7 @@ RailsAdmin.config do |config|
     config.logging = false
     config.line_item_limit = 1000
     config.update_if_exists = false
+    config.pass_filename = false
     config.rollback_on_error = false
     config.header_converter = lambda do |header|
       header.parameterize.underscore if header.present?
@@ -217,6 +220,7 @@ end
 * __header_converter__ (default `lambda { ... }`): a lambda to convert each CSV header text string to a model attribute name. The default header converter converts to lowercase and replaces spaces with underscores.
 
 * __csv_options__ (default `{}`): a hash of options that will be passed to a new [CSV](http://ruby-doc.org/stdlib-2.0.0/libdoc/csv/rdoc/CSV.html) instance
+* __pass_filename__ (default `false`): Access the uploaded file name in your model actions, for example if set to true, inside each record, there will be an addtional property `record[:filename_importer]` which contains the file name of the currently uploaded file.
 
 ### Model-specific configuration
 
