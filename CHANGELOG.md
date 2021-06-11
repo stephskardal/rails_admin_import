@@ -1,5 +1,25 @@
 # Change Log
 
+# 2.3.0 / 2021-06-11
+
+- Added an option to pass filename for each record. Thanks @waheedi
+- Enumeration translation. Thanks @zaknafain
+
+# 2.2.0 / 2019-02-24
+
+- Switch to using CharlockHolmes for character detection. Thanks @codealchemy
+- Readme improvements. Thanks @olleolleolle
+
+# 2.1.0 / 2017-11-18
+
+- French translation. Thanks @rodinux
+- Check for blank headers. Thanks @JuandGirald
+- Italian translation. Thanks @aprofiti
+- Remove haml dependency. Thanks @prem-prakash
+- Japanese translation. Thanks @higumachan
+- Multiple mapping keys. Thanks @dmitrypol
+- Add more hooks during import
+
 # 2.0.0 / 2016-05-04
 
 - Pull in the encoding list from the Encoding module instead of RailsAdmin. Thanks @baldursson, @patricklewis and @lucasff
