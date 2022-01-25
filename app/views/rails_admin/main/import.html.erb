@@ -1,0 +1,102 @@
+<%
+  translations = {
+    add: t('admin.import.enumeration.add'),
+    chooseAll: t('admin.import.enumeration.choose_all'),
+    clearAll: t('admin.import.enumeration.clear_all'),
+    down: t('admin.import.enumeration.down'),
+    remove: t('admin.import.enumeration.remove'),
+    search: t('admin.import.enumeration.search'),
+    up: t('admin.import.enumeration.up')
+  }
+%>
+
+<%= render "results" %>
+<%= form_tag import_path(@abstract_model), :multipart => true, class: 'form-horizontal denser' do %>
+  <input name="send_data" type="hidden" value="true">/</input>
+  <fieldset>
+    <legend>
+      <i class="icon-chevron-down"></i>
+      <%= t('admin.import.legend.fields') %>
+    </legend>
+    <%= render "section", section: "model_fields", fields: @import_model.model_fields %>
+    <%= render "section", section: "association_fields", fields: @import_model.association_fields %>
+  </fieldset>
+  <fieldset>
+    <legend>
+      <i class="icon-chevron-down"></i>
+      <%= t('admin.import.legend.upload') %>
+    </legend>
+    <div class="form-group control-group">
+      <label class="col-sm-2 control-label" for="file">
+        <%= t("admin.import.file") %>
+      </label>
+      <div class="col-sm-10 controls">
+        <%= file_field_tag :file, :class => "form-control" %>
+        <p class="help-block">
+          <%= t('admin.import.help.file_limit', limit: RailsAdminImport.config.line_item_limit) %>
+        </p>
+      </div>
+    </div>
+    <div class="form-group control-group">
+      <label class="col-sm-2 control-label" for="encoding">
+        <%= t("admin.import.encoding") %>
+      </label>
+      <div class="col-sm-10 controls">
+        <%= select_tag 'encoding', options_for_select(Encoding.name_list.sort), include_blank: true, data: { enumeration: true, options: { regional: translations } } %>
+        <p class="help-block">
+          <%= t('admin.import.help.encoding', name: 'UTF-8') %>
+        </p>
+      </div>
+    </div>
+    <div class="form-group control-group">
+      <label class="col-sm-2 control-label">
+        <%= t("admin.import.update_if_exists") %>
+      </label>
+      <div class="col-sm-10 controls">
+        <%= check_box_tag :update_if_exists, '1', RailsAdminImport.config.update_if_exists, :class => "form-control" %>
+        <p class="help-block">
+          <%= t('admin.import.help.update_if_exists') %>
+        </p>
+      </div>
+    </div>
+    <div class="form-group control-group">
+      <label class="col-sm-2 control-label" for="update_lookup">
+        <%= t("admin.import.update_lookup") %>
+      </label>
+      <div class="col-sm-10 controls">
+        <%= select_tag 'update_lookup', options_for_select(@import_model.update_lookup_field_names), multiple: true, data: { enumeration: true, options: { regional: translations } } %>
+      </div>
+    </div>
+  </fieldset>
+  <% unless @import_model.association_fields.empty? %>
+    <fieldset>
+      <legend>
+        <i class="icon-chevron-down"></i>
+        <%= t('admin.import.legend.mapping') %>
+      </legend>
+      <% @import_model.association_fields.each do |field| %>
+        <div class="form-group control-group">
+          <label class="col-sm-2 control-label">
+            <%= capitalize_first_letter(field.label) %>
+            <%= t("admin.import.mapping") %>
+          </label>
+          <div class="col-sm-10 controls">
+            <%= select_tag "associations[#{field.name}]", options_for_select(@import_model.associated_model_fields(field)), data: { enumeration: true, options: { regional: translations } } %>
+          </div>
+        </div>
+      <% end %>
+    </fieldset>
+  <% end %>
+  <br/>
+  <div class="form-actions">
+    <input name="return_to" type="<%= :hidden %>" value="<%= (request.params[:return_to].presence || request.referer) %>"></input>
+    <button class="btn btn-primary" data_disable_with="Uploading..." name="commit" type="submit">
+      <i class="icon-white icon-ok"></i>
+      <%= t("admin.form.save") %>
+    </button>
+    <button class="btn" name="_continue" type="submit">
+      <i class="icon-remove"></i>
+      <%= t("admin.form.cancel") %>
+    </button>
+  </div>
+<% end %>
