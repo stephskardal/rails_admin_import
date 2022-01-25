@@ -77,7 +77,7 @@
       <% @import_model.association_fields.each do |field| %>
         <div class="form-group control-group">
           <label class="col-sm-2 control-label">
-            <%= capitalize_first_letter(field.label) %>
+            <%= field.label %>
             <%= t("admin.import.mapping") %>
           </label>
           <div class="col-sm-10 controls">
