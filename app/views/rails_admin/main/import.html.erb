@@ -15,7 +15,7 @@
   <input name="send_data" type="hidden" value="true">/</input>
   <fieldset>
     <legend>
-      <i class="fa-chevron-down"></i>
+      <i class="fas fa-chevron-down"></i>
       <%= t('admin.import.legend.fields') %>
     </legend>
     <%= render "section", section: "model_fields", fields: @import_model.model_fields %>
@@ -23,7 +23,7 @@
   </fieldset>
   <fieldset>
     <legend>
-      <i class="fa-chevron-down"></i>
+      <i class="fas fa-chevron-down"></i>
       <%= t('admin.import.legend.upload') %>
     </legend>
     <div class="form-group control-group">
@@ -71,7 +71,7 @@
   <% unless @import_model.association_fields.empty? %>
     <fieldset>
       <legend>
-        <i class="fa-chevron-down"></i>
+        <i class="fas fa-chevron-down"></i>
         <%= t('admin.import.legend.mapping') %>
       </legend>
       <% @import_model.association_fields.each do |field| %>
