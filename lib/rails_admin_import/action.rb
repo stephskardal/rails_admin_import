@@ -38,7 +38,7 @@ module RailsAdmin
         end
 
         register_instance_option :link_icon do
-          "icon-folder-open"
+          "fas fa-folder-open"
         end
       end
     end
