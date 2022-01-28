@@ -64,7 +64,7 @@
         <%= t("admin.import.update_lookup") %>
       </label>
       <div class="col-sm-10 controls">
-        <%= select_tag 'update_lookup', options_for_select(@import_model.update_lookup_field_names), multiple: true, data: { enumeration: true, options: { regional: translations } } %>
+        <%= select_tag 'update_lookup', options_for_select(@import_model.update_lookup_field_names, Array.wrap(@import_model.config.mapping_key).map(&:to_s)), multiple: true, data: { enumeration: true, options: { regional: translations } } %>
       </div>
     </div>
   </fieldset>
@@ -81,7 +81,7 @@
             <%= t("admin.import.mapping") %>
           </label>
           <div class="col-sm-10 controls">
-            <%= select_tag "associations[#{field.name}]", options_for_select(@import_model.associated_model_fields(field)), data: { enumeration: true, options: { regional: translations } } %>
+            <%= select_tag "associations[#{field.name}]", options_for_select(@import_model.associated_model_fields(field), Array.wrap(@import_model.associated_config(field).mapping_key).first.to_s), data: { enumeration: true, options: { regional: translations } } %>
           </div>
         </div>
       <% end %>
