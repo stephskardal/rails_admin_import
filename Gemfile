@@ -2,7 +2,7 @@ source "http://rubygems.org"
 
 # CI dependencies
 gem 'rails', '~> 6.1'
-gem 'rails_admin', '~> 2.2'
+gem 'rails_admin', '~> 3.0.0.beta2'
 
 case ENV['CI_ORM']
 when 'mongoid'

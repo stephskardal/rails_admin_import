@@ -4,6 +4,12 @@
 
 Plugin functionality to add generic import to Rails Admin from CSV, JSON and XLSX files
 
+## Versions
+
+Rails Admin Import 3.x is compatible with Rails Admin 3.x.
+
+If you're still using Rails Admin 2.x, use Rails Admin Import 2.3.1
+
 ## Installation
 
 * First, add to Gemfile:
