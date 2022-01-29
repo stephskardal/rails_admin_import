@@ -414,16 +414,22 @@ Another suggestion is to set `config.cache_classes = true` to true in your `deve
 
 ## Customize the UI
 
-If you want to hide all the advanced fields from the import UI, you can copy [`app/views/rails_admin/main/import.html.haml`](app/views/rails_admin/main/import.html.haml) to your project at the same path. Add `.hidden` at the end of lines you want to hide.
+If you want to hide all the advanced fields from the import UI, you can copy [`app/views/rails_admin/main/import.html.haml`](app/views/rails_admin/main/import.html.erb) to your project at the same path. Add `hidden` class to elements you want to hide.
 
 For example:
 
-```haml
-    .form-group.control-group.hidden
-      %label.col-sm-2.control-label= t("admin.import.update_if_exists")
-      .col-sm-10.controls
-        = check_box_tag :update_if_exists, '1', true, :class => "form-control"
-        %p.help-block= t('admin.import.help.update_if_exists')
+```erb
+    <div class="form-group control-group hidden">
+      <label class="col-sm-2 control-label">
+        <%= t("admin.import.update_if_exists") %>
+      </label>
+      <div class="col-sm-10 controls">
+        <%= check_box_tag :update_if_exists, '1', RailsAdminImport.config.update_if_exists, :class => "form-control" %>
+        <p class="help-block">
+          <%= t('admin.import.help.update_if_exists') %>
+        </p>
+      </div>
+    </div>
 ```
 
 ## Upgrading
