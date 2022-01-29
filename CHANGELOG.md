@@ -1,5 +1,10 @@
 # Change Log
 
+# 2.3.1 / 2022-01-29
+
+- Mark compatibility to Rails Admin < 3.0
+- Bump Nokogiri in tests
+
 # 2.3.0 / 2021-06-11
 
 - Added an option to pass filename for each record. Thanks @waheedi
