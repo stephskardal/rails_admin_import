@@ -1,6 +1,6 @@
 # Rails Admin Import
 
-[![Build Status](https://github.com/monkbroc/rails_admin_import/actions/workflows/ruby.yml/badge.svg)](https://github.com/monkbroc/rails_admin_import/actions/workflows/ruby.yml)
+[![Build Status](https://github.com/stephskardal/rails_admin_import/actions/workflows/ruby.yml/badge.svg)](https://github.com/stephskardal/rails_admin_import/actions/workflows/ruby.yml)
 
 Plugin functionality to add generic import to Rails Admin from CSV, JSON and XLSX files
 
