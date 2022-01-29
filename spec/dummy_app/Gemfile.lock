@@ -1,7 +1,7 @@
 PATH
   remote: ../..
   specs:
-    rails_admin_import (2.3.1)
+    rails_admin_import (3.0.0)
       charlock_holmes (~> 0.7)
       rails (>= 3.2)
       rails_admin (>= 3.0.0.beta)

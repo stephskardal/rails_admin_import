@@ -15,7 +15,7 @@ If you're still using Rails Admin 2.x, use Rails Admin Import 2.3.1
 * First, add to Gemfile:
 
 ```ruby
-gem "rails_admin_import", "~> 2.3"
+gem "rails_admin_import", "~> 3.0"
 ```
 
 * Define configuration in `config/initializers/rails_admin_import.rb`:
@@ -401,7 +401,7 @@ Since the import functionality is rarely used in many applications, some gems ar
 If you prefer to eager load all dependecies at boot, use this line in your `Gemfile`.
 
 ```ruby
-gem "rails_admin_import", "~> 1.2.0", require: "rails_admin_import/eager_load"
+gem "rails_admin_import", "~> 3.0", require: "rails_admin_import/eager_load"
 ```
 
 ## Import error due to Rails class reloading
