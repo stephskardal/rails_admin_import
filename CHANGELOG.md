@@ -1,5 +1,9 @@
 # Change Log
 
+# 3.0.0 / 2022-01-29
+
+- BREAKING CHANGE: Templates are now compatible with Rails Admin 3.x. For Rails Admin 2.x, continue using version 2.3.1. Thanks @Wowu
+
 # 2.3.1 / 2022-01-29
 
 - Mark compatibility to Rails Admin < 3.0
