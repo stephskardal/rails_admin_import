@@ -1,0 +1,21 @@
+<% if fields.any? %>
+  <div class="form-group control-group">
+    <label class="col-sm-2 control-label">
+      <%= t("admin.import.#{section}") %>
+    </label>
+    <div class="col-sm-10 controls">
+      <ul class="list-unstyled">
+        <% fields.each do |field| %>
+          <li>
+            <label>
+              <%= field.label %>
+            </label>
+          </li>
+        <% end %>
+      </ul>
+      <p class="help-block">
+        <%= t("admin.import.help.#{section}") %>
+      </p>
+    </div>
+  </div>
+<% end %>

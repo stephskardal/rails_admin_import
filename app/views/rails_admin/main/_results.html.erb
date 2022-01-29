@@ -1,0 +1,35 @@
+<% if @results && @results[:success].any? %>
+  <div class="alert alert-success form-horizontal denser">
+    <fieldset>
+      <legend>
+        <i class="fas fa-chevron-right"></i>
+        <%= @results[:success_message] %>
+      </legend>
+      <ul class="control-group" style="display: none">
+        <% @results[:success].each do |message| %>
+          <li>
+            <%= message %>
+          </li>
+        <% end %>
+      </ul>
+    </fieldset>
+  </div>
+<% end %>
+
+<% if @results && @results[:error].any? %>
+  <div class="alert alert-danger form-horizontal denser">
+    <fieldset>
+      <legend>
+        <i class="fas fa-chevron-down"></i>
+        <%= @results[:error_message] %>
+      </legend>
+      <ul class="control-group">
+        <% @results[:error].each do |message| %>
+          <li>
+            <%= message %>
+          </li>
+        <% end %>
+      </ul>
+    </fieldset>
+  </div>
+<% end %>
