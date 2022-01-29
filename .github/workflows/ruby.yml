@@ -62,6 +62,13 @@ jobs:
           db_adapter=$(echo ${{ matrix.db }} | cut -f2 -d:)
           echo "::set-output name=orm::$orm"
           echo "::set-output name=db_adapter::$db_adapter"
+      # Fix for libstdc++ cannot allocate memory in static TLS block
+      # https://github.com/actions/virtual-environments/issues/4799
+      - name: GA fixes
+        run: |
+          sudo apt-get update
+          sudo apt-get remove mysql* && sudo apt-get install -y mysql-server libmysqlclient-dev
+          
       - name: Install dependencies
         run: |
           gem install bundler -v 2.2.19
