@@ -205,10 +205,10 @@ module RailsAdminImport
 
       if object.nil?
         object = model.new
-        perform_model_callback(object, :before_import_attributes, record)
+        perform_model_callback(object, :before_import_attributes, new_attrs)
         object.attributes = new_attrs
       else
-        perform_model_callback(object, :before_import_attributes, record)
+        perform_model_callback(object, :before_import_attributes, new_attrs)
         object.attributes = new_attrs.except(update.map(&:to_sym))
       end
       object
