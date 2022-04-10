@@ -66,7 +66,7 @@ module RailsAdminImport
       if @config.mapping_key_list.present?
         @update_lookup_field_names = @config.mapping_key_list
       else
-        @update_lookup_field_names ||= model_fields.map(&:name) + belongs_to_fields.map(&:foreign_key)
+        @update_lookup_field_names ||= model_fields.map(&:name) + belongs_to_fields.map(&:associated_primary_key)
       end
     end
 
