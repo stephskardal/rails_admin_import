@@ -85,7 +85,7 @@ jobs:
           CI_DB_ADAPTER: ${{ steps.setup-orm.outputs.db_adapter }}
 
       - name: Run tests
-        run: bundle exec rake
+        run: bundle exec rake test
         env:
           RAILS_ENV: test
           CI_ORM: ${{ steps.setup-orm.outputs.orm }}
