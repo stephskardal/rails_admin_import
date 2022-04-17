@@ -29,6 +29,7 @@ RSpec.configure do |config|
     RailsAdminImport.reset
 
     RailsAdmin.config do |config|
+      config.asset_source = :sprockets
       config.actions do
         dashboard
         index
