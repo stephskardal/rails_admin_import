@@ -3,6 +3,7 @@ source "http://rubygems.org"
 # CI dependencies
 gem 'rails', '~> 6.1'
 gem 'rails_admin', '~> 3.0.0'
+gem 'sassc-rails'
 
 case ENV['CI_ORM']
 when 'mongoid'
@@ -18,8 +19,6 @@ else
     gem 'sqlite3', '~> 1.4.2'
   end
 end
-
-gem 'sassc-rails'
 
 group :test do
   gem 'rspec', '~> 3.10'
