@@ -24,7 +24,8 @@ group :test do
   gem 'rspec', '~> 3.10'
   gem 'rspec-rails', '~> 5.0'
   gem 'factory_bot_rails', '~> 6.2'
-  gem 'database_cleaner'
+  gem 'database_cleaner-active_record', require: false
+  gem 'database_cleaner-mongoid', require: false
 end
 
 gem 'rubygems-tasks'
