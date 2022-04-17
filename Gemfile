@@ -7,6 +7,7 @@ gem 'rails_admin', '~> 3.0.0'
 case ENV['CI_ORM']
 when 'mongoid'
   gem 'mongoid', '~> 7.3'
+  gem 'kaminari-mongoid'
 else
   case ENV['CI_DB_ADAPTER']
   when 'mysql2'

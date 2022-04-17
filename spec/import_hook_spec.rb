@@ -57,7 +57,7 @@ describe "Import hook", :type => :request do
       }
 
       expect(response.body).not_to include "failed"
-      expect(Company.find_by_name("No employees").employees.count).to eq 0
+      expect(Company.find_by(name: "No employees").employees.count).to eq 0
     end
   end
 

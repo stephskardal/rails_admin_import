@@ -21,15 +21,15 @@ class Company
 
   # Global hooks
   def self.callback_log
-    @callbacks
+    @callbacks ||= []
   end
   def self.reset_callback_log
     @callbacks = []
   end
   def self.before_import
-    @callbacks << :before_import
+    callback_log << :before_import
   end
   def self.after_import
-    @callbacks << :after_import
+    callback_log << :after_import
   end
 end
