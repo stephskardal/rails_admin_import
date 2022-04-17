@@ -55,6 +55,12 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: ${{ matrix.ruby_version }}
+      - uses: actions/cache@v2
+        with:
+          path: vendor/bundle
+          key: ${{ matrix.ruby_version}}-${{ matrix.db }}-gems-${{ hashFiles('**/Gemfile.lock') }}
+          restore-keys: |
+            ${{ matrix.ruby_version}}-${{ matrix.db }}-gems-
       - name: Set up ORM and DB adapter
         id: setup-orm
         run: |
@@ -71,6 +77,7 @@ jobs:
           
       - name: Install dependencies
         run: |
+          bundle config path vendor/bundle
           gem install bundler -v 2.2.19
           bundle install --jobs 4 --retry 3
           pushd spec/dummy_app
