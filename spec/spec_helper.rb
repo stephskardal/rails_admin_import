@@ -30,7 +30,9 @@ RSpec.configure do |config|
 
     RailsAdmin.config do |config|
       config.actions do
-        all
+        dashboard
+        index
+        new
         import
       end
     end
