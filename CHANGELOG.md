@@ -1,5 +1,17 @@
 # Change Log
 
+# 3.0.2 / 2022-04-17
+
+- Calculate the `new_attrs` after the `before_import_attributes` hook
+- Fix GitHub Actions CI
+- Bump Nokogiri in tests
+
+# 3.0.1 / 2022-04-10
+
+- pass `new_attrs` instead of record to `before_import_attributes` hook. Thanks @Wowu
+- Use `associated_primary_key` for models with associations (compat fix for Rails Admin 3.x)
+- Bump Nokogiri in tests
+
 # 3.0.0 / 2022-01-29
 
 - BREAKING CHANGE: Templates are now compatible with Rails Admin 3.x. For Rails Admin 2.x, continue using version 2.3.1. Thanks @Wowu
