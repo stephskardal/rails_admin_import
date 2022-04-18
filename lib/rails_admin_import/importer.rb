@@ -190,11 +190,6 @@ module RailsAdminImport
     end
 
     def find_or_create_object(record, update)
-      field_names = import_model.model_fields.map(&:name)
-      new_attrs = record.select do |field_name, value|
-        field_names.include?(field_name) && !value.blank?
-      end
-
       model = import_model.model
       object = if update.present?
                  query = update.each_with_object({}) do
@@ -205,10 +200,18 @@ module RailsAdminImport
 
       if object.nil?
         object = model.new
-        perform_model_callback(object, :before_import_attributes, new_attrs)
+      end
+
+      perform_model_callback(object, :before_import_attributes, record)
+
+      field_names = import_model.model_fields.map(&:name)
+      new_attrs = record.select do |field_name, value|
+        field_names.include?(field_name) && !value.blank?
+      end
+
+      if object.new_record?
         object.attributes = new_attrs
       else
-        perform_model_callback(object, :before_import_attributes, new_attrs)
         object.attributes = new_attrs.except(update.map(&:to_sym))
       end
       object

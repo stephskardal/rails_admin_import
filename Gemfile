@@ -2,11 +2,13 @@ source "http://rubygems.org"
 
 # CI dependencies
 gem 'rails', '~> 6.1'
-gem 'rails_admin', '~> 3.0.0.beta2'
+gem 'rails_admin', '~> 3.0.0'
+gem 'sassc-rails'
 
 case ENV['CI_ORM']
 when 'mongoid'
   gem 'mongoid', '~> 7.3'
+  gem 'kaminari-mongoid'
 else
   case ENV['CI_DB_ADAPTER']
   when 'mysql2'
@@ -22,7 +24,8 @@ group :test do
   gem 'rspec', '~> 3.10'
   gem 'rspec-rails', '~> 5.0'
   gem 'factory_bot_rails', '~> 6.2'
-  gem 'database_cleaner'
+  gem 'database_cleaner-active_record', require: false
+  gem 'database_cleaner-mongoid', require: false
 end
 
 gem 'rubygems-tasks'

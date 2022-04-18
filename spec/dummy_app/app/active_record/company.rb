@@ -5,7 +5,7 @@ class Company < ActiveRecord::Base
     throw :skip if record[:name] == "skip"
   end
 
-  def before_import_attributes(record)
+  def before_import_associations(record)
     record.delete(:employees) if record[:name] == "No employees"
   end
 

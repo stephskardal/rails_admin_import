@@ -5,6 +5,7 @@ CI_ORM = (ENV['CI_ORM'] || :active_record).to_sym
 require File.expand_path('../dummy_app/config/environment', __FILE__)
 
 require 'rspec/rails'
+require "database_cleaner/#{CI_ORM}"
 
 # Requires supporting ruby files with custom matchers and macros, etc,
 # in spec/support/ and its subdirectories.
@@ -20,7 +21,13 @@ RSpec.configure do |config|
   config.include ActionDispatch::TestProcess
   config.fixture_path = File.expand_path "../fixtures", __FILE__
 
-  DatabaseCleaner.strategy = :truncation
+  DatabaseCleaner.strategy =
+    if CI_ORM == :mongoid
+      :deletion
+    else
+      :transaction
+    end
+  
   config.before do
     
     DatabaseCleaner.start
@@ -29,8 +36,11 @@ RSpec.configure do |config|
     RailsAdminImport.reset
 
     RailsAdmin.config do |config|
+      config.asset_source = :sprockets
       config.actions do
-        all
+        dashboard
+        index
+        new
         import
       end
     end

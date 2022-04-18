@@ -55,6 +55,12 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: ${{ matrix.ruby_version }}
+      - uses: actions/cache@v2
+        with:
+          path: ~/vendor/bundle
+          key: ${{ matrix.ruby_version}}-${{ matrix.db }}-gems-${{ hashFiles('**/Gemfile', '**/Gemfile.lock') }}
+          restore-keys: |
+            ${{ matrix.ruby_version}}-${{ matrix.db }}-gems-
       - name: Set up ORM and DB adapter
         id: setup-orm
         run: |
@@ -62,18 +68,14 @@ jobs:
           db_adapter=$(echo ${{ matrix.db }} | cut -f2 -d:)
           echo "::set-output name=orm::$orm"
           echo "::set-output name=db_adapter::$db_adapter"
-      # Fix for libstdc++ cannot allocate memory in static TLS block
-      # https://github.com/actions/virtual-environments/issues/4799
-      - name: GA fixes
-        run: |
-          sudo apt-get update
-          sudo apt-get remove mysql* && sudo apt-get install -y mysql-server libmysqlclient-dev
           
       - name: Install dependencies
         run: |
+          bundle config path ~/vendor/bundle
           gem install bundler -v 2.2.19
           bundle install --jobs 4 --retry 3
           pushd spec/dummy_app
+          bundle config path ~/vendor/bundle
           bundle install --jobs 4 --retry 3
           # Piggyback of the Rails Admin CI rake task
           bundle exec rake rails_admin:prepare_ci_env
@@ -85,7 +87,7 @@ jobs:
           CI_DB_ADAPTER: ${{ steps.setup-orm.outputs.db_adapter }}
 
       - name: Run tests
-        run: bundle exec rake
+        run: bundle exec rake test
         env:
           RAILS_ENV: test
           CI_ORM: ${{ steps.setup-orm.outputs.orm }}

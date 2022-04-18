@@ -35,6 +35,17 @@ describe "Import hook", :type => :request do
   end
 
   describe "before_import_attributes" do
+    it "allows modifying attributes" do
+      file = fixture_file_upload("ball_grey.csv", "text/plain")
+      post "/admin/ball/import", params: {
+        file: file
+      }
+
+      expect(Ball.where(color: "gray").count).to eq 1
+    end
+  end
+
+  describe "before_import_associations" do
     it "allows modifying the import record" do
       # Add people from support/associations.rb to the database
       people = create_people
@@ -46,7 +57,7 @@ describe "Import hook", :type => :request do
       }
 
       expect(response.body).not_to include "failed"
-      expect(Company.find_by_name("No employees").employees.count).to eq 0
+      expect(Company.find_by(name: "No employees").employees.count).to eq 0
     end
   end
 
