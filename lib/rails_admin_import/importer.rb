@@ -206,7 +206,7 @@ module RailsAdminImport
 
       field_names = import_model.model_fields.map(&:name)
       new_attrs = record.select do |field_name, value|
-        field_names.include?(field_name) && !value.blank?
+        field_names.include?(field_name) && (!value.blank? || value == false)
       end
 
       if object.new_record?
