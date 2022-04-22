@@ -1,5 +1,9 @@
 # Change Log
 
+# 3.0.3 / 2022-04-22
+
+- Allow importing false values. Thanks @Wowu
+
 # 3.0.2 / 2022-04-17
 
 - Calculate the `new_attrs` after the `before_import_attributes` hook
