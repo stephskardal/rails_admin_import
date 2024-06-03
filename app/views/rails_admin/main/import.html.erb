@@ -11,7 +11,7 @@
 %>
 
 <%= render "results" %>
-<%= form_tag import_path(@abstract_model), :multipart => true, class: 'form-horizontal denser' do %>
+<%= form_tag import_path(@abstract_model), :multipart => true, class: 'form-horizontal denser', data: { turbo: false } do %>
   <input name="send_data" type="hidden" value="true">/</input>
   <fieldset>
     <legend>
