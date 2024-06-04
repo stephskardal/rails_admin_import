@@ -1,5 +1,9 @@
 # Change Log
 
+# 3.0.4 / 2024-06-04
+
+- Fix missing flash messages. Thanks @nanjakkun
+
 # 3.0.3 / 2022-04-22
 
 - Allow importing false values. Thanks @Wowu
